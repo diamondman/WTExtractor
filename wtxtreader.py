@@ -1,9 +1,13 @@
+#!/usr/bin/python3
 import datetime
 import sys
 import struct
 import collections
 import uuid
 import sys
+
+class WTFormatException(Exception):
+    pass
 
 def rev_offset(num, offset):
     tmp = num-offset
@@ -40,114 +44,96 @@ field_interpretation = [
     (4, int_decode, "EncodeType"),
 ]
 
-def main(inpath, outpath, showdetails=False):
-    inpath = os.path.expanduser(inpath)
-    f = open(inpath, "rb")
-    magic = f.read(4)
-    if magic != b"WLD3":
-        print("File does not have correct Magic. Exiting.", file=sys.stderr)
-        sys.exit(-1)
+def decompress_payload(enc_data, enc_key_table):
+    outdata = bytearray(len(enc_data))
+    subkey = 0
+    for i, inbyte in enumerate(enc_data):
+        outdata[i] = inbyte ^ subkey ^ enc_key_table[i%len(enc_key_table)]
+        subkey = inbyte
+    return outdata
 
-    headline = f.readline().decode()
-    base_type, magic_msg = headline.split(' ', 1)
-    if magic_msg != "WildTangent 3D 300 Compressed and Patented\r\n":
-        print("File does not have correct Magic Line. Exiting.", file=sys.stderr)
-        sys.exit(-2)
-
-    if f.read(20) != b'Converted by XtoWT: ':
-        print("File does not have correct Magic 2nd Line. Exiting.", file=sys.stderr)
-        sys.exit(-3)
-
-    datestr = f.readline().strip().decode()
-    datetime_object = datetime.datetime.strptime(datestr, '%a %b %d %H:%M:%S %Y')
-
-    emptyline = f.readline()
-    if emptyline != b'\r\n':
-        print("File Should have an empty line after date. Exiting.", file=sys.stderr)
-        sys.exit(-4)
-
-    commentfield = f.readline().decode().strip()
-
-    if f.readline().strip() != b'.START':
-        print("File missing .START section. Exiting.", file=sys.stderr)
-        sys.exit(-5)
-
-    fieldcount = rev_offset(ord(f.read(1)), 0xC5)
-    if fieldcount != 9:
-        print("Only know how to use files with 9 headers, not %s. Exiting."%fieldcount,
-              file=sys.stderr)
-        sys.exit(-6)
-    fieldlens = [rev_offset(ord(f.read(1)), 0x39 + (13*i)) for i in range(fieldcount)]
-    rawfields = [f.read(fieldlen) for fieldlen in fieldlens]
-
+def process_fields(rawfields):
     fields = collections.OrderedDict()
     for i, rawfield in enumerate(rawfields):
         size, func, name = field_interpretation[i]
         fields[name] = func(rawfield[:size] if size else rawfield)
+    return fields
 
-    max_field_len = max(fieldlens)
+def calc_hash_byte_TYPEDATA(rawfields):
+    max_field_len = max((len(f) for f in rawfields))
     enc_byte = 0
-    for i, rawfield in enumerate(rawfields):
+    for i, data in enumerate(rawfields):
         if max_field_len > 0:
             for j in range(max_field_len):
-                buff_len = len(rawfield)
-                if buff_len >= 1:
-                    c = rawfield[j % buff_len]
-                else:
-                    c = 0
-                enc_byte ^=  i + j + c * (j + 1)
-    enc_byte &= 0xFF
+                c = data[j % len(data)] if len(data) >= 1 else 0
+                enc_byte ^= i + j + c * (j + 1)
+    return enc_byte & 0xFF
 
-    enc_key_table = [enc_byte]*max_field_len
-    for i in range(max_field_len):
+def calc_enc_key_table_TYPEDATA(rawfields, enc_byte=None):
+    if enc_byte is None:
+        enc_byte = calc_hash_byte_TYPEDATA(rawfields)
+    enc_key_table = [enc_byte] * max((len(f) for f in rawfields))
+    for i in range(len(enc_key_table)):
         key = enc_key_table[i]
-
         chr_index = i + 7
         for field_i, field_val in enumerate(rawfields):
-            if ( len(field_val) >= 1 ):
-                element = field_val[chr_index % len(field_val)];
-            else:
-                element = 0;
-            key ^= element;
-            chr_index += 13;
-
+            key ^= field_val[chr_index % len(field_val)]\
+                   if ( len(field_val) >= 1 ) else 0
+            chr_index += 13
         enc_key_table[i] = key & 0xFF
+    return enc_key_table
 
+def main(f, showdetails=False):
+    magic = f.read(4)
+    if magic != b"WLD3":
+        raise WTFormatException("File does not have correct Magic. Exiting.", -1)
 
-    enc_data = f.read()
+    headline = f.readline().decode()
+    base_type, magic_msg = headline.split(' ', 1)
+    if magic_msg != "WildTangent 3D 300 Compressed and Patented\r\n":
+        raise WTFormatException("File does not have correct Magic Line. Exiting.", -2)
 
-    outdata = bytearray(len(enc_data))
-    subkey = 0
-    for i, inbyte in enumerate(enc_data):
-        outdata[i] = inbyte ^ subkey ^ enc_key_table[i%max_field_len]
-        subkey = inbyte
+    if f.read(20) != b'Converted by XtoWT: ':
+        raise WTFormatException(
+            "File does not have correct Magic 2nd Line. Exiting.", -3)
 
-    f.close()
+    datestr = f.readline().strip().decode()
+    header_createdate = datetime.datetime.strptime(datestr, '%a %b %d %H:%M:%S %Y')
+
+    if f.readline() != b'\r\n':
+        raise WTFormatException(
+            "File Should have an empty line after date. Exiting.", -4)
+
+    commentfield = f.readline().decode().strip()
+
+    if f.readline().strip() != b'.START':
+        raise WTFormatException("File missing .START section. Exiting.", -5)
+
+    fieldcount = rev_offset(ord(f.read(1)), 0xC5)
+    if fieldcount != 9:
+        raise WTFormatException(
+            "Only know how to use files with 9 headers, not %s. Exiting."%fieldcount, -6)
+    fieldlens = [rev_offset(ord(f.read(1)), 0x39 + (13*i)) for i in range(fieldcount)]
+    rawfields = [f.read(fieldlen) for fieldlen in fieldlens]
+
+    fields = process_fields(rawfields)
+    enc_key_table = calc_enc_key_table_TYPEDATA(rawfields)
+
+    outdata = decompress_payload(f.read(), enc_key_table)
 
     ############### DRAWING OUTPUT ###############
     if showdetails:
         print("FTYPE:    %s" % base_type, file=sys.stderr)
-        print("CREATED:  %s" % datetime_object, file=sys.stderr)
+        print("CREATED:  %s" % header_createdate, file=sys.stderr)
         print("COMMENT:  %s" % commentfield, file=sys.stderr)
         print("FieldCnt: %s" % fieldcount, file=sys.stderr)
-        print("MaxFieldLen: %s"%max_field_len, file=sys.stderr)
-        #print("ENCKEYT:  %s"%\
-        #      (", ".join([hex(a)for a in enc_key_table])), file=sys.stderr)
 
         max_name_len = max((len(fi[2]) for fi in field_interpretation))
         for k, v in fields.items():
             print(("  {:<%s}: {}" % max_name_len).format(k,repr(v)),
                   file=sys.stderr)
 
-    ############### WRITE FILE ###############
-    if outpath is None:
-        sys.stdout.buffer.write(outdata)
-    else:
-        with open(os.path.expanduser(outpath), 'wb') as fout:
-            fout.write(outdata)
-
-    if showdetails:
-        print("File Successfully written.", file=sys.stderr)
+    return outdata
 
 if __name__ == "__main__":
     import os
@@ -159,7 +145,25 @@ if __name__ == "__main__":
     parser.add_argument('inpath', type=str, help='File Path of Compressed file')
     parser.add_argument('outpath', type=str, default=None, nargs='?',
                         help='Filepath to put output. Defaults to stdout.')
+    parser.add_argument('-q', dest='quiet', action="store_true",
+                        help='Supress file information output.')
 
     args = parser.parse_args()
 
-    main(args.inpath, args.outpath, showdetails=True)
+    inpath = os.path.expanduser(args.inpath)
+    try:
+        with open(inpath, "rb") as f:
+            unencoded_data = main(f, showdetails=not args.quiet)
+    except WTFormatException as e:
+        msg, code = e.args
+        print(msg, file=sys.stderr)
+        sys.exit(code)
+
+    if args.outpath is None:
+        sys.stdout.buffer.write(unencoded_data)
+    else:
+        with open(os.path.expanduser(args.outpath), 'wb') as fout:
+            fout.write(unencoded_data)
+
+    if not args.quiet:
+        print("File Successfully written.", file=sys.stderr)
