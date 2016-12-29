@@ -44,14 +44,6 @@ field_interpretation = [
     (4, int_decode, "EncodeType"),
 ]
 
-def decompress_payload(enc_data, enc_key_table, starti=0, subkey=0):
-    outdata = bytearray(len(enc_data))
-    for i, inbyte in enumerate(enc_data):
-        outdata[i] = inbyte ^ subkey ^\
-                     enc_key_table[(i+starti)%len(enc_key_table)]
-        subkey = inbyte
-    return outdata
-
 def process_fields(rawfields):
     fields = collections.OrderedDict()
     for i, rawfield in enumerate(rawfields):
@@ -65,34 +57,46 @@ class Decoder(object):
         self._last_crypt_byte = 0
         self._f = f
 
-    def decode(self, table):
-        inbyte = self._f.read(1)[0]
+    def _readb(self):
+        return self._f.read(1)[0]
+
+    def _readintcrypt(self, table):
+        return int_decode(bytes((self.decode(table) for i in range(4))))
+
+    def _read_str_crypt(self, table, cnt):
+        return bytes((self.decode(table) for i in range(cnt))).decode()
+
+    def decode(self, table, inbyte=None):
+        if inbyte is None:
+            inbyte = self._readb()
         res = inbyte ^ self._last_crypt_byte ^\
               table[self._index%len(table)]
         self._index += 1
         self._last_crypt_byte = inbyte
         return res
 
+    def decode_payload(self, enc_key_table):
+        enc_data = self._f.read()
+        return bytearray((
+            self.decode(enc_key_table, inbyte) for inbyte in enc_data))
+
     def decode_urls(self, rawfields):
         media_enc_table = calc_enc_key_table_TYPEMEDIA(rawfields)
 
         urls = {}
-
         while True:
             urltype = self.decode(media_enc_table)
-            url_len = int_decode(bytes((self.decode(media_enc_table) for i in range(4))))
-            always300_0 = int_decode(bytes((self.decode(media_enc_table)
-                                            for i in range(4))))
-            always300_1 = int_decode(bytes((self.decode(media_enc_table)
-                                            for i in range(4))))
+            url_len = self._readintcrypt(media_enc_table)
+            always300_0 = self._readintcrypt(media_enc_table)
+            always300_1 = self._readintcrypt(media_enc_table)
             if url_len == 0 and urltype == 0:
                 break
 
-            urlbody = bytes((self.decode(media_enc_table)
-                             for i in range(url_len))).decode()
+            urlbody = self._read_str_crypt(media_enc_table, url_len)
             urls.setdefault(urltype, []).append(urlbody)
 
         return urls
+
 
 def calc_hash_byte_TYPEDATA(rawfields):
     max_field_len = max((len(f) for f in rawfields))
@@ -152,6 +156,8 @@ def main(f, showdetails=False):
         raise WTFormatException(
             "File Should have an empty line after date. Exiting.", -4)
 
+    decoder = Decoder(f)
+
     commentfield = f.readline().decode().strip()
 
     if f.readline().strip() != b'.START':
@@ -166,14 +172,11 @@ def main(f, showdetails=False):
 
     fields = process_fields(rawfields)
 
-    decoder = Decoder(f)
-
     urls = decoder.decode_urls(rawfields) if fields.get("EncodeType", 0)>=300 else {}
 
     enc_key_table = calc_enc_key_table_TYPEDATA(rawfields)
 
-    outdata = decompress_payload(f.read(), enc_key_table,
-                                 decoder._index, decoder._last_crypt_byte)
+    outdata = decoder.decode_payload(enc_key_table)
 
     ############### DRAWING OUTPUT ###############
     if showdetails:
