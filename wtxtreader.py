@@ -44,11 +44,11 @@ field_interpretation = [
     (4, int_decode, "EncodeType"),
 ]
 
-def decompress_payload(enc_data, enc_key_table):
+def decompress_payload(enc_data, enc_key_table, starti=0, subkey=0):
     outdata = bytearray(len(enc_data))
-    subkey = 0
     for i, inbyte in enumerate(enc_data):
-        outdata[i] = inbyte ^ subkey ^ enc_key_table[i%len(enc_key_table)]
+        outdata[i] = inbyte ^ subkey ^\
+                     enc_key_table[(i+starti)%len(enc_key_table)]
         subkey = inbyte
     return outdata
 
@@ -58,6 +58,41 @@ def process_fields(rawfields):
         size, func, name = field_interpretation[i]
         fields[name] = func(rawfield[:size] if size else rawfield)
     return fields
+
+class Decoder(object):
+    def __init__(self, f):
+        self._index = 0
+        self._last_crypt_byte = 0
+        self._f = f
+
+    def decode(self, table):
+        inbyte = self._f.read(1)[0]
+        res = inbyte ^ self._last_crypt_byte ^\
+              table[self._index%len(table)]
+        self._index += 1
+        self._last_crypt_byte = inbyte
+        return res
+
+    def decode_urls(self, rawfields):
+        media_enc_table = calc_enc_key_table_TYPEMEDIA(rawfields)
+
+        urls = {}
+
+        while True:
+            urltype = self.decode(media_enc_table)
+            url_len = int_decode(bytes((self.decode(media_enc_table) for i in range(4))))
+            always300_0 = int_decode(bytes((self.decode(media_enc_table)
+                                            for i in range(4))))
+            always300_1 = int_decode(bytes((self.decode(media_enc_table)
+                                            for i in range(4))))
+            if url_len == 0 and urltype == 0:
+                break
+
+            urlbody = bytes((self.decode(media_enc_table)
+                             for i in range(url_len))).decode()
+            urls.setdefault(urltype, []).append(urlbody)
+
+        return urls
 
 def calc_hash_byte_TYPEDATA(rawfields):
     max_field_len = max((len(f) for f in rawfields))
@@ -76,10 +111,23 @@ def calc_enc_key_table_TYPEDATA(rawfields, enc_byte=None):
     for i in range(len(enc_key_table)):
         key = enc_key_table[i]
         chr_index = i + 7
-        for field_i, field_val in enumerate(rawfields):
-            key ^= field_val[chr_index % len(field_val)]\
-                   if ( len(field_val) >= 1 ) else 0
+        for field in rawfields:
+            key ^= field[chr_index % len(field)]\
+                   if ( len(field) >= 1 ) else 0
             chr_index += 13
+        enc_key_table[i] = key & 0xFF
+    return enc_key_table
+
+def calc_enc_key_table_TYPEMEDIA(rawfields, enc_byte=None):
+    if enc_byte is None:
+        enc_byte = calc_hash_byte_TYPEDATA(rawfields)
+    enc_key_table = [enc_byte] * max((len(f) for f in rawfields))
+
+    for i in range(len(enc_key_table)):
+        key = enc_key_table[i]
+        for j, field in enumerate(rawfields):
+            key ^= field[(j + i) % len(field)]\
+                   if ( len(field) >= 1 ) else 0
         enc_key_table[i] = key & 0xFF
     return enc_key_table
 
@@ -117,9 +165,15 @@ def main(f, showdetails=False):
     rawfields = [f.read(fieldlen) for fieldlen in fieldlens]
 
     fields = process_fields(rawfields)
+
+    decoder = Decoder(f)
+
+    urls = decoder.decode_urls(rawfields) if fields.get("EncodeType", 0)>=300 else {}
+
     enc_key_table = calc_enc_key_table_TYPEDATA(rawfields)
 
-    outdata = decompress_payload(f.read(), enc_key_table)
+    outdata = decompress_payload(f.read(), enc_key_table,
+                                 decoder._index, decoder._last_crypt_byte)
 
     ############### DRAWING OUTPUT ###############
     if showdetails:
@@ -127,18 +181,24 @@ def main(f, showdetails=False):
         print("CREATED:  %s" % header_createdate, file=sys.stderr)
         print("COMMENT:  %s" % commentfield, file=sys.stderr)
         print("FieldCnt: %s" % fieldcount, file=sys.stderr)
-
         max_name_len = max((len(fi[2]) for fi in field_interpretation))
         for k, v in fields.items():
             print(("  {:<%s}: {}" % max_name_len).format(k,repr(v)),
                   file=sys.stderr)
+
+        if urls:
+            print("URLS:", file=sys.stderr)
+            for k,v in urls.items():
+                print("  TYPE %s" % k, file=sys.stderr)
+                for url in v:
+                    print("    %s" % url, file=sys.stderr)
 
     return outdata
 
 if __name__ == "__main__":
     import os
     import argparse
-    import pyunpack
+    #import pyunpack
 
     parser = argparse.ArgumentParser(
         description='Decrypt WildTangent WebDriver Compressed Files.')
