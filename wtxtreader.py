@@ -44,29 +44,28 @@ field_interpretation = [
     (4, int_decode, "EncodeType"),
 ]
 
-def process_fields(rawfields):
-    fields = collections.OrderedDict()
-    for i, rawfield in enumerate(rawfields):
-        size, func, name = field_interpretation[i]
-        fields[name] = func(rawfield[:size] if size else rawfield)
-    return fields
-
-class Decoder(object):
+class WTDecoder(object):
     def __init__(self, f):
         self._index = 0
         self._last_crypt_byte = 0
         self._f = f
 
+    def _read(self, *args, **kwargs):
+        return self._f.read(*args, **kwargs)
+
+    def _readline(self, *args, **kwargs):
+        return self._f.readline(*args, **kwargs)
+
     def _readb(self):
-        return self._f.read(1)[0]
+        return self._read(1)[0]
 
     def _readintcrypt(self, table):
-        return int_decode(bytes((self.decode(table) for i in range(4))))
+        return int_decode(bytes((self.decodeByte(table) for i in range(4))))
 
     def _read_str_crypt(self, table, cnt):
-        return bytes((self.decode(table) for i in range(cnt))).decode()
+        return bytes((self.decodeByte(table) for i in range(cnt))).decode()
 
-    def decode(self, table, inbyte=None):
+    def decodeByte(self, table, inbyte=None):
         if inbyte is None:
             inbyte = self._readb()
         res = inbyte ^ self._last_crypt_byte ^\
@@ -76,16 +75,17 @@ class Decoder(object):
         return res
 
     def decode_payload(self, enc_key_table):
-        enc_data = self._f.read()
         return bytearray((
-            self.decode(enc_key_table, inbyte) for inbyte in enc_data))
+            self.decodeByte(enc_key_table, inbyte) for inbyte in self._read()))
 
-    def decode_urls(self, rawfields):
-        media_enc_table = calc_enc_key_table_TYPEMEDIA(rawfields)
+    def _decode_urls(self):
+        if self.fields.get("EncodeType", 0) < 300:
+            return
 
-        urls = {}
+        media_enc_table = self.calc_enc_key_table_TYPEMEDIA()
+        self.urls = {}
         while True:
-            urltype = self.decode(media_enc_table)
+            urltype = self.decodeByte(media_enc_table)
             url_len = self._readintcrypt(media_enc_table)
             always300_0 = self._readintcrypt(media_enc_table)
             always300_1 = self._readintcrypt(media_enc_table)
@@ -93,110 +93,114 @@ class Decoder(object):
                 break
 
             urlbody = self._read_str_crypt(media_enc_table, url_len)
-            urls.setdefault(urltype, []).append(urlbody)
+            self.urls.setdefault(urltype, []).append(urlbody)
 
-        return urls
+    def decode(self):
+        self.magic = self._read(4)
+        if self.magic != b"WLD3":
+            raise WTFormatException("File does not have correct Magic. Exiting.", -1)
 
+        headline = self._readline().decode()
+        self.base_type, magic_msg = headline.split(' ', 1)
+        if magic_msg != "WildTangent 3D 300 Compressed and Patented\r\n":
+            raise WTFormatException("File does not have correct Magic Line. Exiting.", -2)
 
-def calc_hash_byte_TYPEDATA(rawfields):
-    max_field_len = max((len(f) for f in rawfields))
-    enc_byte = 0
-    for i, data in enumerate(rawfields):
-        if max_field_len > 0:
-            for j in range(max_field_len):
-                c = data[j % len(data)] if len(data) >= 1 else 0
-                enc_byte ^= i + j + c * (j + 1)
-    return enc_byte & 0xFF
+        if self._read(20) != b'Converted by XtoWT: ':
+            raise WTFormatException(
+                "File does not have correct Magic 2nd Line. Exiting.", -3)
 
-def calc_enc_key_table_TYPEDATA(rawfields, enc_byte=None):
-    if enc_byte is None:
-        enc_byte = calc_hash_byte_TYPEDATA(rawfields)
-    enc_key_table = [enc_byte] * max((len(f) for f in rawfields))
-    for i in range(len(enc_key_table)):
-        key = enc_key_table[i]
-        chr_index = i + 7
-        for field in rawfields:
-            key ^= field[chr_index % len(field)]\
-                   if ( len(field) >= 1 ) else 0
-            chr_index += 13
-        enc_key_table[i] = key & 0xFF
-    return enc_key_table
+        self.created = datetime.datetime.strptime(
+            self._readline().strip().decode(), '%a %b %d %H:%M:%S %Y')
 
-def calc_enc_key_table_TYPEMEDIA(rawfields, enc_byte=None):
-    if enc_byte is None:
-        enc_byte = calc_hash_byte_TYPEDATA(rawfields)
-    enc_key_table = [enc_byte] * max((len(f) for f in rawfields))
+        if self._readline() != b'\r\n':
+            raise WTFormatException(
+                "File Should have an empty line after date. Exiting.", -4)
 
-    for i in range(len(enc_key_table)):
-        key = enc_key_table[i]
-        for j, field in enumerate(rawfields):
-            key ^= field[(j + i) % len(field)]\
-                   if ( len(field) >= 1 ) else 0
-        enc_key_table[i] = key & 0xFF
-    return enc_key_table
+        self.comment = self._readline().decode().strip()
 
-def main(f, showdetails=False):
-    magic = f.read(4)
-    if magic != b"WLD3":
-        raise WTFormatException("File does not have correct Magic. Exiting.", -1)
+        if self._readline().strip() != b'.START':
+            raise WTFormatException("File missing .START section. Exiting.", -5)
 
-    headline = f.readline().decode()
-    base_type, magic_msg = headline.split(' ', 1)
-    if magic_msg != "WildTangent 3D 300 Compressed and Patented\r\n":
-        raise WTFormatException("File does not have correct Magic Line. Exiting.", -2)
+        fieldcount = rev_offset(ord(self._read(1)), 0xC5)
+        if fieldcount != 9:
+            raise WTFormatException(
+                "Only know how to use files with 9 headers, not %s. Exiting."%fieldcount, -6)
+        fieldlens = [rev_offset(ord(self._read(1)), 0x39 + (13*i)) for i in range(fieldcount)]
+        self.rawfields = [self._read(fieldlen) for fieldlen in fieldlens]
 
-    if f.read(20) != b'Converted by XtoWT: ':
-        raise WTFormatException(
-            "File does not have correct Magic 2nd Line. Exiting.", -3)
+        self._process_fields()
 
-    datestr = f.readline().strip().decode()
-    header_createdate = datetime.datetime.strptime(datestr, '%a %b %d %H:%M:%S %Y')
+        self._decode_urls()
 
-    if f.readline() != b'\r\n':
-        raise WTFormatException(
-            "File Should have an empty line after date. Exiting.", -4)
+        self.outdata = self.decode_payload(self.calc_enc_key_table_TYPEDATA())
 
-    decoder = Decoder(f)
+        return self.outdata
 
-    commentfield = f.readline().decode().strip()
+    def _process_fields(self):
+        self.fields = collections.OrderedDict()
+        for i, rawfield in enumerate(self.rawfields):
+            size, func, name = field_interpretation[i]
+            self.fields[name] = func(rawfield[:size] if size else rawfield)
 
-    if f.readline().strip() != b'.START':
-        raise WTFormatException("File missing .START section. Exiting.", -5)
+    def calc_hash_byte_TYPEDATA(self):
+        max_field_len = max((len(f) for f in self.rawfields))
+        enc_byte = 0
+        for i, data in enumerate(self.rawfields):
+            if max_field_len > 0:
+                for j in range(max_field_len):
+                    c = data[j % len(data)] if len(data) >= 1 else 0
+                    enc_byte ^= i + j + c * (j + 1)
+        return enc_byte & 0xFF
 
-    fieldcount = rev_offset(ord(f.read(1)), 0xC5)
-    if fieldcount != 9:
-        raise WTFormatException(
-            "Only know how to use files with 9 headers, not %s. Exiting."%fieldcount, -6)
-    fieldlens = [rev_offset(ord(f.read(1)), 0x39 + (13*i)) for i in range(fieldcount)]
-    rawfields = [f.read(fieldlen) for fieldlen in fieldlens]
+    def calc_enc_key_table_TYPEDATA(self, enc_byte=None):
+        if enc_byte is None:
+            enc_byte = self.calc_hash_byte_TYPEDATA()
+        enc_key_table = [enc_byte] * max((len(f) for f in self.rawfields))
+        for i in range(len(enc_key_table)):
+            key = enc_key_table[i]
+            chr_index = i + 7
+            for field in self.rawfields:
+                key ^= field[chr_index % len(field)]\
+                       if ( len(field) >= 1 ) else 0
+                chr_index += 13
+            enc_key_table[i] = key & 0xFF
+        return enc_key_table
 
-    fields = process_fields(rawfields)
+    def calc_enc_key_table_TYPEMEDIA(self, enc_byte=None):
+        if enc_byte is None:
+            enc_byte = self.calc_hash_byte_TYPEDATA()
+        enc_key_table = [enc_byte] * max((len(f) for f in self.rawfields))
 
-    urls = decoder.decode_urls(rawfields) if fields.get("EncodeType", 0)>=300 else {}
+        for i in range(len(enc_key_table)):
+            key = enc_key_table[i]
+            for j, field in enumerate(self.rawfields):
+                key ^= field[(j + i) % len(field)]\
+                       if ( len(field) >= 1 ) else 0
+            enc_key_table[i] = key & 0xFF
+        return enc_key_table
 
-    enc_key_table = calc_enc_key_table_TYPEDATA(rawfields)
+    def __repr__(self):
+        return "%s(Decoded: %s; type: %s)"%\
+            (type(self).__name__, True, self.base_type)
 
-    outdata = decoder.decode_payload(enc_key_table)
-
-    ############### DRAWING OUTPUT ###############
-    if showdetails:
-        print("FTYPE:    %s" % base_type, file=sys.stderr)
-        print("CREATED:  %s" % header_createdate, file=sys.stderr)
-        print("COMMENT:  %s" % commentfield, file=sys.stderr)
-        print("FieldCnt: %s" % fieldcount, file=sys.stderr)
+    def __str__(self):
+        s = []
+        s.append("FTYPE:    %s" % decoder.base_type)
+        s.append("CREATED:  %s" % decoder.created)
+        s.append("COMMENT:  %s" % decoder.comment)
+        s.append("FieldCnt: %s" % len(decoder.fields))
         max_name_len = max((len(fi[2]) for fi in field_interpretation))
-        for k, v in fields.items():
-            print(("  {:<%s}: {}" % max_name_len).format(k,repr(v)),
-                  file=sys.stderr)
+        for k, v in decoder.fields.items():
+            s.append(("  {:<%s}: {}" % max_name_len).format(k,repr(v)))
 
-        if urls:
-            print("URLS:", file=sys.stderr)
-            for k,v in urls.items():
-                print("  TYPE %s" % k, file=sys.stderr)
+        if decoder.urls:
+            s.append("URLS:")
+            for k,v in decoder.urls.items():
+                s.append("  TYPE %s" % k)
                 for url in v:
-                    print("    %s" % url, file=sys.stderr)
+                    s.append("    %s" % url)
 
-    return outdata
+        return "\n".join(s)
 
 if __name__ == "__main__":
     import os
@@ -216,17 +220,22 @@ if __name__ == "__main__":
     inpath = os.path.expanduser(args.inpath)
     try:
         with open(inpath, "rb") as f:
-            unencoded_data = main(f, showdetails=not args.quiet)
+            decoder = WTDecoder(f)
+            decoded_data = decoder.decode()
     except WTFormatException as e:
         msg, code = e.args
         print(msg, file=sys.stderr)
         sys.exit(code)
 
+    ############### DRAWING OUTPUT ###############
+    if not args.quiet:
+        print(decoder, file=sys.stderr)
+
     if args.outpath is None:
-        sys.stdout.buffer.write(unencoded_data)
+        sys.stdout.buffer.write(decoded_data)
     else:
         with open(os.path.expanduser(args.outpath), 'wb') as fout:
-            fout.write(unencoded_data)
+            fout.write(decoded_data)
 
     if not args.quiet:
         print("File Successfully written.", file=sys.stderr)
