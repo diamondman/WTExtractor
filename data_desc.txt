@@ -1,0 +1,30 @@
+For Text File. Address 0x33d7A8
+
+Hash calc in ENCRYPT_MYS0::GetBuffHash
+
+RealL: Var; 21:"(c) Copyright Yourmom"
+RealL: 4;   8: 76h, 84h, 61h, 58h, 0BFh, 5Fh, 3Bh, 68h #TIMESTAMP
+RealL: 4;   5: 0, 0, 0, 0, 0BFh #const_struct_2_ref->out_header_0_field_44
+RealL: 4;   14:FFh, 0FFh, 0FFh, 0FFh, 0BFh, 5Fh, 3Bh, 68h, 0BEh, 0CDh, 7Dh, 0A8h, 0F3h, 36h #const_struct_2_ref->out_header_0_field_48
+RealL: 16;  28:6Ch D7h A4h 21h 26h 13h E9h 42h 8Eh 2Dh 21h E2h 8Fh 89h 43h 2Ch BFh 5Fh 3Bh 68h BEh CDh 7Dh A8h F3h 36h 76h 4Fh #NEW GUID
+RealL: 16;  18:2Fh, 4, 3Ch, 0EAh, 0B8h, 59h, 76h, 43h, 9Ah, 3Fh, 60h, 0DAh, 26h, 75h, 0ABh, 6Dh,# 0BFh, 5Fh #GUID from config
+RealL: 4;   4: free
+RealL: Var; 10:'+_;\r\n.BODY' #Has back padding
+RealL: 4;   8: 0C8h, 0, 0, 0, 0BFh, 5Fh, 3Bh, 68h #200 if 0x!B0C is null. Otherwise 300. Related to extra allocated stuff
+
+
+
+
+TEST4
+Stack[0000002F]:0033ECB0 db 2Fh, 0Dh, 13h, 57h, 0C4h, 3Fh, 85h, 19h, 9Bh, 40h, 17h, 0D9h, 6Fh, 0D3h
+Stack[0000002F]:0033ECB0 db 9Bh, 44h, 0E8h, 5Bh, 0F0h, 0B4h, 90h, 6Fh, 70h
+
+Start at char 7
+for each valid buffer
+  get 7%bufflen
+  xor with current char for this run
+  increment char index by 13
+
+
+maxlen = 15h
+ENC_TABLE: 2, 86h, 0D5h, 2Ah, 0D4h, 0F2h, 0A1h, 84h, 0A5h, 0E1h, 7Dh, 82h, 25h, 0ADh, 11h, 90h, 3Eh, 0F5h, 7Bh, 0A8h, 0A6h
