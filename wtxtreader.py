@@ -46,6 +46,19 @@ class WTDecoder(object):
         (4, int_decode, "EncodeType"),
     ]
 
+    file_type_info = {
+        "png": 1,
+        "jpg": 1,
+        "wav": 1,
+        "mid": 1,
+        "rmi": 1,
+        "wt": 0,
+        "cfg": 2,
+        "dat": 2,
+        "ini": 2,
+        "txt": 2
+    }
+
     def __init__(self, f):
         self._index = 0
         self._last_crypt_byte = 0
@@ -112,7 +125,7 @@ class WTDecoder(object):
             raise WTFormatException("File does not have correct Magic. Exiting.", -1)
 
         headline = self._readline().decode()
-        self.base_type, magic_msg = headline.split(' ', 1)
+        self.base_type, magic_msg = headline[1:].split(' ', 1)
         if magic_msg != "WildTangent 3D 300 Compressed and Patented\r\n":
             raise WTFormatException("File does not have correct Magic Line. Exiting.", -2)
 
@@ -143,7 +156,17 @@ class WTDecoder(object):
 
         self._decode_urls()
 
-        self.decode_payload(self.calc_enc_key_table_TYPEDATA())
+        type = WTDecoder.file_type_info.get(self.base_type, None)
+        if type == 0:
+            raise Exception("Can't handle Model files yet!")
+        elif type == 1:
+            table = self.calc_enc_key_table_TYPEMEDIA()
+        elif type == 2:
+            table = self.calc_enc_key_table_TYPEDATA()
+        else:
+            raise Exception("No known way to extract type '%s'"%self.base_type)
+
+        self.decode_payload(table)
 
         return self.outdata
 
@@ -240,14 +263,22 @@ if __name__ == "__main__":
         print(msg, file=sys.stderr)
         sys.exit(code)
 
-    ############### DRAWING OUTPUT ###############
     if not args.quiet:
         print(decoder, file=sys.stderr)
+
+    wascab = False
 
     if args.outpath is None:
         sys.stdout.buffer.write(decoded_data)
     else:
-        with open(os.path.expanduser(args.outpath), 'wb') as fout:
+        outpath = os.path.splitext(inpath)[0] if args.outpath == '-'\
+                  else args.outpath
+        outpath = os.path.expanduser(outpath)
+        if decoded_data[:4] == b'MSCF':
+            wascab = True
+        outpath += ".cab" if wascab else "."+decoder.base_type
+        print("Writing to", repr(outpath), file=sys.stderr)
+        with open(outpath, 'wb') as fout:
             fout.write(decoded_data)
 
     if not args.quiet:
