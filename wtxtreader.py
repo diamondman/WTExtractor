@@ -17,7 +17,8 @@ def str_decode(s):
     return s.decode()
 
 def UTC_decode(s):
-    return datetime.datetime.fromtimestamp(int_decode(s))
+    i = int_decode(s)
+    return datetime.datetime.fromtimestamp(i) if i else None
 
 def int_decode(s):
     return struct.unpack("<L", s)[0]
@@ -32,23 +33,32 @@ def UUID_decode(s):
     pt3 = s[8:]
     return uuid.UUID(bytes=pt0+pt1+pt2+pt3)
 
-field_interpretation = [
-    (0, str_decode, "Copyright"),
-    (4, UTC_decode, "CreatedDate"),
-    (4, int_decode, "field_44"),
-    (4, int_decode, "field_48"),
-    (16, UUID_decode, "WTVerUUID"),
-    (16, UUID_decode, "ResourceUUID"),
-    (4, str_decode, "License"),
-    (0, BDY_decode, "BodyMarker"),
-    (4, int_decode, "EncodeType"),
-]
-
 class WTDecoder(object):
+    field_interpretation = [
+        (0, str_decode, "Copyright"),
+        (4, UTC_decode, "CreatedDate"),
+        (4, UTC_decode, "StartValidDate"),
+        (4, UTC_decode, "ExpireDate"),
+        (16, UUID_decode, "WTVerUUID"),
+        (16, UUID_decode, "ResourceUUID"),
+        (4, str_decode, "License"),
+        (0, BDY_decode, "BodyMarker"),
+        (4, int_decode, "EncodeType"),
+    ]
+
     def __init__(self, f):
         self._index = 0
         self._last_crypt_byte = 0
         self._f = f
+        self._decoded = False
+        self.magic = None
+        self.urls = None
+        self.rawfields = None
+        self.fields = None
+        self.comment = None
+        self.created = None
+        self.base_type = None
+        self.outdata = None
 
     def _read(self, *args, **kwargs):
         return self._f.read(*args, **kwargs)
@@ -75,7 +85,7 @@ class WTDecoder(object):
         return res
 
     def decode_payload(self, enc_key_table):
-        return bytearray((
+        self.outdata = bytearray((
             self.decodeByte(enc_key_table, inbyte) for inbyte in self._read()))
 
     def _decode_urls(self):
@@ -96,6 +106,7 @@ class WTDecoder(object):
             self.urls.setdefault(urltype, []).append(urlbody)
 
     def decode(self):
+        self._decoded = True
         self.magic = self._read(4)
         if self.magic != b"WLD3":
             raise WTFormatException("File does not have correct Magic. Exiting.", -1)
@@ -132,14 +143,14 @@ class WTDecoder(object):
 
         self._decode_urls()
 
-        self.outdata = self.decode_payload(self.calc_enc_key_table_TYPEDATA())
+        self.decode_payload(self.calc_enc_key_table_TYPEDATA())
 
         return self.outdata
 
     def _process_fields(self):
         self.fields = collections.OrderedDict()
         for i, rawfield in enumerate(self.rawfields):
-            size, func, name = field_interpretation[i]
+            size, func, name = WTDecoder.field_interpretation[i]
             self.fields[name] = func(rawfield[:size] if size else rawfield)
 
     def calc_hash_byte_TYPEDATA(self):
@@ -181,17 +192,19 @@ class WTDecoder(object):
 
     def __repr__(self):
         return "%s(Decoded: %s; type: %s)"%\
-            (type(self).__name__, True, self.base_type)
+            (type(self).__name__, self._decoded, self.base_type)
 
     def __str__(self):
+        if not self._decoded:
+            return repr(self)
         s = []
         s.append("FTYPE:    %s" % decoder.base_type)
         s.append("CREATED:  %s" % decoder.created)
         s.append("COMMENT:  %s" % decoder.comment)
         s.append("FieldCnt: %s" % len(decoder.fields))
-        max_name_len = max((len(fi[2]) for fi in field_interpretation))
+        max_name_len = max((len(fi[2]) for fi in WTDecoder.field_interpretation))
         for k, v in decoder.fields.items():
-            s.append(("  {:<%s}: {}" % max_name_len).format(k,repr(v)))
+            s.append(("  {:<%s}: {}" % max_name_len).format(k,v))
 
         if decoder.urls:
             s.append("URLS:")
