@@ -75,6 +75,7 @@ class WTDecoder(object):
         self.base_type = None
         self.out_ext = None
         self.outdata = None
+        self.containscab = False
 
     def _read(self, *args, **kwargs):
         return self._f.read(*args, **kwargs)
@@ -101,8 +102,42 @@ class WTDecoder(object):
         return res
 
     def decode_payload(self, enc_key_table):
-        self.outdata = bytearray((
-            self.decodeByte(enc_key_table, inbyte) for inbyte in self._read()))
+        decoded_data = bytearray((self.decodeByte(enc_key_table, inbyte)
+                             for inbyte in self._read()))
+        self.containscab = decoded_data[:4] == b'MSCF'
+
+        if self.containscab:
+            import patoolib
+            import tempfile
+
+            tmpoutdir = tempfile.TemporaryDirectory()
+            tmpcabf = tempfile.NamedTemporaryFile()
+            tmpcabf.write(decoded_data)
+            tmpcabf.flush()
+
+            try:
+                patoolib.extract_archive(
+                    tmpcabf.name, outdir=tmpoutdir.name,
+                verbosity=-1)
+
+                file_list = os.listdir(tmpoutdir.name)
+                if len(file_list) is 0:
+                    raise WTFormatException(
+                        "Extracted cab file contains no files!")
+                if len(file_list) > 1:
+                    raise WTFormatException(
+                        "Extracted cab file contained multiple "
+                        "files %s" % file_list)
+                with open(os.path.join(tmpoutdir.name, file_list[0]),
+                          'rb') as f:
+                    decoded_data = f.read()
+
+            except patoolib.util.PatoolError as e:
+                print("Failed to extract cab file, contents may have "
+                      "started with CAB file magic number, or be "
+                      "corrupt. Emitting the contents. Error: <%s>" % e)
+
+        self.outdata = decoded_data
 
     def _decode_urls(self):
         if self.fields.get("EncodeType", 0) < 300:
@@ -122,6 +157,8 @@ class WTDecoder(object):
             self.urls.setdefault(urltype, []).append(urlbody)
 
     def decode(self):
+        if self._decoded:
+            raise Exception("Already decoded")
         self._decoded = True
         self.magic = self._read(4)
         if self.magic != b"WLD3":
@@ -272,7 +309,6 @@ class WTDecoder(object):
 if __name__ == "__main__":
     import os
     import argparse
-    import tempfile
 
     parser = argparse.ArgumentParser(
         description='Decrypt WildTangent WebDriver Compressed Files.')
@@ -301,44 +337,12 @@ if __name__ == "__main__":
     if not args.quiet:
         print(decoder, file=sys.stderr)
 
-    wascab = decoded_data[:4] == b'MSCF'
-
-    if wascab:
-        import patoolib
-        tmpcabf = tempfile.NamedTemporaryFile()
-        tmpcabf.write(decoded_data)
-        tmpcabf.flush()
-
-        tmpoutdir = tempfile.TemporaryDirectory()
-
-        try:
-            print("Extracting enclosed CAB archive...", file=sys.stderr)
-            patoolib.extract_archive(tmpcabf.name, outdir=tmpoutdir.name)
-
-            file_list = os.listdir(tmpoutdir.name)
-            if len(file_list) is 0:
-                raise Exception("Extracted cab file contains no files!")
-            if len(file_list) > 1:
-                raise Exception("Extracted cab file contained multiple "
-                                "files %s" % file_list)
-            with open(os.path.join(tmpoutdir.name, file_list[0]),
-                      'rb') as f:
-                decoded_data = f.read()
-
-            wascab = False
-
-        except patoolib.util.PatoolError as e:
-            print("Failed to extract cab file, cab file will be writen "
-                  "for further processing. Error: %s" % e)
-
     if args.outpath is None:
         sys.stdout.buffer.write(decoded_data)
     else:
-        outpath = os.path.splitext(inpath)[0] if args.outpath == '-'\
-                  else args.outpath
-        outpath = os.path.expanduser(outpath)
-        outpath += ".cab" if wascab else "."+decoder.out_ext
-
+        outpath = os.path.expanduser(
+            os.path.splitext(inpath)[0]+"."+decoder.out_ext\
+            if args.outpath == '-' else args.outpath)
 
         if outpath == inpath:
             basepath = outpath
