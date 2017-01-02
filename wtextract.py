@@ -47,16 +47,18 @@ class WTDecoder(object):
     ]
 
     file_type_info = {
-        "png": 1,
-        "jpg": 1,
-        "wav": 1,
-        "mid": 1,
-        "rmi": 1,
-        "wt": 0,
-        "cfg": 2,
-        "dat": 2,
-        "ini": 2,
-        "txt": 2
+        "png": (1, 'png'),
+        "jpg": (1, 'jpg'),
+        "wav": (1, 'wav'),
+        "mid": (1, 'mid'),
+        "rmi": (1, 'rmi'),
+        "wt":  (0, 'pwt'),
+        "cfg": (2, 'cfg'),
+        "dat": (2, 'dat'),
+        "ini": (2, 'ini'),
+        "txt": (2, 'txt'),
+        "cab": (1, 'cab'),
+        "tmp": (1, 'tmp'),
     }
 
     def __init__(self, f):
@@ -71,6 +73,7 @@ class WTDecoder(object):
         self.comment = None
         self.created = None
         self.base_type = None
+        self.out_ext = None
         self.outdata = None
 
     def _read(self, *args, **kwargs):
@@ -156,9 +159,13 @@ class WTDecoder(object):
 
         self._decode_urls()
 
-        type = WTDecoder.file_type_info.get(self.base_type, None)
+        type, self.out_ext = WTDecoder.file_type_info.get(
+            self.base_type, (None, None))
         if type == 0:
-            raise Exception("Can't handle Model files yet!")
+            table = self.calc_enc_key_table_TYPEMODEL()
+            print("Warning, Model decompression produces a cab with a pwt file. "
+                  "The pwt file is not reversed and therefore currently unusable.",
+                  file=sys.stderr)
         elif type == 1:
             table = self.calc_enc_key_table_TYPEMEDIA()
         elif type == 2:
@@ -176,7 +183,7 @@ class WTDecoder(object):
             size, func, name = WTDecoder.field_interpretation[i]
             self.fields[name] = func(rawfield[:size] if size else rawfield)
 
-    def calc_hash_byte_TYPEDATA(self):
+    def calc_hash_byte_TYPEMEDIADATA(self):
         max_field_len = max((len(f) for f in self.rawfields))
         enc_byte = 0
         for i, data in enumerate(self.rawfields):
@@ -186,9 +193,19 @@ class WTDecoder(object):
                     enc_byte ^= i + j + c * (j + 1)
         return enc_byte & 0xFF
 
+    def calc_hash_byte_TYPEMODEL(self):
+        max_field_len = max((len(f) for f in self.rawfields))
+        enc_byte = 0
+        for i, data in enumerate(self.rawfields):
+            if max_field_len > 0:
+                for j in range(max_field_len):
+                    c = data[j % len(data)] if len(data) >= 1 else 0
+                    enc_byte ^= c
+        return enc_byte & 0xFF
+
     def calc_enc_key_table_TYPEDATA(self, enc_byte=None):
         if enc_byte is None:
-            enc_byte = self.calc_hash_byte_TYPEDATA()
+            enc_byte = self.calc_hash_byte_TYPEMEDIADATA()
         enc_key_table = [enc_byte] * max((len(f) for f in self.rawfields))
         for i in range(len(enc_key_table)):
             key = enc_key_table[i]
@@ -202,13 +219,26 @@ class WTDecoder(object):
 
     def calc_enc_key_table_TYPEMEDIA(self, enc_byte=None):
         if enc_byte is None:
-            enc_byte = self.calc_hash_byte_TYPEDATA()
+            enc_byte = self.calc_hash_byte_TYPEMEDIADATA()
         enc_key_table = [enc_byte] * max((len(f) for f in self.rawfields))
 
         for i in range(len(enc_key_table)):
             key = enc_key_table[i]
             for j, field in enumerate(self.rawfields):
                 key ^= field[(j + i) % len(field)]\
+                       if ( len(field) >= 1 ) else 0
+            enc_key_table[i] = key & 0xFF
+        return enc_key_table
+
+    def calc_enc_key_table_TYPEMODEL(self, enc_byte=None):
+        if enc_byte is None:
+            enc_byte = self.calc_hash_byte_TYPEMODEL()
+        enc_key_table = [enc_byte] * max((len(f) for f in self.rawfields))
+
+        for i in range(len(enc_key_table)):
+            key = enc_key_table[i]
+            for j, field in enumerate(self.rawfields):
+                key ^= field[i % len(field)]\
                        if ( len(field) >= 1 ) else 0
             enc_key_table[i] = key & 0xFF
         return enc_key_table
@@ -222,6 +252,7 @@ class WTDecoder(object):
             return repr(self)
         s = []
         s.append("FTYPE:    %s" % decoder.base_type)
+        s.append("OUTEXT    %s" % decoder.out_ext)
         s.append("CREATED:  %s" % decoder.created)
         s.append("COMMENT:  %s" % decoder.comment)
         s.append("FieldCnt: %s" % len(decoder.fields))
@@ -241,15 +272,17 @@ class WTDecoder(object):
 if __name__ == "__main__":
     import os
     import argparse
-    #import pyunpack
+    import tempfile
 
     parser = argparse.ArgumentParser(
         description='Decrypt WildTangent WebDriver Compressed Files.')
     parser.add_argument('inpath', type=str, help='File Path of Compressed file')
     parser.add_argument('outpath', type=str, default=None, nargs='?',
-                        help='Filepath to put output. Defaults to stdout.')
+                        help='Filepath to put output. Defaults to stdout. A - will output a new file in the same directory.')
     parser.add_argument('-q', dest='quiet', action="store_true",
                         help='Supress file information output.')
+    parser.add_argument('-s', dest='stay', action="store_true",
+                        help='Waits for enter after extract.')
 
     args = parser.parse_args()
 
@@ -261,12 +294,42 @@ if __name__ == "__main__":
     except WTFormatException as e:
         msg, code = e.args
         print(msg, file=sys.stderr)
+        if args.stay:
+            input()
         sys.exit(code)
 
     if not args.quiet:
         print(decoder, file=sys.stderr)
 
-    wascab = False
+    wascab = decoded_data[:4] == b'MSCF'
+
+    if wascab:
+        import patoolib
+        tmpcabf = tempfile.NamedTemporaryFile()
+        tmpcabf.write(decoded_data)
+        tmpcabf.flush()
+
+        tmpoutdir = tempfile.TemporaryDirectory()
+
+        try:
+            print("Extracting enclosed CAB archive...", file=sys.stderr)
+            patoolib.extract_archive(tmpcabf.name, outdir=tmpoutdir.name)
+
+            file_list = os.listdir(tmpoutdir.name)
+            if len(file_list) is 0:
+                raise Exception("Extracted cab file contains no files!")
+            if len(file_list) > 1:
+                raise Exception("Extracted cab file contained multiple "
+                                "files %s" % file_list)
+            with open(os.path.join(tmpoutdir.name, file_list[0]),
+                      'rb') as f:
+                decoded_data = f.read()
+
+            wascab = False
+
+        except patoolib.util.PatoolError as e:
+            print("Failed to extract cab file, cab file will be writen "
+                  "for further processing. Error: %s" % e)
 
     if args.outpath is None:
         sys.stdout.buffer.write(decoded_data)
@@ -274,12 +337,21 @@ if __name__ == "__main__":
         outpath = os.path.splitext(inpath)[0] if args.outpath == '-'\
                   else args.outpath
         outpath = os.path.expanduser(outpath)
-        if decoded_data[:4] == b'MSCF':
-            wascab = True
-        outpath += ".cab" if wascab else "."+decoder.base_type
+        outpath += ".cab" if wascab else "."+decoder.out_ext
+
+
+        if outpath == inpath:
+            basepath = outpath
+            i = 0
+            while outpath == inpath:
+                outpath = basepath + "_" + str(i)
+                i += 1
         print("Writing to", repr(outpath), file=sys.stderr)
         with open(outpath, 'wb') as fout:
             fout.write(decoded_data)
 
     if not args.quiet:
         print("File Successfully written.", file=sys.stderr)
+
+    if args.stay:
+        input()
