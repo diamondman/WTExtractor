@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import math
 import struct
 from bitarray import bitarray
 
@@ -99,6 +100,15 @@ class PWTDecode(object):
         self.has_visuals = bool(self._read(1)[0])
 
         if self.has_animation:
+            animationsize = struct.unpack('>i', self._read(4))[0]
+            D3DOptions = struct.unpack('>i', self._read(4))[0]
+            animation = []
+            for _ in range(animationsize):
+                dvTime = struct.unpack('>f', self._read(4))[0]
+                keytype = struct.unpack('>i', self._read(4))[0]
+                ani_A, ani_B, ani_C, ani_D = struct.unpack('>4f', self._read(4*4))
+                animation.append((dvTime, keytype, ani_A, ani_B, ani_C, ani_D))
+
             raise NotImplementedError()
 
         if self.has_visuals:
@@ -119,6 +129,8 @@ class PWTDecode(object):
         test2, = struct.unpack('>i', bf.readbits(32))
 
         if test1 != test2:
+            print(test1, test2)
+            print("FRAME COUNT", self.subframe_count)
             raise Exception("Don't know how to handle "
                             "diff norm vert count")
 
@@ -142,8 +154,6 @@ class PWTDecode(object):
             z = struct.unpack('>i', z)[0]
 
             scaled_vertices.append((x,y,z))
-
-        #scaled_vertices = scaled_vertices[-1:] + scaled_vertices[:-1]
 
         oddbitnum = (1 << vertex_bit_num) - 1
         vertices = [((v[0]*maxbbox_dimen/oddbitnum) + self.bboxMIN[0],
@@ -196,6 +206,56 @@ class PWTDecode(object):
              (v[2]*maxbbox_dimen_normals/maxnum) + self.norm_bboxMIN[2])
             for v in scaled_normals]
 
+        ############### FACES ###############
+
+        face_vertex_bit_length = math.ceil(math.log2(f_vcount))
+
+        bf = BitfieldReader(self._f)
+
+        faces = []
+
+        for _ in range(f_fcount):
+            face_ints = []
+            normal_ints = []
+            for _ in range(3):
+                n = bf.readbits(3)
+                n = struct.unpack('>i', b'\x00'*(4-len(n)) + n)[0]
+                normal_ints.append(n)
+
+                v = bf.readbits(3)
+                v = struct.unpack('>i', b'\x00'*(4-len(v)) + v)[0]
+                face_ints.append(v)
+
+            faces.append((tuple(face_ints), tuple(normal_ints)))
+
+        ############### TEXMAP ###############
+
+        texmapU = []
+        for _ in range(f_vcount):
+            texmapU.append(struct.unpack('>i', self._read(4))[0])
+
+        texmapV = []
+        for _ in range(f_vcount):
+            texmapV.append(struct.unpack('>i', self._read(4))[0])
+
+        ############### FACE DETAIL ###############
+        face_details = []
+
+        for _ in range(f_fcount):
+            texture_name = struct.unpack('>b', self._read(1))[0]
+            texture_color = struct.unpack('>I', self._read(4))[0]
+            texture_power = struct.unpack('>f', self._read(4))[0]
+            emmisivity = struct.unpack('>3f', self._read(12))
+            specularity = struct.unpack('>3f', self._read(12))
+
+            face_d = {"texture_name":texture_name,
+                      "texture_color":texture_color,
+                      "texture_power":texture_power,
+                      "emmisivity":emmisivity,
+                      "specularity":specularity}
+            face_details.append(face_d)
+
+        ############### OUTPUT ###############
 
         print("HEADER")
         print("  GlobalMin:  ", self.global_min)
@@ -206,7 +266,7 @@ class PWTDecode(object):
         print("  IncNormals: ", bool(dowrite_normals))
         print("  VBitNum:    ", vertex_bit_num)
         print("  VBitNum1:   ", vertex_bit_num_1)
-        print("  NVitNum:    ", normal_bit_number)
+        print("  NBitNum:    ", normal_bit_number)
         print("  f44:        ", f44)
         print("  f48:        ", f48)
         print("  VertexCount:", self.vertex_count)
@@ -251,6 +311,12 @@ class PWTDecode(object):
         #       (normal_bit_number*3-norm_bbx-norm_bby-norm_bbz)*norm_test2))
         #print(scaled_normals)
         print("Normals:", normals)
+        print("FACES:", faces)
+        print("FaceDetails:")
+        for detail in face_details:
+            print("   ", detail)
+
+        print("\nConsumed Bytes:", f.tell(), hex(f.tell()))
 
     def _read(self, *args, **kwargs):
         return self._f.read(*args, **kwargs)
