@@ -87,56 +87,7 @@ class PWTDecode(object):
             = struct.unpack('>3ii', self._read(16))
 
         #####################################
-
-        self.subframe_count, = struct.unpack('>i', self._read(4))
-
-        name_buff = bytearray()
-        while True:
-            c = self._read(1)[0]
-            name_buff.append(c)
-            if c == 0:
-                break
-        self.name = struct.unpack('s', name_buff)[0][:-1].decode('utf8')
-
-        mata = struct.unpack('>4f', self._read(4*4))
-        matb = struct.unpack('>4f', self._read(4*4))
-        matc = struct.unpack('>4f', self._read(4*4))
-        matd = struct.unpack('>4f', self._read(4*4))
-        self.matrix = np.matrix([mata, matb, matc, matd])
-
-        self.has_animation = bool(self._read(1)[0])
-        self.has_visuals = bool(self._read(1)[0])
-
-        if self.has_animation:
-            animationsize = struct.unpack('>i', self._read(4))[0]
-            D3DOptions = struct.unpack('>i', self._read(4))[0]
-            animation = []
-            for _ in range(animationsize):
-                dvTime = struct.unpack('>f', self._read(4))[0]
-                keytype = struct.unpack('>i', self._read(4))[0]
-                ani_A, ani_B, ani_C, ani_D = struct.unpack('>4f', self._read(4*4))
-                animation.append((dvTime, keytype, ani_A, ani_B, ani_C, ani_D))
-
-            raise NotImplementedError()
-
-        if self.has_visuals:
-            self.visuals = ModelVisuals(self)
-        else:
-            self.visuals = None
-
-        #print("SubFrameCount: ", self.subframe_count)
-        #print("Name:          ", repr(self.name))
-        #print("Matrix:")
-        #print("   ", self.matrix[:4])
-        #print("   ", self.matrix[4:8])
-        #print("   ", self.matrix[8:12])
-        #print("   ", self.matrix[12:])
-        #print("HasAnimation:", self.has_animation)
-        #print("HasVisuals:", self.has_visuals)
-        #print("FrameVertexCount:", f_vcount)
-        #print("FrameNormalCount:", f_ncount)
-        #print("FrameFaceCount:  ", f_fcount)
-        #print("TextureCount:    ", texcount)
+        self.frame = ModelFrame(self)
 
         print("\nConsumed Bytes:", f.tell(), hex(f.tell()))
 
@@ -163,7 +114,7 @@ class PWTDecode(object):
             ("NormalCount", "normal_count"),
             ("FaceCount", "face_count"),
             ("f40", "f40"),
-            ("Visuals", "visuals")
+            ("Frame", "frame"),
         )
 
         max_name_len = max((len(fi[0]) for fi in represent))
@@ -188,14 +139,98 @@ class PWTDecode(object):
 
         return "\n".join(s)
 
+class ModelFrame(object):
 
-class ModelVisuals(object):
     def _read(self, *args, **kwargs):
         return self._pwt._read(*args, **kwargs)
 
     def __init__(self, pwt):
         self._pwt = pwt
-        f_vcount, f_ncount, f_fcount\
+
+        self.subframe_count, = struct.unpack('>i', self._read(4))
+
+        name_buff = bytearray()
+        while True:
+            c = self._read(1)[0]
+            name_buff.append(c)
+            if c == 0:
+                break
+        self.name = struct.unpack('s', name_buff)[0][:-1].decode('utf8')
+
+        mata = struct.unpack('>4f', self._read(4*4))
+        matb = struct.unpack('>4f', self._read(4*4))
+        matc = struct.unpack('>4f', self._read(4*4))
+        matd = struct.unpack('>4f', self._read(4*4))
+        self.matrix = np.matrix([mata, matb, matc, matd])
+
+        self.has_animation = bool(self._read(1)[0])
+        self.has_visuals = bool(self._read(1)[0])
+
+        self.animation = None
+        if self.has_animation:
+            animationsize = struct.unpack('>i', self._read(4))[0]
+            D3DOptions = struct.unpack('>i', self._read(4))[0]
+            self.animation = []
+            for _ in range(animationsize):
+                dvTime = struct.unpack('>f', self._read(4))[0]
+                keytype = struct.unpack('>i', self._read(4))[0]
+                ani_A, ani_B, ani_C, ani_D\
+                    = struct.unpack('>4f', self._read(4*4))
+                self.animation.append(
+                    (dvTime, keytype, ani_A, ani_B, ani_C, ani_D))
+
+            raise NotImplementedError()
+
+        if self.has_visuals:
+            self.visuals = ModelVisuals(self)
+        else:
+            self.visuals = None
+
+    def __str__(self):
+        represent = (
+            ("SubFrameCount", "subframe_count"),
+            ("Name", "name"),
+            ("Matrix", "matrix"),
+            ("HasAnimation", "has_animation"),
+            ("HasVisuals", "has_visuals"),
+            ("Animation", "animation"),
+            ("Visuals", "visuals"),
+        )
+
+        max_name_len = max((len(fi[0]) for fi in represent))
+
+        s = []
+        for name, field in represent:
+            value = getattr(self, field)
+            if isinstance(value, list):
+                s.append(("{:<%s}:" % max_name_len)\
+                         .format(name))
+                s += ["  "+str(item) for item in value]
+            else:
+                value = str(value).splitlines()
+                if len(value) is 1:
+                    s.append(("{:<%s}: {}" % max_name_len)\
+                             .format(name, value[0]))
+                else:
+                    value = tuple(("  "+v for v in value))
+                    s.append(("{:<%s}:" % max_name_len)\
+                             .format(name))
+                    s += value
+
+        return "\n".join(s)
+
+class ModelVisuals(object):
+    @property
+    def _pwt(self):
+        return self._frame._pwt
+
+    def _read(self, *args, **kwargs):
+        return self._pwt._read(*args, **kwargs)
+
+    def __init__(self, frame):
+        self._frame = frame
+
+        self.vcount, self.ncount, self.fcount\
             = struct.unpack('>3i', self._read(12))
         texcount = self._read(1)[0]
 
@@ -293,12 +328,12 @@ class ModelVisuals(object):
 
         ############### FACES ###############
 
-        face_vertex_bit_length = math.ceil(math.log2(f_vcount))
+        face_vertex_bit_length = math.ceil(math.log2(self.vcount))
 
         bf = BitfieldReader(self._pwt._f)
 
         self.faces = []
-        for _ in range(f_fcount):
+        for _ in range(self.fcount):
             face_ints = []
             normal_ints = []
             for _ in range(3):
@@ -315,17 +350,17 @@ class ModelVisuals(object):
         ############### TEXMAP ###############
 
         texmapU = []
-        for _ in range(f_vcount):
+        for _ in range(self.vcount):
             texmapU.append(struct.unpack('>i', self._read(4))[0])
 
         texmapV = []
-        for _ in range(f_vcount):
+        for _ in range(self.vcount):
             texmapV.append(struct.unpack('>i', self._read(4))[0])
 
         ############### FACE DETAIL ###############
         self.face_details = []
 
-        for _ in range(f_fcount):
+        for _ in range(self.fcount):
             texture_name = struct.unpack('>b', self._read(1))[0]
             texture_color = struct.unpack('>I', self._read(4))[0]
             texture_power = struct.unpack('>f', self._read(4))[0]
