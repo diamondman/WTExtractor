@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import math
 import struct
+import numpy as np
 from bitarray import bitarray
 
 class PWTFormatException(Exception):
@@ -74,14 +75,17 @@ class PWTDecode(object):
         self.veryclose, self.prettyclose = struct.unpack(
             '>ii', self._read(8))
 
-        dowrite_vertices, dowrite_normals, vertex_bit_num, vertex_bit_num_1,\
-            normal_bit_number, f44, f48\
+        self.dowrite_vertices, self.dowrite_normals,\
+            self.vertex_bit_num, self.vertex_bit_num_1,\
+            self.normal_bit_number, self.f44, self.f48\
             = struct.unpack('>7i', self._read(28))
 
-        self.vertex_count, self.normal_count, self.face_count\
-            = struct.unpack('>3i', self._read(12))
+        self.dowrite_vertices, self.dowrite_normals\
+            = bool(self.dowrite_vertices), bool(self.dowrite_normals)
 
-        f40, = struct.unpack('>i', self._read(4))
+        self.vertex_count, self.normal_count, self.face_count, self.f40\
+            = struct.unpack('>3ii', self._read(16))
+
         #####################################
 
         self.subframe_count, = struct.unpack('>i', self._read(4))
@@ -94,7 +98,11 @@ class PWTDecode(object):
                 break
         self.name = struct.unpack('s', name_buff)[0][:-1].decode('utf8')
 
-        self.matrix = struct.unpack('>16f', self._read(16*4))
+        mata = struct.unpack('>4f', self._read(4*4))
+        matb = struct.unpack('>4f', self._read(4*4))
+        matc = struct.unpack('>4f', self._read(4*4))
+        matd = struct.unpack('>4f', self._read(4*4))
+        self.matrix = np.matrix([mata, matb, matc, matd])
 
         self.has_animation = bool(self._read(1)[0])
         self.has_visuals = bool(self._read(1)[0])
@@ -112,24 +120,99 @@ class PWTDecode(object):
             raise NotImplementedError()
 
         if self.has_visuals:
-            f_vcount, f_ncount, f_fcount\
-                = struct.unpack('>3i', self._read(12))
-            texcount = self._read(1)[0]
+            self.visuals = ModelVisuals(self)
+        else:
+            self.visuals = None
+
+        #print("SubFrameCount: ", self.subframe_count)
+        #print("Name:          ", repr(self.name))
+        #print("Matrix:")
+        #print("   ", self.matrix[:4])
+        #print("   ", self.matrix[4:8])
+        #print("   ", self.matrix[8:12])
+        #print("   ", self.matrix[12:])
+        #print("HasAnimation:", self.has_animation)
+        #print("HasVisuals:", self.has_visuals)
+        #print("FrameVertexCount:", f_vcount)
+        #print("FrameNormalCount:", f_ncount)
+        #print("FrameFaceCount:  ", f_fcount)
+        #print("TextureCount:    ", texcount)
+
+        print("\nConsumed Bytes:", f.tell(), hex(f.tell()))
+
+    def _read(self, *args, **kwargs):
+        return self._f.read(*args, **kwargs)
+
+    def _readline(self, *args, **kwargs):
+        return self._f.readline(*args, **kwargs)
+
+    def __str__(self):
+        represent = (
+            ("GlobalMin", "global_min"),
+            ("GlobalMax", "global_max"),
+            ("VeryClose", "veryclose"),
+            ("PrettyClose", "prettyclose"),
+            ("IncVertices", "dowrite_vertices"),
+            ("IncNormals", "dowrite_normals"),
+            ("VBitNum", "vertex_bit_num"),
+            ("VBitNum1", "vertex_bit_num_1"),
+            ("NBitNum", "normal_bit_number"),
+            ("f44", "f44"),
+            ("f48", "f48"),
+            ("VertexCount", "vertex_count"),
+            ("NormalCount", "normal_count"),
+            ("FaceCount", "face_count"),
+            ("f40", "f40"),
+            ("Visuals", "visuals")
+        )
+
+        max_name_len = max((len(fi[0]) for fi in represent))
+
+        s = []
+        for name, field in represent:
+            value = getattr(self, field)
+            if isinstance(value, list):
+                s.append(("{:<%s}:" % max_name_len)\
+                         .format(name))
+                s += ["  "+str(item) for item in value]
+            else:
+                value = str(value).splitlines()
+                if len(value) is 1:
+                    s.append(("{:<%s}: {}" % max_name_len)\
+                             .format(name, value[0]))
+                else:
+                    value = tuple(("  "+v for v in value))
+                    s.append(("{:<%s}:" % max_name_len)\
+                             .format(name))
+                    s += value
+
+        return "\n".join(s)
+
+
+class ModelVisuals(object):
+    def _read(self, *args, **kwargs):
+        return self._pwt._read(*args, **kwargs)
+
+    def __init__(self, pwt):
+        self._pwt = pwt
+        f_vcount, f_ncount, f_fcount\
+            = struct.unpack('>3i', self._read(12))
+        texcount = self._read(1)[0]
 
         ###### VERTICES ######
 
         maxbbox_dimen = max((
-            self.global_max[0] - self.global_min[0],
-            self.global_max[1] - self.global_min[1],
-            self.global_max[2] - self.global_min[2],
+            self._pwt.global_max[0] - self._pwt.global_min[0],
+            self._pwt.global_max[1] - self._pwt.global_min[1],
+            self._pwt.global_max[2] - self._pwt.global_min[2],
         ))
 
-        bf = BitfieldReader(self._f)
-        test1, = struct.unpack('>i', bf.readbits(32))
-        test2, = struct.unpack('>i', bf.readbits(32))
+        bf = BitfieldReader(self._pwt._f)
+        self.vertexcount, = struct.unpack('>i', bf.readbits(32))
+        self.normalcount, = struct.unpack('>i', bf.readbits(32))
 
-        if test1 != test2:
-            print(test1, test2)
+        if self.vertexcount != self.normalcount:
+            print(self.vertexcount, self.normalcount)
             print("FRAME COUNT", self.subframe_count)
             raise Exception("Don't know how to handle "
                             "diff norm vert count")
@@ -140,13 +223,15 @@ class PWTDecode(object):
         bby = struct.unpack('>B', bf.readbits(6))[0]
         bbz = struct.unpack('>B', bf.readbits(6))[0]
 
+        self.vertex_unused_bits = (bbx, bby, bbz)
+
         scaled_vertices = []
-        for _ in range(test1):
-            x = bf.readbits(vertex_bit_num-bbx)
+        for _ in range(self.vertexcount):
+            x = bf.readbits(self._pwt.vertex_bit_num-bbx)
             x = b'\x00'*(4-len(x)) + x
-            y = bf.readbits(vertex_bit_num-bby)
+            y = bf.readbits(self._pwt.vertex_bit_num-bby)
             y = b'\x00'*(4-len(y)) + y
-            z = bf.readbits(vertex_bit_num-bbz)
+            z = bf.readbits(self._pwt.vertex_bit_num-bbz)
             z = b'\x00'*(4-len(z)) + z
 
             x = struct.unpack('>i', x)[0]
@@ -155,14 +240,14 @@ class PWTDecode(object):
 
             scaled_vertices.append((x,y,z))
 
-        oddbitnum = (1 << vertex_bit_num) - 1
-        vertices = [((v[0]*maxbbox_dimen/oddbitnum) + self.bboxMIN[0],
+        oddbitnum = (1 << self._pwt.vertex_bit_num) - 1
+        self.vertices = [((v[0]*maxbbox_dimen/oddbitnum) + self.bboxMIN[0],
                      (v[1]*maxbbox_dimen/oddbitnum) + self.bboxMIN[1],
                      (v[2]*maxbbox_dimen/oddbitnum) + self.bboxMIN[2])
         for v in scaled_vertices]
 
         ########## NORMALS ##########
-        bf = BitfieldReader(self._f)
+        bf = BitfieldReader(self._pwt._f)
 
         norm_test1, = struct.unpack('>i', bf.readbits(32))
         norm_test2, = struct.unpack('>i', bf.readbits(32))
@@ -180,12 +265,12 @@ class PWTDecode(object):
         norm_bbz = struct.unpack('>B', bf.readbits(6))[0]
 
         scaled_normals = []
-        for _ in range(test1):
-            x = bf.readbits(normal_bit_number-bbx)
+        for _ in range(self.normalcount):
+            x = bf.readbits(self._pwt.normal_bit_number-bbx)
             x = b'\x00'*(4-len(x)) + x
-            y = bf.readbits(normal_bit_number-bby)
+            y = bf.readbits(self._pwt.normal_bit_number-bby)
             y = b'\x00'*(4-len(y)) + y
-            z = bf.readbits(normal_bit_number-bbz)
+            z = bf.readbits(self._pwt.normal_bit_number-bbz)
             z = b'\x00'*(4-len(z)) + z
 
             x = struct.unpack('>i', x)[0]
@@ -199,8 +284,8 @@ class PWTDecode(object):
             self.norm_bboxMAX[2] - self.norm_bboxMIN[2],
         ))
 
-        maxnum = (1 << normal_bit_number) - 1
-        normals = [
+        maxnum = (1 << self._pwt.normal_bit_number) - 1
+        self.normals = [
             ((v[0]*maxbbox_dimen_normals/maxnum) + self.norm_bboxMIN[0],
              (v[1]*maxbbox_dimen_normals/maxnum) + self.norm_bboxMIN[1],
              (v[2]*maxbbox_dimen_normals/maxnum) + self.norm_bboxMIN[2])
@@ -210,10 +295,9 @@ class PWTDecode(object):
 
         face_vertex_bit_length = math.ceil(math.log2(f_vcount))
 
-        bf = BitfieldReader(self._f)
+        bf = BitfieldReader(self._pwt._f)
 
-        faces = []
-
+        self.faces = []
         for _ in range(f_fcount):
             face_ints = []
             normal_ints = []
@@ -226,7 +310,7 @@ class PWTDecode(object):
                 v = struct.unpack('>i', b'\x00'*(4-len(v)) + v)[0]
                 face_ints.append(v)
 
-            faces.append((tuple(face_ints), tuple(normal_ints)))
+            self.faces.append((tuple(face_ints), tuple(normal_ints)))
 
         ############### TEXMAP ###############
 
@@ -239,7 +323,7 @@ class PWTDecode(object):
             texmapV.append(struct.unpack('>i', self._read(4))[0])
 
         ############### FACE DETAIL ###############
-        face_details = []
+        self.face_details = []
 
         for _ in range(f_fcount):
             texture_name = struct.unpack('>b', self._read(1))[0]
@@ -253,77 +337,41 @@ class PWTDecode(object):
                       "texture_power":texture_power,
                       "emmisivity":emmisivity,
                       "specularity":specularity}
-            face_details.append(face_d)
+            self.face_details.append(face_d)
 
-        ############### OUTPUT ###############
+    def __str__(self):
+        represent = (
+            ("Vertexcount", "vertexcount"),
+            ("Normalcount", "normalcount"),
+            ("bboxMIN", "bboxMIN"),
+            ("VertexUnusedBits", "vertex_unused_bits"),
+            ("Vertices", "vertices"),
+            ("Normals", "normals"),
+            ("Faces", "faces"),
+            ("FaceDetails", "face_details"),
+        )
 
-        print("HEADER")
-        print("  GlobalMin:  ", self.global_min)
-        print("  GlobalMax:  ", self.global_max)
-        print("  VeryClose:  ", self.veryclose)
-        print("  PrettyClose:", self.prettyclose)
-        print("  IncVertices:", bool(dowrite_vertices))
-        print("  IncNormals: ", bool(dowrite_normals))
-        print("  VBitNum:    ", vertex_bit_num)
-        print("  VBitNum1:   ", vertex_bit_num_1)
-        print("  NBitNum:    ", normal_bit_number)
-        print("  f44:        ", f44)
-        print("  f48:        ", f48)
-        print("  VertexCount:", self.vertex_count)
-        print("  NormalCount:", self.normal_count)
-        print("  FaceCount:  ", self.face_count)
-        print("  f40:        ", f40)
-        print("SubFrameCount: ", self.subframe_count)
-        print("Name:          ", repr(self.name))
-        print("Matrix:")
-        print("   ", self.matrix[:4])
-        print("   ", self.matrix[4:8])
-        print("   ", self.matrix[8:12])
-        print("   ", self.matrix[12:])
-        print("HasAnimation:", self.has_animation)
-        print("HasVisuals:", self.has_visuals)
-        print("FrameVertexCount:", f_vcount)
-        print("FrameNormalCount:", f_ncount)
-        print("FrameFaceCount:  ", f_fcount)
-        print("TextureCount:    ", texcount)
+        max_name_len = max((len(fi[0]) for fi in represent))
 
-        print("FrameVertexCount2:", test1)
-        print("FrameNormalCount2:", test2)
-        print("BBOXMIN:", self.bboxMIN)
-        #print("BBOXMAX:", self.bboxMAX)
-        print("VTRX_BBX/Y/Z:", bbx, bby, bbz)
-        #print("%s vertices X:%s Y:%s Z:%s bits. %s bits total"%
-        #      (test1, vertex_bit_num-bbx,
-        #       vertex_bit_num-bby, vertex_bit_num-bbz,
-        #       (vertex_bit_num*3-bbx-bby-bbz)*test1))
-        #print("SCALED(%s)"%len(scaled_vertices), scaled_vertices)
-        print("VERTICES:", vertices)
+        s = []
+        for name, field in represent:
+            value = getattr(self, field)
+            if isinstance(value, list):
+                s.append(("{:<%s}:" % max_name_len)\
+                         .format(name))
+                s += ["  "+str(item) for item in value]
+            else:
+                value = str(value).splitlines()
+                if len(value) is 1:
+                    s.append(("{:<%s}: {}" % max_name_len)\
+                             .format(name, value[0]))
+                else:
+                    value = tuple(("  "+v for v in value))
+                    s.append(("{:<%s}:" % max_name_len)\
+                             .format(name))
+                    s += value
 
-        print()
-        print("NormVertexCount2:", norm_test1)
-        print("NormNormalCount2:", norm_test2)
-        print("NORM_BBOXMIN:", self.norm_bboxMIN)
-        print("NORM_BBOXMAX:", self.norm_bboxMAX)
-        print("NORM_BBX/Y/Z:", norm_bbx, norm_bby, norm_bby)
-        #print("%s normals X:%s Y:%s Z:%s bits. %s bits total"%
-        #      (norm_test2, normal_bit_number-norm_bbx,
-        #       normal_bit_number-norm_bby, normal_bit_number-norm_bbz,
-        #       (normal_bit_number*3-norm_bbx-norm_bby-norm_bbz)*norm_test2))
-        #print(scaled_normals)
-        print("Normals:", normals)
-        print("FACES:", faces)
-        print("FaceDetails:")
-        for detail in face_details:
-            print("   ", detail)
-
-        print("\nConsumed Bytes:", f.tell(), hex(f.tell()))
-
-    def _read(self, *args, **kwargs):
-        return self._f.read(*args, **kwargs)
-
-    def _readline(self, *args, **kwargs):
-        return self._f.readline(*args, **kwargs)
-
+        return "\n".join(s)
 
 if __name__ == "__main__":
     import os
@@ -345,3 +393,4 @@ if __name__ == "__main__":
     with open(inpath, "rb") as f:
         decoder = PWTDecode(f)
         decoder.decode()
+        print(decoder)
