@@ -138,9 +138,9 @@ class ModelFrame(object):
 
         self.has_animation = bool(self._read(1)[0])
         self.has_visuals = bool(self._read(1)[0])
-        print("FRAME: '%s'; Subframes: %s; Visuals: %s; Animation: %s"%\
-              (self.name, self.subframe_count,
-               self.has_visuals, self.has_animation))
+        #print("FRAME: '%s'; Subframes: %s; Visuals: %s; Animation: %s"%\
+        #      (self.name, self.subframe_count,
+        #       self.has_visuals, self.has_animation))
 
         self.animation = None
         if self.has_animation:
@@ -206,8 +206,7 @@ class ModelVisuals(object):
         self.vertexcomp_count, = struct.unpack('>i', bf.readbits(32))
 
         if self.vertexcount != self.vertexcomp_count:
-            print(self.vertexcount, self.normalcount)
-            print("FRAME COUNT", self.subframe_count)
+            #print(self.vertexcount, self.vertexcomp_count)
             raise Exception("Don't know how to handle compressed vectors")
 
         self.bboxMIN = struct.unpack('>3f', bf.readbits(3*4*8))
@@ -289,9 +288,6 @@ class ModelVisuals(object):
 
         face_vertex_bit_length = math.ceil(math.log2(self.vcount))
         face_normal_bit_length = math.ceil(math.log2(self.ncount))
-        print("VCOUNT", self.vcount)
-        print("NCOUNT", self.ncount)
-        print("FACE BITS", face_vertex_bit_length, face_normal_bit_length)
 
         #raise Exception(face_vertex_bit_length)
         bf = BitfieldReader(self._pwt._f)
@@ -302,11 +298,11 @@ class ModelVisuals(object):
             face_ints = []
             normal_ints = []
             for _ in range(3):
-                tmp = bf.readbits(face_vertex_bit_length)
+                tmp = bf.readbits(face_normal_bit_length)
                 n = struct.unpack('>i', b'\x00'*(4-len(tmp)) + tmp)[0]
                 normal_ints.append(n)
 
-                tmp = bf.readbits(face_normal_bit_length)
+                tmp = bf.readbits(face_vertex_bit_length)
                 v = struct.unpack('>i', b'\x00'*(4-len(tmp)) + tmp)[0]
                 face_ints.append(v)
 
@@ -326,7 +322,7 @@ class ModelVisuals(object):
         ############### FACE DETAIL ###############
 
         #showpoints(self.vertices)
-        #showpoly(self.vertices, self.faces)
+        showpoly(self.vertices, self.faces)
         self.face_details = []
         try:
             for _ in range(self.fcount):
@@ -370,11 +366,11 @@ class ModelVisuals(object):
             ("bboxMIN", "bboxMIN"),
             ("VertexUnusedBits", "vertex_unused_bits"),
             ("NormalUnusedBits", "normal_unused_bits"),
-            ("Vertices", "vertices"),
-            ("Normals", "normals"),
-            ("Faces", "faces"),
-            ("FacesNormals", "facenormals"),
-            ("FaceDetails", "face_details"),
+            #("Vertices", "vertices"),
+            #("Normals", "normals"),
+            #("Faces", "faces"),
+            #("FacesNormals", "facenormals"),
+            #("FaceDetails", "face_details"),
             ("Textures", "textures"),
         )
         return do_str(self, represent)
@@ -408,25 +404,20 @@ def showpoly(vertices, faces):
     import matplotlib.pyplot as plt
     import mpl_toolkits.mplot3d as a3
     ax = a3.Axes3D(plt.figure())
-    print(faces)
 
     facevertices = [(vertices[ai], vertices[bi], vertices[ci])
                     for ai,bi, ci in faces]
 
-    print(facevertices)
     for face in facevertices:
-        tri = a3.art3d.Poly3DCollection([
-            face
-            #for face in facevertices
-        ])
+        tri = a3.art3d.Poly3DCollection([face])
         ax.add_collection3d(tri)
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
-    ax.set_xlim(-2,2)
-    ax.set_ylim(-2,2)
-    ax.set_zlim(-2,2)
+    ax.set_xlim(-200,200)
+    ax.set_ylim(-200,200)
+    ax.set_zlim(-200,200)
 
     plt.show()
 
