@@ -200,9 +200,6 @@ class WTDecoder(object):
             self.base_type, (None, None))
         if type == 0:
             table = self.calc_enc_key_table_TYPEMODEL()
-            print("Warning, Model decompression produces a cab with a pwt file. "
-                  "The pwt file is not reversed and therefore currently unusable.",
-                  file=sys.stderr)
         elif type == 1:
             table = self.calc_enc_key_table_TYPEMEDIA()
         elif type == 2:

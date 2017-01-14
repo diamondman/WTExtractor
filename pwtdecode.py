@@ -76,8 +76,8 @@ class PWTDecode(object):
             '>ii', self._read(8))
 
         self.dowrite_vertices, self.dowrite_normals,\
-            self.vertex_bit_num, self.vertex_bit_num_1,\
-            self.normal_bit_number, self.f44, self.f48\
+            self.vertex_bit_accuracy, self.vertex_bit_accuracy_1,\
+            self.normal_bit_accuracy, self.f44, self.f48\
             = struct.unpack('>7i', self._read(28))
 
         self.dowrite_vertices, self.dowrite_normals\
@@ -88,8 +88,6 @@ class PWTDecode(object):
 
         #####################################
         self.frame = ModelFrame(self)
-
-        print("\nConsumed Bytes:", f.tell(), hex(f.tell()))
 
     def _read(self, *args, **kwargs):
         return self._f.read(*args, **kwargs)
@@ -105,9 +103,9 @@ class PWTDecode(object):
             ("PrettyClose", "prettyclose"),
             ("IncVertices", "dowrite_vertices"),
             ("IncNormals", "dowrite_normals"),
-            ("VBitNum", "vertex_bit_num"),
-            ("VBitNum1", "vertex_bit_num_1"),
-            ("NBitNum", "normal_bit_number"),
+            ("VAccuracy", "vertex_bit_accuracy"),
+            ("VAccuracy1", "vertex_bit_accuracy_1"),
+            ("NAccuracy", "normal_bit_accuracy"),
             ("f44", "f44"),
             ("f48", "f48"),
             ("VertexCount", "vertex_count"),
@@ -116,31 +114,9 @@ class PWTDecode(object):
             ("f40", "f40"),
             ("Frame", "frame"),
         )
-
-        max_name_len = max((len(fi[0]) for fi in represent))
-
-        s = []
-        for name, field in represent:
-            value = getattr(self, field)
-            if isinstance(value, list):
-                s.append(("{:<%s}:" % max_name_len)\
-                         .format(name))
-                s += ["  "+str(item) for item in value]
-            else:
-                value = str(value).splitlines()
-                if len(value) is 1:
-                    s.append(("{:<%s}: {}" % max_name_len)\
-                             .format(name, value[0]))
-                else:
-                    value = tuple(("  "+v for v in value))
-                    s.append(("{:<%s}:" % max_name_len)\
-                             .format(name))
-                    s += value
-
-        return "\n".join(s)
+        return do_str(self, represent)
 
 class ModelFrame(object):
-
     def _read(self, *args, **kwargs):
         return self._pwt._read(*args, **kwargs)
 
@@ -149,13 +125,10 @@ class ModelFrame(object):
 
         self.subframe_count, = struct.unpack('>i', self._read(4))
 
-        name_buff = bytearray()
-        while True:
-            c = self._read(1)[0]
-            name_buff.append(c)
-            if c == 0:
-                break
-        self.name = struct.unpack('s', name_buff)[0][:-1].decode('utf8')
+        namelen = struct.unpack('B', self._read(1))[0]
+
+        self.name = "" if namelen is 0 else\
+                    self._read(namelen).decode('utf8')
 
         mata = struct.unpack('>4f', self._read(4*4))
         matb = struct.unpack('>4f', self._read(4*4))
@@ -165,6 +138,9 @@ class ModelFrame(object):
 
         self.has_animation = bool(self._read(1)[0])
         self.has_visuals = bool(self._read(1)[0])
+        print("FRAME: '%s'; Subframes: %s; Visuals: %s; Animation: %s"%\
+              (self.name, self.subframe_count,
+               self.has_visuals, self.has_animation))
 
         self.animation = None
         if self.has_animation:
@@ -179,45 +155,28 @@ class ModelFrame(object):
                 self.animation.append(
                     (dvTime, keytype, ani_A, ani_B, ani_C, ani_D))
 
-            raise NotImplementedError()
-
         if self.has_visuals:
             self.visuals = ModelVisuals(self)
         else:
             self.visuals = None
 
+        self.subframes = []
+        for _ in range(self.subframe_count):
+            subframe = ModelFrame(self._pwt)
+            self.subframes.append(subframe)
+
     def __str__(self):
         represent = (
-            ("SubFrameCount", "subframe_count"),
             ("Name", "name"),
             ("Matrix", "matrix"),
-            ("HasAnimation", "has_animation"),
-            ("HasVisuals", "has_visuals"),
+            #("HasAnimation", "has_animation"),
+            #("HasVisuals", "has_visuals"),
             ("Animation", "animation"),
             ("Visuals", "visuals"),
+            ("SubFrameCount", "subframe_count"),
+            ("SubFrames", "subframes"),
         )
-
-        max_name_len = max((len(fi[0]) for fi in represent))
-
-        s = []
-        for name, field in represent:
-            value = getattr(self, field)
-            if isinstance(value, list):
-                s.append(("{:<%s}:" % max_name_len)\
-                         .format(name))
-                s += ["  "+str(item) for item in value]
-            else:
-                value = str(value).splitlines()
-                if len(value) is 1:
-                    s.append(("{:<%s}: {}" % max_name_len)\
-                             .format(name, value[0]))
-                else:
-                    value = tuple(("  "+v for v in value))
-                    s.append(("{:<%s}:" % max_name_len)\
-                             .format(name))
-                    s += value
-
-        return "\n".join(s)
+        return do_str(self, represent)
 
 class ModelVisuals(object):
     @property
@@ -232,7 +191,7 @@ class ModelVisuals(object):
 
         self.vcount, self.ncount, self.fcount\
             = struct.unpack('>3i', self._read(12))
-        texcount = self._read(1)[0]
+        self.texturecount = self._read(1)[0]
 
         ###### VERTICES ######
 
@@ -244,13 +203,12 @@ class ModelVisuals(object):
 
         bf = BitfieldReader(self._pwt._f)
         self.vertexcount, = struct.unpack('>i', bf.readbits(32))
-        self.normalcount, = struct.unpack('>i', bf.readbits(32))
+        self.vertexcomp_count, = struct.unpack('>i', bf.readbits(32))
 
-        if self.vertexcount != self.normalcount:
+        if self.vertexcount != self.vertexcomp_count:
             print(self.vertexcount, self.normalcount)
             print("FRAME COUNT", self.subframe_count)
-            raise Exception("Don't know how to handle "
-                            "diff norm vert count")
+            raise Exception("Don't know how to handle compressed vectors")
 
         self.bboxMIN = struct.unpack('>3f', bf.readbits(3*4*8))
 
@@ -262,11 +220,11 @@ class ModelVisuals(object):
 
         scaled_vertices = []
         for _ in range(self.vertexcount):
-            x = bf.readbits(self._pwt.vertex_bit_num-bbx)
+            x = bf.readbits(self._pwt.vertex_bit_accuracy-bbx)
             x = b'\x00'*(4-len(x)) + x
-            y = bf.readbits(self._pwt.vertex_bit_num-bby)
+            y = bf.readbits(self._pwt.vertex_bit_accuracy-bby)
             y = b'\x00'*(4-len(y)) + y
-            z = bf.readbits(self._pwt.vertex_bit_num-bbz)
+            z = bf.readbits(self._pwt.vertex_bit_accuracy-bbz)
             z = b'\x00'*(4-len(z)) + z
 
             x = struct.unpack('>i', x)[0]
@@ -275,7 +233,7 @@ class ModelVisuals(object):
 
             scaled_vertices.append((x,y,z))
 
-        oddbitnum = (1 << self._pwt.vertex_bit_num) - 1
+        oddbitnum = (1 << self._pwt.vertex_bit_accuracy) - 1
         self.vertices = [((v[0]*maxbbox_dimen/oddbitnum) + self.bboxMIN[0],
                      (v[1]*maxbbox_dimen/oddbitnum) + self.bboxMIN[1],
                      (v[2]*maxbbox_dimen/oddbitnum) + self.bboxMIN[2])
@@ -284,12 +242,11 @@ class ModelVisuals(object):
         ########## NORMALS ##########
         bf = BitfieldReader(self._pwt._f)
 
-        norm_test1, = struct.unpack('>i', bf.readbits(32))
-        norm_test2, = struct.unpack('>i', bf.readbits(32))
+        self.normalcount, = struct.unpack('>i', bf.readbits(32))
+        self.normalcomp_count, = struct.unpack('>i', bf.readbits(32))
 
-        if norm_test1 != norm_test2:
-            raise Exception("Don't know how to handle "
-                            "diff norm vert count")
+        if self.normalcount != self.normalcomp_count:
+            raise Exception("Don't know how to handle compressed vectors")
 
         self.norm_bboxMIN = struct.unpack('>3f', bf.readbits(3*4*8))
         #Only needed for non vertices..... or something
@@ -298,14 +255,16 @@ class ModelVisuals(object):
         norm_bbx = struct.unpack('>B', bf.readbits(6))[0]
         norm_bby = struct.unpack('>B', bf.readbits(6))[0]
         norm_bbz = struct.unpack('>B', bf.readbits(6))[0]
+        self.normal_unused_bits = (norm_bbx, norm_bby, norm_bbz)
+
 
         scaled_normals = []
         for _ in range(self.normalcount):
-            x = bf.readbits(self._pwt.normal_bit_number-bbx)
+            x = bf.readbits(self._pwt.normal_bit_accuracy-norm_bbx)
             x = b'\x00'*(4-len(x)) + x
-            y = bf.readbits(self._pwt.normal_bit_number-bby)
+            y = bf.readbits(self._pwt.normal_bit_accuracy-norm_bby)
             y = b'\x00'*(4-len(y)) + y
-            z = bf.readbits(self._pwt.normal_bit_number-bbz)
+            z = bf.readbits(self._pwt.normal_bit_accuracy-norm_bbz)
             z = b'\x00'*(4-len(z)) + z
 
             x = struct.unpack('>i', x)[0]
@@ -319,7 +278,7 @@ class ModelVisuals(object):
             self.norm_bboxMAX[2] - self.norm_bboxMIN[2],
         ))
 
-        maxnum = (1 << self._pwt.normal_bit_number) - 1
+        maxnum = (1 << self._pwt.normal_bit_accuracy) - 1
         self.normals = [
             ((v[0]*maxbbox_dimen_normals/maxnum) + self.norm_bboxMIN[0],
              (v[1]*maxbbox_dimen_normals/maxnum) + self.norm_bboxMIN[1],
@@ -329,23 +288,30 @@ class ModelVisuals(object):
         ############### FACES ###############
 
         face_vertex_bit_length = math.ceil(math.log2(self.vcount))
+        face_normal_bit_length = math.ceil(math.log2(self.ncount))
+        print("VCOUNT", self.vcount)
+        print("NCOUNT", self.ncount)
+        print("FACE BITS", face_vertex_bit_length, face_normal_bit_length)
 
+        #raise Exception(face_vertex_bit_length)
         bf = BitfieldReader(self._pwt._f)
 
         self.faces = []
+        self.facenormals = []
         for _ in range(self.fcount):
             face_ints = []
             normal_ints = []
             for _ in range(3):
-                n = bf.readbits(3)
-                n = struct.unpack('>i', b'\x00'*(4-len(n)) + n)[0]
+                tmp = bf.readbits(face_vertex_bit_length)
+                n = struct.unpack('>i', b'\x00'*(4-len(tmp)) + tmp)[0]
                 normal_ints.append(n)
 
-                v = bf.readbits(3)
-                v = struct.unpack('>i', b'\x00'*(4-len(v)) + v)[0]
+                tmp = bf.readbits(face_normal_bit_length)
+                v = struct.unpack('>i', b'\x00'*(4-len(tmp)) + tmp)[0]
                 face_ints.append(v)
 
-            self.faces.append((tuple(face_ints), tuple(normal_ints)))
+            self.faces.append(tuple(face_ints))
+            self.facenormals.append(tuple(normal_ints))
 
         ############### TEXMAP ###############
 
@@ -358,55 +324,131 @@ class ModelVisuals(object):
             texmapV.append(struct.unpack('>i', self._read(4))[0])
 
         ############### FACE DETAIL ###############
+
+        #showpoints(self.vertices)
+        #showpoly(self.vertices, self.faces)
         self.face_details = []
+        try:
+            for _ in range(self.fcount):
+                texture_name = struct.unpack('>b', self._read(1))[0]
+                texture_color = struct.unpack('>I', self._read(4))[0]
+                texture_power = struct.unpack('>f', self._read(4))[0]
+                emmisivity = struct.unpack('>3f', self._read(12))
+                specularity = struct.unpack('>3f', self._read(12))
 
-        for _ in range(self.fcount):
-            texture_name = struct.unpack('>b', self._read(1))[0]
-            texture_color = struct.unpack('>I', self._read(4))[0]
-            texture_power = struct.unpack('>f', self._read(4))[0]
-            emmisivity = struct.unpack('>3f', self._read(12))
-            specularity = struct.unpack('>3f', self._read(12))
+                face_d = {"texture_name":texture_name,
+                          "texture_color":texture_color,
+                          "texture_power":texture_power,
+                          "emmisivity":emmisivity,
+                          "specularity":specularity}
+                self.face_details.append(face_d)
+        except:
+            self.face_details.append("HIT EOF")
 
-            face_d = {"texture_name":texture_name,
-                      "texture_color":texture_color,
-                      "texture_power":texture_power,
-                      "emmisivity":emmisivity,
-                      "specularity":specularity}
-            self.face_details.append(face_d)
+        ############### TEXTURES ###############
+        try:
+            self.textures = None
+            if self.texturecount:
+                self.textures = []
+                datlen = self._read(1)[0]
+                for _ in range(self.texturecount):
+                    self.textures.append(self._read(datlen))
+        except:
+            self.textures.append("HIT EOF")
 
     def __str__(self):
         represent = (
+            ("VisualsVcount", "vcount"),
+            ("VisualsNcount", "ncount"),
+            ("VisualsFcount", "fcount"),
             ("Vertexcount", "vertexcount"),
+            ("CompressevVcount", "vertexcomp_count"),
             ("Normalcount", "normalcount"),
+            ("CompressevNcount", "normalcomp_count"),
+            ("FaceCount", "fcount"),
+            ("Texturecount", "texturecount"),
             ("bboxMIN", "bboxMIN"),
             ("VertexUnusedBits", "vertex_unused_bits"),
+            ("NormalUnusedBits", "normal_unused_bits"),
             ("Vertices", "vertices"),
             ("Normals", "normals"),
             ("Faces", "faces"),
+            ("FacesNormals", "facenormals"),
             ("FaceDetails", "face_details"),
+            ("Textures", "textures"),
         )
+        return do_str(self, represent)
 
-        max_name_len = max((len(fi[0]) for fi in represent))
-
-        s = []
-        for name, field in represent:
-            value = getattr(self, field)
-            if isinstance(value, list):
+def do_str(instance, represent):
+    max_name_len = max((len(fi[0]) for fi in represent))
+    s = []
+    for name, field in represent:
+        value = getattr(instance, field)
+        if isinstance(value, list):
+            if not len(value):
+                s.append(("{:<%s}: []" % max_name_len).format(name))
+            else:
+                s.append(("{:<%s}:" % max_name_len).format(name))
+                for item in value:
+                    item = str(item).splitlines()
+                    s += tuple(("  "+v for v in item))
+        else:
+            value = str(value).splitlines()
+            if len(value) is 1:
+                s.append(("{:<%s}: {}" % max_name_len)\
+                         .format(name, value[0]))
+            else:
                 s.append(("{:<%s}:" % max_name_len)\
                          .format(name))
-                s += ["  "+str(item) for item in value]
-            else:
-                value = str(value).splitlines()
-                if len(value) is 1:
-                    s.append(("{:<%s}: {}" % max_name_len)\
-                             .format(name, value[0]))
-                else:
-                    value = tuple(("  "+v for v in value))
-                    s.append(("{:<%s}:" % max_name_len)\
-                             .format(name))
-                    s += value
+                s += tuple(("  "+v for v in value))
 
-        return "\n".join(s)
+    return "\n".join(s)
+
+def showpoly(vertices, faces):
+    import matplotlib.pyplot as plt
+    import mpl_toolkits.mplot3d as a3
+    ax = a3.Axes3D(plt.figure())
+    print(faces)
+
+    facevertices = [(vertices[ai], vertices[bi], vertices[ci])
+                    for ai,bi, ci in faces]
+
+    print(facevertices)
+    for face in facevertices:
+        tri = a3.art3d.Poly3DCollection([
+            face
+            #for face in facevertices
+        ])
+        ax.add_collection3d(tri)
+
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+    ax.set_xlim(-2,2)
+    ax.set_ylim(-2,2)
+    ax.set_zlim(-2,2)
+
+    plt.show()
+
+def showpoints(points):
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.set_aspect("equal")
+
+    xs = [elem[0] for elem in points]
+    ys = [elem[2] for elem in points]
+    zs = [elem[1] for elem in points]
+
+    ax.scatter(xs, ys, zs)
+
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+
+    plt.show()
 
 if __name__ == "__main__":
     import os
@@ -429,3 +471,6 @@ if __name__ == "__main__":
         decoder = PWTDecode(f)
         decoder.decode()
         print(decoder)
+        print("\nConsumed Bytes:", f.tell(), hex(f.tell()))
+        f.seek(0, os.SEEK_END)
+        print("Total Bytes:   ", f.tell(), hex(f.tell()))
