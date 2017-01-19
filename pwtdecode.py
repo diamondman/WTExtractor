@@ -311,13 +311,13 @@ class ModelVisuals(object):
 
         ############### TEXMAP ###############
 
-        texmapU = []
+        self.texmapU = []
         for _ in range(self.vcount):
-            texmapU.append(struct.unpack('>i', self._read(4))[0])
+            self.texmapU.append(struct.unpack('>f', self._read(4))[0])
 
-        texmapV = []
+        self.texmapV = []
         for _ in range(self.vcount):
-            texmapV.append(struct.unpack('>i', self._read(4))[0])
+            self.texmapV.append(struct.unpack('>f', self._read(4))[0])
 
         ############### FACE DETAIL ###############
 
@@ -371,6 +371,8 @@ class ModelVisuals(object):
             #("Faces", "faces"),
             #("FacesNormals", "facenormals"),
             #("FaceDetails", "face_details"),
+            #("Texmapu", "texmapU"),
+            #("Texmapv", "texmapV"),
             ("Textures", "textures"),
         )
         return do_str(self, represent)

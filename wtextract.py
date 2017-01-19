@@ -180,10 +180,12 @@ class WTDecoder(object):
             raise WTFormatException(
                 "File Should have an empty line after date. Exiting.", -4)
 
-        self.comment = self._readline().decode().strip()
-
-        if self._readline().strip() != b'.START':
-            raise WTFormatException("File missing .START section. Exiting.", -5)
+        self.comment = ""
+        while True:
+            s = self._readline().decode()
+            if s == ".START\n":
+                break
+            self.comment += s
 
         fieldcount = rev_offset(ord(self._read(1)), 0xC5)
         if fieldcount != 9:
@@ -196,13 +198,13 @@ class WTDecoder(object):
 
         self._decode_urls()
 
-        type, self.out_ext = WTDecoder.file_type_info.get(
+        type_, self.out_ext = WTDecoder.file_type_info.get(
             self.base_type, (None, None))
-        if type == 0:
+        if type_ == 0:
             table = self.calc_enc_key_table_TYPEMODEL()
-        elif type == 1:
+        elif type_ == 1:
             table = self.calc_enc_key_table_TYPEMEDIA()
-        elif type == 2:
+        elif type_ == 2:
             table = self.calc_enc_key_table_TYPEDATA()
         else:
             raise Exception("No known way to extract type '%s'"%self.base_type)
@@ -217,6 +219,7 @@ class WTDecoder(object):
             size, func, name = WTDecoder.field_interpretation[i]
             self.fields[name] = func(rawfield[:size] if size else rawfield)
 
+    ########### HASH BYTE CALCULATION
     def calc_hash_byte_TYPEMEDIADATA(self):
         max_field_len = max((len(f) for f in self.rawfields))
         enc_byte = 0
@@ -230,13 +233,14 @@ class WTDecoder(object):
     def calc_hash_byte_TYPEMODEL(self):
         max_field_len = max((len(f) for f in self.rawfields))
         enc_byte = 0
-        for i, data in enumerate(self.rawfields):
+        for data in self.rawfields:
             if max_field_len > 0:
                 for j in range(max_field_len):
                     c = data[j % len(data)] if len(data) >= 1 else 0
                     enc_byte ^= c
         return enc_byte & 0xFF
 
+    ########### HASH TABLE CALCULATION
     def calc_enc_key_table_TYPEDATA(self, enc_byte=None):
         if enc_byte is None:
             enc_byte = self.calc_hash_byte_TYPEMEDIADATA()
@@ -254,6 +258,7 @@ class WTDecoder(object):
     def calc_enc_key_table_TYPEMEDIA(self, enc_byte=None):
         if enc_byte is None:
             enc_byte = self.calc_hash_byte_TYPEMEDIADATA()
+
         enc_key_table = [enc_byte] * max((len(f) for f in self.rawfields))
 
         for i in range(len(enc_key_table)):
