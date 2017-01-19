@@ -1,3 +1,7 @@
+WildCompress CMD FLAGS to trigger model creation
+-convertmodel /home/diamondman/vmwritable/WildCompress/notajpeg.wjp2
+
+
 For Text File. Address 0x33d7A8
 
 Hash calc in ENCRYPT_MYS0::GetBuffHash

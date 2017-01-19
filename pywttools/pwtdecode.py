@@ -321,8 +321,8 @@ class ModelVisuals(object):
 
         ############### FACE DETAIL ###############
 
-        #showpoints(self.vertices)
-        showpoly(self.vertices, self.faces)
+        #self.showpoints()
+        self.showpoly()
         self.face_details = []
         try:
             for _ in range(self.fcount):
@@ -351,6 +351,47 @@ class ModelVisuals(object):
                     self.textures.append(self._read(datlen))
         except:
             self.textures.append("HIT EOF")
+
+    def showpoly(self):
+        import matplotlib.pyplot as plt
+        import mpl_toolkits.mplot3d as a3
+        ax = a3.Axes3D(plt.figure())
+
+        facevertices = [(self.vertices[ai], self.vertices[bi],
+                         self.vertices[ci]) for ai,bi, ci in self.faces]
+
+        for face in facevertices:
+            tri = a3.art3d.Poly3DCollection([face])
+            ax.add_collection3d(tri)
+
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('Y Label')
+        ax.set_zlabel('Z Label')
+        ax.set_xlim(-200,200)
+        ax.set_ylim(-200,200)
+        ax.set_zlim(-200,200)
+
+        plt.show()
+
+    def showpoints(self):
+        from mpl_toolkits.mplot3d import Axes3D
+        import matplotlib.pyplot as plt
+
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        ax.set_aspect("equal")
+
+        xs = [elem[0] for elem in self.vertices]
+        ys = [elem[2] for elem in self.vertices]
+        zs = [elem[1] for elem in self.vertices]
+
+        ax.scatter(xs, ys, zs)
+
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('Y Label')
+        ax.set_zlabel('Z Label')
+
+        plt.show()
 
     def __str__(self):
         represent = (
@@ -401,47 +442,6 @@ def do_str(instance, represent):
                 s += tuple(("  "+v for v in value))
 
     return "\n".join(s)
-
-def showpoly(vertices, faces):
-    import matplotlib.pyplot as plt
-    import mpl_toolkits.mplot3d as a3
-    ax = a3.Axes3D(plt.figure())
-
-    facevertices = [(vertices[ai], vertices[bi], vertices[ci])
-                    for ai,bi, ci in faces]
-
-    for face in facevertices:
-        tri = a3.art3d.Poly3DCollection([face])
-        ax.add_collection3d(tri)
-
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
-    ax.set_xlim(-200,200)
-    ax.set_ylim(-200,200)
-    ax.set_zlim(-200,200)
-
-    plt.show()
-
-def showpoints(points):
-    from mpl_toolkits.mplot3d import Axes3D
-    import matplotlib.pyplot as plt
-
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.set_aspect("equal")
-
-    xs = [elem[0] for elem in points]
-    ys = [elem[2] for elem in points]
-    zs = [elem[1] for elem in points]
-
-    ax.scatter(xs, ys, zs)
-
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
-
-    plt.show()
 
 if __name__ == "__main__":
     import os
