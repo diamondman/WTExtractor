@@ -18,10 +18,11 @@ int main(int args, char** argv){
   fread(fbuff, 1, fsize, fp);
   fclose(fp);
 
-  wld3_extract(fbuff, fsize);
+  WLD3* wt = wld3_extract(fbuff, fsize);
+  wlkd_print(wt);
 
   free(fbuff);
-
+  wld3_free(wt);
   return 0;
 }
 

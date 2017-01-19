@@ -3,44 +3,30 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <mspack.h>
 
 #define __USE_XOPEN
 #include <time.h>
 
 #include "wld3_extract.h"
+#include "multifh.h"
 
-//typedef struct reader_{
-//  uint8_t* fbuff;
-//  size_t fsize;
-//  uint8_t* ptr;
-//} Reader;
-//
-//Reader* readerCreate(uint8_t* fbuff, size_t fsize){
-//  Reader* r = malloc(sizeof(Reader));
-//  r->fbuff = fbuff;
-//  r->fsize = fsize;
-//  r->ptr = fbuff;
-//  return r;
-//}
-//
-//void readerDelete(Reader* r){
-//  free(r);
-//}
+#define WT_HEADER_STR "WildTangent 3D 300 Compressed and Patented\r\nConverted by XtoWT: "
 
-typedef struct{
+typedef struct {
   uint8_t len;
   uint8_t* buff;
   uint8_t last_crypt_byte;
   uint32_t index;
 } EncryptTable;
 
-typedef struct fileinfo{
+typedef struct {
   char headerval[EXT_BUFF_LEN];
   enum resource_class rc;
   char outext[EXT_BUFF_LEN];
 } FileInfo;
 
-const FileInfo file_type_info[] = {
+static const FileInfo file_type_info[] = {
   {"png", media, "png"},
   {"jpg", media, "jpg"},
   {"wav", media, "wav"},
@@ -55,12 +41,11 @@ const FileInfo file_type_info[] = {
   {"tmp", media, "tmp"},
 };
 
-const uint8_t WTFIELD_MIN_LEN [9] = {
+static const uint8_t WTFIELD_MIN_LEN [9] = {
   0, 4, 4, 4, 16, 16, 4, 5, 4
 };
 
-
-uint8_t calc_header_maxlen(uint8_t headerlens[], uint8_t headercount){
+static uint8_t calc_header_maxlen(uint8_t headerlens[], uint8_t headercount){
   uint8_t max = 0;
   for(int i = 0; i < headercount; i++)
     if(headerlens[i] > max)
@@ -68,9 +53,9 @@ uint8_t calc_header_maxlen(uint8_t headerlens[], uint8_t headercount){
   return max;
 }
 
-uint8_t calc_hash_byte_TYPEMODEL
+/////////////// HASH BYTE CALCULATION
+static uint8_t calc_hash_byte_MODEL
 (uint8_t* rawheaders[], uint8_t headerlens[], uint8_t headercount){
-  printf("CALC MODEL HASH BYTE\n");
   uint8_t maxlen = calc_header_maxlen(headerlens, headercount);
   uint8_t enc_byte = 0;
   for(int i=0; i<headercount; i++)
@@ -79,11 +64,10 @@ uint8_t calc_hash_byte_TYPEMODEL
 	if(headerlens[i] >= 1)
 	  enc_byte ^= rawheaders[i][j % headerlens[i]];
   return enc_byte;
-
 }
-uint8_t calc_hash_byte_TYPEMEDIADATA
+
+static uint8_t calc_hash_byte_MEDIADATA
 (uint8_t* rawheaders[], uint8_t headerlens[], uint8_t headercount){
-  printf("CALC MEDIA HASH BYTE\n");
   uint8_t maxlen = calc_header_maxlen(headerlens, headercount);
   uint8_t enc_byte = 0;
   uint8_t c;
@@ -100,8 +84,8 @@ uint8_t calc_hash_byte_TYPEMEDIADATA
   return enc_byte;
 }
 
-////////////////
-EncryptTable* createEncryptTable(){
+/////////////// HASH TABLE CALCULATION
+static EncryptTable* createEncryptTable(){
   EncryptTable* table = malloc(sizeof(EncryptTable));
   table->len = 0;
   table->buff = NULL;
@@ -110,10 +94,17 @@ EncryptTable* createEncryptTable(){
   return table;
 }
 
-EncryptTable* calc_enc_key_table_TYPEDATA
-(uint8_t* rawheaders[], uint8_t headerlens[],
- uint8_t headercount, EncryptTable* table){
+void EncryptTable_free(EncryptTable* table){
+  if(table){
+    if(table->buff){free(table->buff); table->buff=0;}
+    free(table);
+  }
+}
 
+static EncryptTable* get_DATA_hashtable(uint8_t* rawheaders[],
+					uint8_t headerlens[],
+					uint8_t headercount,
+					EncryptTable* table){
   if(table == NULL) table = createEncryptTable();
 
   if(table->len == 0){
@@ -121,7 +112,7 @@ EncryptTable* calc_enc_key_table_TYPEDATA
     table->buff = malloc(table->len);
   }
 
-  uint8_t enc_byte = calc_hash_byte_TYPEMEDIADATA
+  uint8_t enc_byte = calc_hash_byte_MEDIADATA
     (rawheaders, headerlens, headercount);
   memset(table->buff, enc_byte, table->len);
 
@@ -136,10 +127,10 @@ EncryptTable* calc_enc_key_table_TYPEDATA
   return table;
 }
 
-EncryptTable* calc_enc_key_table_TYPEMEDIA
-(uint8_t* rawheaders[], uint8_t headerlens[],
- uint8_t headercount, EncryptTable* table){
-
+static EncryptTable* get_MEDIA_hashtable(uint8_t* rawheaders[],
+					 uint8_t headerlens[],
+					 uint8_t headercount,
+					 EncryptTable* table){
   if(table == NULL) table = createEncryptTable();
 
   if(table->len == 0){
@@ -147,7 +138,7 @@ EncryptTable* calc_enc_key_table_TYPEMEDIA
     table->buff = malloc(table->len);
   }
 
-  uint8_t enc_byte = calc_hash_byte_TYPEMEDIADATA
+  uint8_t enc_byte = calc_hash_byte_MEDIADATA
     (rawheaders, headerlens, headercount);
   memset(table->buff, enc_byte, table->len);
 
@@ -158,10 +149,10 @@ EncryptTable* calc_enc_key_table_TYPEMEDIA
   return table;
 }
 
-EncryptTable* calc_enc_key_table_TYPEMODEL
-(uint8_t* rawheaders[], uint8_t headerlens[],
- uint8_t headercount, EncryptTable* table){
-
+static EncryptTable* get_MODEL_hashtable(uint8_t* rawheaders[],
+					 uint8_t headerlens[],
+					 uint8_t headercount,
+					 EncryptTable* table){
   if(table == NULL) table = createEncryptTable();
 
   if(table->len == 0){
@@ -169,7 +160,7 @@ EncryptTable* calc_enc_key_table_TYPEMODEL
     table->buff = malloc(table->len);
   }
 
-  uint8_t enc_byte = calc_hash_byte_TYPEMODEL
+  uint8_t enc_byte = calc_hash_byte_MODEL
     (rawheaders, headerlens, headercount);
   memset(table->buff, enc_byte, table->len);
 
@@ -181,7 +172,7 @@ EncryptTable* calc_enc_key_table_TYPEMODEL
 }
 
 
-uint8_t decodeByte(EncryptTable* table, uint8_t inbyte){
+static uint8_t decodeByte(EncryptTable* table, uint8_t inbyte){
   uint8_t res = inbyte ^ table->last_crypt_byte ^
       table->buff[table->index % table->len];
   table->index += 1;
@@ -189,8 +180,8 @@ uint8_t decodeByte(EncryptTable* table, uint8_t inbyte){
   return res;
 }
 
-uint32_t readintcrypt(EncryptTable* table, uint8_t a,
-			uint8_t b, uint8_t c, uint8_t d){
+static uint32_t readintcrypt(EncryptTable* table, uint8_t a,
+			     uint8_t b, uint8_t c, uint8_t d){
   a = decodeByte(table, a);
   b = decodeByte(table, b);
   c = decodeByte(table, c);
@@ -198,7 +189,8 @@ uint32_t readintcrypt(EncryptTable* table, uint8_t a,
   return le32toh(d<<24 | c << 16 | b << 8 | a);
 }
 
-char* read_str_crypt(EncryptTable* table, uint8_t* ptr, uint32_t cnt){
+static char* read_str_crypt(EncryptTable* table, uint8_t* ptr,
+			    uint32_t cnt){
   char* outbuff = malloc(cnt+1);
   memcpy(outbuff, ptr, cnt);
   for(int i = 0; i < cnt; i++)
@@ -207,7 +199,7 @@ char* read_str_crypt(EncryptTable* table, uint8_t* ptr, uint32_t cnt){
   return outbuff;
 }
 
-void wtloadUUID(uuid_t u, uint8_t* inbuff){
+static void wtloadUUID(uuid_t u, uint8_t* inbuff){
   u[0] = inbuff[3];
   u[1] = inbuff[2];
   u[2] = inbuff[1];
@@ -221,7 +213,93 @@ void wtloadUUID(uuid_t u, uint8_t* inbuff){
   }
 }
 
-#define WT_HEADER_STR "WildTangent 3D 300 Compressed and Patented\r\nConverted by XtoWT: "
+ExtraStringLL* ExtraStringLL_create(EncryptTable* table, uint8_t* ptr){
+  ExtraStringLL* url = malloc(sizeof(ExtraStringLL));
+
+  url->type = decodeByte(table, *ptr++);
+  url->len = readintcrypt(table, *ptr, *(ptr+1),
+			  *(ptr+2), *(ptr+3));
+  ptr += 4;
+  url->always300_0 = readintcrypt(table, *ptr, *(ptr+1),
+				  *(ptr+2), *(ptr+3));
+  ptr += 4;
+  url->always300_1 = readintcrypt(table, *ptr, *(ptr+1),
+				  *(ptr+2), *(ptr+3));
+  ptr += 4;
+  if(url->len == 0 && url->type == 0){
+    free(url);
+    return NULL;
+  }
+  url->buff = read_str_crypt(table, ptr, url->len);
+  ptr += url->len;
+
+  url->next = NULL;
+
+  return url;
+}
+
+void ExtraStringLL_free(ExtraStringLL* this){
+  if(this->len && this->buff){free(this->buff); this->buff=0;}
+  if(this->next){ExtraStringLL_free(this->next);this->next=0;}
+  free(this);
+}
+
+static void wt_cab_extract(WLD3* wt){
+  uint8_t* inbuff = wt->payload_data;
+  uint32_t inbuff_len = wt->payload_len;
+  const char *mem_cab_in, *mem_cab_out;
+  struct mscab_decompressor *cabd;
+  struct mscabd_cabinet *cab;
+  struct mscabd_file *file;
+  int err;
+
+  mem_cab_in = create_filename_from_memory(inbuff, inbuff_len);
+  if (!mem_cab_in) exit(1);
+
+  MSPACK_SYS_SELFTEST(err);
+  if (err) exit(1);
+
+  if (cabd = mspack_create_cab_decompressor(&multi_system)) {
+    if (cab = cabd->open(cabd, mem_cab_in)) {
+      int filecount = 0;
+      file = cab->files;
+      while(file != NULL){
+	filecount += 1;
+	file = file->next;
+      }
+      if(filecount > 1){
+	printf("More than one file in cab. Aborting extract.\n");
+	cabd->close(cabd, cab);
+      }else{
+	file = cab->files;
+	wt->payload_len = file->length;
+	wt->payload_data = malloc(wt->payload_len);
+	wt->cabcompression = true;
+	//printf("Filename: %s\n", file->filename);
+
+	mem_cab_out = create_filename_from_memory
+	  (wt->payload_data, wt->payload_len);
+	if (!mem_cab_out) exit(1);
+
+	if (cabd->extract(cabd, file, mem_cab_out)) {
+	  printf("Failed to write out to mem buff");
+	  exit(1);
+	}
+	free_filename(mem_cab_out);
+	free(inbuff);
+	cabd->close(cabd, cab);
+      }
+    } else {
+      fprintf(stderr, "can't open cabinet (%d)\n",
+	      cabd->last_error(cabd));
+    }
+    mspack_destroy_cab_decompressor(cabd);
+  } else {
+    fprintf(stderr, "can't make decompressor\n");
+  }
+
+  free_filename(mem_cab_in);
+}
 
 WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
   //Reader *f = readerCreate(fbuff, fsize);
@@ -229,12 +307,13 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
   uint8_t headerlens[9];
   uint8_t* rawheaders[9];
   struct tm tm;
-  EncryptTable table;
   WLD3* wt;
-
+  EncryptTable* table;
 
   wt = malloc(sizeof(WLD3));
   memset(wt, 0, sizeof(WLD3));
+
+  table = createEncryptTable();
 
   if(memcmp(ptr, "WLD3", 4)){
     printf("Bad Magic\n");
@@ -276,9 +355,6 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
     printf("Failed to parse creatime date from text header.\n");
     goto FAIL;
   }
-  //printf("Y: %d; M: %d; D: %d; H: %d; MIN: %d; S: %d\n",
-  //  tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
-  //  tm.tm_hour, tm.tm_min, tm.tm_sec);
   tm.tm_isdst = -1;/* tells mktime() to determine DST*/
   wt->created_unimportant = mktime(&tm);
   if(wt->created_unimportant == -1){
@@ -334,34 +410,34 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
   // COPYRIGHT
   wt->copyright = calloc(headerlens[0]+1, 1);
   memcpy(wt->copyright, rawheaders[0], headerlens[0]);
-  printf("%s\n", wt->copyright);
+  //printf("%s\n", wt->copyright);
 
   //CreatedDate
   wt->createddate = (time_t)le32toh(*((uint32_t*)rawheaders[1]));
-  printf("CREATED %u\n", (unsigned int)wt->createddate);
+  //printf("CREATED %u\n", (unsigned int)wt->createddate);
 
   //StartValieDate
   wt->startvaliedate = (time_t)le32toh(*((uint32_t*)rawheaders[2]));
-  printf("VALIDD  %u\n", (unsigned int)wt->startvaliedate);
+  //printf("VALIDD  %u\n", (unsigned int)wt->startvaliedate);
 
   //ExpireDate
   wt->expiredate = (time_t)le32toh(*((uint32_t*)rawheaders[3]));
-  printf("Expire  %u\n", (unsigned int)wt->expiredate);
+  //printf("Expire  %u\n", (unsigned int)wt->expiredate);
 
   //WTVerUUID
+  //char uuid_str[37];
   wtloadUUID(wt->wtversionUUID, rawheaders[4]);
-  char uuid_str[37];
-  uuid_unparse(wt->wtversionUUID, uuid_str);
-  printf("UUID: %s\n", uuid_str);
+  //uuid_unparse(wt->wtversionUUID, uuid_str);
+  //printf("UUID: %s\n", uuid_str);
 
   //ResourceUUID
   wtloadUUID(wt->resourceUUID, rawheaders[5]);
-  uuid_unparse(wt->resourceUUID, uuid_str);
-  printf("UUID: %s\n", uuid_str);
+  //uuid_unparse(wt->resourceUUID, uuid_str);
+  //printf("UUID: %s\n", uuid_str);
 
   //LicenseType
   memcpy(wt->licensetype, rawheaders[6], 4);
-  printf("LicenseType: %s\n", wt->licensetype);
+  //printf("LicenseType: %s\n", wt->licensetype);
 
   //Check Body Marker
   if(memcmp(rawheaders[7]+(headerlens[7]-5), ".BODY", 5) != 0){
@@ -375,36 +451,24 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
     printf("Invalid Format: Unknown Encode Type %d\n", wt->encodeversion);
     goto FAIL;
   }
-  printf("EncodeVersion: %u\n", wt->encodeversion);
+  //printf("EncodeVersion: %u\n", wt->encodeversion);
 
   //ExtraURLs
   if(wt->encodeversion >= 300){
-    calc_enc_key_table_TYPEMEDIA
-      (rawheaders, headerlens, headercount, &table);
-    //self.urls = {};
-    printf("\n\nURLS:\n");
+    get_MEDIA_hashtable(rawheaders, headerlens, headercount, table);
+    ExtraStringLL** tail = &wt->urls;
     while(1){
-      uint8_t urltype = decodeByte(&table, *ptr++);
-      uint32_t url_len = readintcrypt(&table, *ptr, *(ptr+1),
-				      *(ptr+2), *(ptr+3));
-      ptr += 4;
-      uint32_t always300_0 = readintcrypt(&table, *ptr, *(ptr+1),
-					  *(ptr+2), *(ptr+3));
-      ptr += 4;
-      uint32_t always300_1 = readintcrypt(&table, *ptr, *(ptr+1),
-					  *(ptr+2), *(ptr+3));
-      ptr += 4;
-      printf("0x%02x %d %d %d\n", urltype, url_len, always300_0,
-	     always300_1);
-      if(url_len == 0 && urltype == 0) break;
+      ExtraStringLL* url = ExtraStringLL_create(table, ptr);
+      if(url == NULL){
+	ptr += 13;
+	//ExtraStringLL_free(url);
+	break;
+      }
 
-      char* urlbody = read_str_crypt(&table, ptr, url_len);
-      printf("URL: %s\n", urlbody);
-      free(urlbody);
-      ptr += url_len;
-      //self.urls.setdefault(urltype, []).append(urlbody);
+      ptr += 13+url->len;
+      *tail = url;
+      tail = &url->next;
     }
-    printf("\n\n");
   }
 
   //EncodeType
@@ -413,10 +477,10 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
   size_t outext_len = strlen(wt->outext);
   for(int i = 0; i < sizeof(file_type_info)/sizeof(FileInfo); i++){
     if(memcmp(file_type_info[i].headerval, wt->outext, outext_len) == 0){
-      memcpy(wt->outext, file_type_info[i].outext, typelen);
+      outext_len = strlen(file_type_info[i].outext);
+      memcpy(wt->outext, file_type_info[i].outext, outext_len);
       encodetype = file_type_info[i].rc;
       typeindex = i;
-      //printf("Found Index %d\n\n\n", i);
       break;
     }
   }
@@ -426,69 +490,80 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
   }
 
   //EncodeTableCalculation
-  printf("TYPE %d\n", encodetype);
-  printf("MODEL TYPE %d\n", model);
   if(encodetype == model){
-    printf("CALCING FOR MODEL\n");
-    calc_enc_key_table_TYPEMODEL
-      (rawheaders, headerlens, headercount, &table);
+    get_MODEL_hashtable(rawheaders, headerlens, headercount, table);
   }else if(encodetype == media){
-    calc_enc_key_table_TYPEMEDIA
-      (rawheaders, headerlens, headercount, &table);
+    get_MEDIA_hashtable(rawheaders, headerlens, headercount, table);
   }else if(encodetype == data){
-    calc_enc_key_table_TYPEDATA
-      (rawheaders, headerlens, headercount, &table);
+    get_DATA_hashtable(rawheaders, headerlens, headercount, table);
   }else{
     printf("Error: Unknown resource class selected.");
     goto FAIL;
   }
 
-  for(int i = 0; i < table.len; i++){
-    printf(" %02x", table.buff[i]);
-  }
-  printf("\n");
-
   wt->payload_len = fsize-(int)(ptr-fbuff);
   wt->payload_data = malloc(wt->payload_len);
+  for(int i = 0; i < wt->payload_len; i++)
+    wt->payload_data[i] = decodeByte(table, *ptr++);
 
-  //memcpy(wt->payload_data, ptr, wt->payload_len);
-  for(int i = 0; i < wt->payload_len; i++){
-    wt->payload_data[i] = decodeByte(&table, *ptr++);
-    printf(" %02x", wt->payload_data[i]);
-  }
-  printf("\n");
+  wt_cab_extract(wt);
 
 
  CLEANUP:
   for(int i = 0; i<headercount; i++)
     if(rawheaders[i]){free(rawheaders[i]);rawheaders[i]=0;}
-  if(table.buff){free(table.buff); table.buff=0;}
+  EncryptTable_free(table);
   return wt;
 
  FAIL:
-  if(wt){
-    if(wt->comment){free(wt->comment); wt->comment=0;}
-    if(wt->payload_data){free(wt->payload_data);wt->payload_data=0;}
-    free(wt); wt = NULL;
-  }
+  wld3_free(wt);
   goto CLEANUP;
 }
 
+void wlkd_print(WLD3* wt){
+  char uuid_str[37];
+  struct tm* timeinfo;
 
-  //printf("Payload Size: %zu\n", wt->payload_len);
+  printf("Copyright:     %s\n", wt->copyright);
 
-  //printf("ENC BYTE: 0x%02x\n", encodebyte);
+  timeinfo = localtime(&wt->createddate);
+  printf("CREATED:       %s", asctime(timeinfo));
+  if(wt->startvaliedate == 0)
+    printf("VALIDD:        NONE\n");
+  else{
+    timeinfo = localtime(&wt->startvaliedate);
+    printf("VALIDD:        %s", asctime(timeinfo));
+  }
+  timeinfo = localtime(&wt->expiredate);
+  printf("EXPIRED:       %s", asctime(timeinfo));
 
-  //for(int i = 0; i < 8; i++){
-  //  printf(" %02x", *(ptr+i));
-  //}
-  //printf("\n");
-  //for(int i = 0; i < 8; i++){
-  //  if(*(ptr+i) == '\n')
-  //    printf(" \\n");
-  //  else if (*(ptr+i) == '\r')
-  //    printf(" \\r");
-  //  else
-  //    printf("  %c", *(ptr+i));
-  //}
-  //printf("\n");
+  uuid_unparse(wt->wtversionUUID, uuid_str);
+  printf("UUID:          %s\n", uuid_str);
+  uuid_unparse(wt->resourceUUID, uuid_str);
+  printf("UUID:          %s\n", uuid_str);
+  printf("LicenseType:   %s\n", wt->licensetype);
+  printf("EncodeVersion: %u\n", wt->encodeversion);
+  printf("OutExt:        %s\n", wt->outext);
+  printf("CabCompressed: %s\n", wt->cabcompression? "true":"false");
+  printf("PayloadLen:    %zu\n", wt->payload_len);
+
+  if(wt->urls){
+    printf("URLS:\n");
+    ExtraStringLL* url = wt->urls;
+    while(url){
+      printf("  Type: 0x%02x; Val: \"%s\"; (%d, %d)\n", url->type,
+	     url->buff, url->always300_0, url->always300_1);
+      url = url->next;
+    }
+  }
+}
+
+void wld3_free(WLD3* wt){
+  if(wt){
+    if(wt->comment){free(wt->comment); wt->comment=0;}
+    if(wt->payload_data){free(wt->payload_data);wt->payload_data=0;}
+    if(wt->copyright){free(wt->copyright); wt->copyright=0;}
+    if(wt->urls){ExtraStringLL_free(wt->urls); wt->urls=0;}
+    free(wt); wt = NULL;
+  }
+}
