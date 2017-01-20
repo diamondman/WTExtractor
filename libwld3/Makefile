@@ -1,6 +1,6 @@
 CFLAGS=-std=gnu11
 CFILES=main.c wld3_extract.c multifh.c
-LDFLAGS=-luuid -lmspack
+LDFLAGS=-luuid -lmspack -lmagic
 
 all:
 	@mkdir -p build

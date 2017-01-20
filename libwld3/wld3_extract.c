@@ -1,15 +1,14 @@
 #include <endian.h>
+#include <magic.h>
+#include <mspack.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <mspack.h>
-
-#define __USE_XOPEN
 #include <time.h>
 
-#include "wld3_extract.h"
 #include "multifh.h"
+#include "wld3_extract.h"
 
 #define WT_HEADER_STR "WildTangent 3D 300 Compressed and Patented\r\nConverted by XtoWT: "
 
@@ -39,6 +38,21 @@ static const FileInfo file_type_info[] = {
   {"txt", data,  "txt"},
   {"cab", media, "cab"},
   {"tmp", media, "tmp"},
+};
+
+typedef struct {
+  const char* mime;
+  const char* ext;
+} ExtLookupEntry;
+
+static const ExtLookupEntry mime_lookup[] = {
+  {"image/jpeg", "jpg"},
+  {"image/png", "png"},
+  {"audio/midi", "mid"},
+  {"audio/x-wav", "wav"},
+  {"text/plain", "txt"},
+  {"application/octet-stream", "bin"},
+  {NULL, NULL}
 };
 
 static const uint8_t WTFIELD_MIN_LEN [9] = {
@@ -284,6 +298,40 @@ void ExtraStringLL_free(ExtraStringLL* this){
 }
 
 /////////////////// WLD3 methods
+static void wt_detect_payload_type(WLD3* wt){
+  magic_t magic_cookie =  magic_open(MAGIC_MIME_TYPE);
+  if(magic_cookie == NULL){
+    fprintf(stderr, "Failed to initialize libmagic\n");
+    return;
+  }
+
+  magic_load(magic_cookie, NULL);
+
+  const char* mime = magic_buffer(magic_cookie,
+			    wt->payload_data,
+			    wt->payload_len);
+  if(mime == NULL){
+    if(magic_error(magic_cookie) == NULL)
+      fprintf(stderr, "Payload type not recognized by libmagic.\n");
+    else
+      fprintf(stderr, "libmagic reported error: '%s'\n",
+	      magic_error(magic_cookie));
+    goto CLEANUP;
+  }
+
+  const ExtLookupEntry* entry = &mime_lookup[0];
+  while(entry->mime != NULL){
+    if(strcmp(entry->mime, mime) == 0){
+      memcpy(wt->outext, entry->ext, 3);
+      break;
+    }
+    entry += 1;
+  }
+
+ CLEANUP:
+  magic_close(magic_cookie);
+}
+
 static void wt_cab_extract(WLD3* wt){
   uint8_t* inbuff = wt->payload_data;
   uint32_t inbuff_len = wt->payload_len;
@@ -330,8 +378,10 @@ static void wt_cab_extract(WLD3* wt){
 	cabd->close(cabd, cab);
       }
     } else {
-      fprintf(stderr, "can't open cabinet (%d)\n",
-	      cabd->last_error(cabd));
+      //Cabinet can not be opened. Assume for now that
+      //the file just isn't a cabinet.
+      //fprintf(stderr, "can't open cabinet (%d)\n",
+      //      cabd->last_error(cabd));
     }
     mspack_destroy_cab_decompressor(cabd);
   } else {
@@ -548,6 +598,8 @@ WLD3* wld3_extract(DataAccessor* acc){
     wt->payload_data[i] = decodeByte(table, acc);
 
   wt_cab_extract(wt);
+  if(strcmp(wt->outext, "cab")==0 || strcmp(wt->outext, "tmp")==0)
+    wt_detect_payload_type(wt);
 
  CLEANUP:
   if(acc){free(acc); acc=0;}
