@@ -45,12 +45,57 @@ static const uint8_t WTFIELD_MIN_LEN [9] = {
   0, 4, 4, 4, 16, 16, 4, 5, 4
 };
 
-static uint8_t calc_header_maxlen(uint8_t headerlens[], uint8_t headercount){
+static uint8_t calc_header_maxlen(uint8_t headerlens[],
+				  uint8_t headercount){
   uint8_t max = 0;
   for(int i = 0; i < headercount; i++)
     if(headerlens[i] > max)
       max = headerlens[i];
   return max;
+}
+
+/////////////// FILE ACCESSORS
+DataAccessor* openBufferAccessor(uint8_t* buffer, size_t len){
+  DataAccessor* acc = malloc(sizeof(DataAccessor));
+  acc->type = 0;
+  acc->length = len;
+  acc->offset = 0;
+  acc->dat.buff = buffer;
+  return acc;
+}
+
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
+size_t da_remaining(DataAccessor* da){
+  return da->length - da->offset;
+};
+
+static size_t da_read(DataAccessor* da, void *buffer, size_t bytes){
+  bytes = MIN(bytes, da->length-da->offset);
+  if(buffer)
+    memcpy(buffer, da->dat.buff+da->offset, bytes);
+  da->offset += bytes;
+  return bytes;
+}
+
+//Just returns 0 if =, 1 if not for now
+static int da_memcmp(DataAccessor* da, uint8_t* buff, size_t bytes){
+  if(bytes > da->length - da->offset) return 1;
+  int res = memcmp(&da->dat.buff[da->offset], buff, bytes);
+  da->offset += bytes;
+  return res;
+}
+
+static int da_strchrpos(DataAccessor* da, uint8_t chr){
+  uint8_t* firstchar = strchr(da->dat.buff+da->offset, chr);
+  if(firstchar == NULL) return -1;
+  return firstchar-da->dat.buff-da->offset;
+}
+
+static int da_strstrpos(DataAccessor* da, uint8_t* str){
+  uint8_t* firstchar = strstr(&da->dat.buff[da->offset], str);
+  if(firstchar == NULL) return -1;
+  return firstchar-da->dat.buff-da->offset;
 }
 
 /////////////// HASH BYTE CALCULATION
@@ -171,34 +216,7 @@ static EncryptTable* get_MODEL_hashtable(uint8_t* rawheaders[],
   return table;
 }
 
-
-static uint8_t decodeByte(EncryptTable* table, uint8_t inbyte){
-  uint8_t res = inbyte ^ table->last_crypt_byte ^
-      table->buff[table->index % table->len];
-  table->index += 1;
-  table->last_crypt_byte = inbyte;
-  return res;
-}
-
-static uint32_t readintcrypt(EncryptTable* table, uint8_t a,
-			     uint8_t b, uint8_t c, uint8_t d){
-  a = decodeByte(table, a);
-  b = decodeByte(table, b);
-  c = decodeByte(table, c);
-  d = decodeByte(table, d);
-  return le32toh(d<<24 | c << 16 | b << 8 | a);
-}
-
-static char* read_str_crypt(EncryptTable* table, uint8_t* ptr,
-			    uint32_t cnt){
-  char* outbuff = malloc(cnt+1);
-  memcpy(outbuff, ptr, cnt);
-  for(int i = 0; i < cnt; i++)
-    outbuff[i] = decodeByte(table, outbuff[i]);
-  outbuff[cnt] = 0;
-  return outbuff;
-}
-
+///////////////// Data reader functions
 static void wtloadUUID(uuid_t u, uint8_t* inbuff){
   u[0] = inbuff[3];
   u[1] = inbuff[2];
@@ -213,28 +231,49 @@ static void wtloadUUID(uuid_t u, uint8_t* inbuff){
   }
 }
 
-ExtraStringLL* ExtraStringLL_create(EncryptTable* table, uint8_t* ptr){
+///////////////// EncryptTable methods
+static uint8_t decodeByte(EncryptTable* table, DataAccessor* acc){
+  uint8_t inbyte;
+  da_read(acc, &inbyte, 1); //TODO HANDLE NO DATA
+  uint8_t res = inbyte ^ table->last_crypt_byte ^
+      table->buff[table->index % table->len];
+  table->index += 1;
+  table->last_crypt_byte = inbyte;
+  return res;
+}
+
+static uint32_t readintcrypt(EncryptTable* table, DataAccessor* acc){
+  uint8_t a = decodeByte(table, acc);
+  uint8_t b = decodeByte(table, acc);
+  uint8_t c = decodeByte(table, acc);
+  uint8_t d = decodeByte(table, acc);
+  return le32toh(d<<24 | c << 16 | b << 8 | a);
+}
+
+static char* read_str_crypt(EncryptTable* table, DataAccessor* acc,
+			    uint32_t cnt){
+  char* outbuff = malloc(cnt+1);
+  for(int i = 0; i < cnt; i++)
+    outbuff[i] = decodeByte(table, acc);//outbuff[i]);
+  outbuff[cnt] = 0;
+  return outbuff;
+}
+
+///////////////// ExtraStringLL methods
+ExtraStringLL* ExtraStringLL_create(EncryptTable* table,
+				    DataAccessor* acc){
   ExtraStringLL* url = malloc(sizeof(ExtraStringLL));
 
-  url->type = decodeByte(table, *ptr++);
-  url->len = readintcrypt(table, *ptr, *(ptr+1),
-			  *(ptr+2), *(ptr+3));
-  ptr += 4;
-  url->always300_0 = readintcrypt(table, *ptr, *(ptr+1),
-				  *(ptr+2), *(ptr+3));
-  ptr += 4;
-  url->always300_1 = readintcrypt(table, *ptr, *(ptr+1),
-				  *(ptr+2), *(ptr+3));
-  ptr += 4;
+  url->type = decodeByte(table, acc);
+  url->len = readintcrypt(table, acc);
+  url->always300_0 = readintcrypt(table, acc);
+  url->always300_1 = readintcrypt(table, acc);
   if(url->len == 0 && url->type == 0){
     free(url);
     return NULL;
   }
-  url->buff = read_str_crypt(table, ptr, url->len);
-  ptr += url->len;
-
+  url->buff = read_str_crypt(table, acc, url->len);
   url->next = NULL;
-
   return url;
 }
 
@@ -244,6 +283,7 @@ void ExtraStringLL_free(ExtraStringLL* this){
   free(this);
 }
 
+/////////////////// WLD3 methods
 static void wt_cab_extract(WLD3* wt){
   uint8_t* inbuff = wt->payload_data;
   uint32_t inbuff_len = wt->payload_len;
@@ -301,36 +341,37 @@ static void wt_cab_extract(WLD3* wt){
   free_filename(mem_cab_in);
 }
 
-WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
+WLD3* wld3_extract(DataAccessor* acc){
   //Reader *f = readerCreate(fbuff, fsize);
-  uint8_t *ptr = fbuff;
   uint8_t headerlens[9];
   uint8_t* rawheaders[9];
   struct tm tm;
   WLD3* wt;
   EncryptTable* table;
+  int res;
+  uint8_t tmp[64];
+
+  for(int i=0; i<sizeof(rawheaders)/sizeof(uint8_t*); i++)
+    rawheaders[i] = 0;
 
   wt = malloc(sizeof(WLD3));
   memset(wt, 0, sizeof(WLD3));
 
   table = createEncryptTable();
 
-  if(memcmp(ptr, "WLD3", 4)){
+  //res = da_read(acc, tmp, 4);
+  if(da_memcmp(acc, "WLD3", 4)){
     printf("Bad Magic\n");
-    printf("%.*s\n", 4, ptr);
     goto FAIL;
   }
-  memcpy(wt->magic, ptr, 4);
-  ptr += 4;
 
-  if(*ptr++ != '.'){
+  if(da_memcmp(acc, ".", 1)){
     printf("Invalid Format: Expected a dot after WLD3 magic.\n");
     goto FAIL;
   }
 
-  uint8_t* firstspace = strchr(ptr, ' ');
-  size_t typelen = (int)(firstspace-ptr);
-  if(firstspace == NULL){
+  size_t typelen = da_strchrpos(acc, ' ');
+  if(typelen == -1){
     printf("Invalid format: No end to typeext detected.\n");
     goto FAIL;
   }
@@ -338,45 +379,45 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
     printf("Invalid format: Typeext too large (%zu).\n", typelen);
     goto FAIL;
   }
-  memcpy(wt->outext, ptr, typelen);
-  ptr += typelen+1;
+  da_read(acc, wt->outext, typelen);
+  da_read(acc, NULL, 1); //Ignore Space
 
-  if(strncmp(ptr, WT_HEADER_STR, sizeof(WT_HEADER_STR)-1) != 0){
+  if(da_memcmp(acc, WT_HEADER_STR, sizeof(WT_HEADER_STR)-1) != 0){
     printf("Invalid format: Incorrect Magic line. Unknown format.\n");
-    //printf("%.*s\n", sizeof(WT_HEADER_STR)-1, WT_HEADER_STR);
-    //printf("%.*s\n", sizeof(WT_HEADER_STR)-1, ptr);
+    goto FAIL;
   }
   wt->formatver = 300;
-  ptr += sizeof(WT_HEADER_STR)-1;
 
-  //Text Header Create Time
-  ptr = strptime(ptr, "%a %b %d %H:%M:%S %Y", &tm);
-  if(ptr == NULL){
-    printf("Failed to parse creatime date from text header.\n");
-    goto FAIL;
-  }
-  tm.tm_isdst = -1;/* tells mktime() to determine DST*/
-  wt->created_unimportant = mktime(&tm);
-  if(wt->created_unimportant == -1){
-    printf("Failed to extract EPOCH time from text header.\n");
-    goto FAIL;
-  }
+  //Skip Text Header Create Time. It is unnecessary
+  uint32_t offset = da_strchrpos(acc, '\n');
+  da_read(acc, NULL, offset);
 
-  if(strncmp(ptr, "\n\r\n", 3) != 0){
+  if(da_memcmp(acc, "\n\r\n", 3) != 0){
     printf("Format Incorrect: Expected newline after date string \n");
     goto FAIL;
   }
-  ptr += 3;
 
-  uint8_t* commentend_ptr = strstr(ptr, ".START\n");
-  if((int)(commentend_ptr-ptr)-2){
-    wt->comment = malloc((int)(commentend_ptr-ptr)-2);
-    memcpy(wt->comment, ptr, (int)(commentend_ptr-ptr)-2);
+  int commentend_offset = da_strstrpos(acc, ".START\n");
+  if(commentend_offset < 0){
+    printf("Format Incorrect: Hit end of file");
+    goto FAIL;
+  }
+  if(commentend_offset-2){
+    wt->comment = malloc(commentend_offset-2+1);
+    da_read(acc, wt->comment, commentend_offset-2);
+    wt->comment[commentend_offset-2] = 0;
   }else
-    wt->comment = 0;
-  ptr = commentend_ptr + 7;
+    wt->comment = NULL;
 
-  uint8_t headercount = (*ptr++) - 0xC5;
+  da_read(acc, NULL, 9); //Consume "\r\n.START\n"
+
+  /////////////// Being Encoded Headers
+  uint8_t headercount;
+  if(da_read(acc, &headercount, 1)<0){
+    printf("Format Incorrect: Hit end of file");
+    goto FAIL;
+  }
+  headercount -= 0xC5;
   if(headercount != 9){
     printf("Only know how to use files with 9 headers, not %d. Exiting.",
 	   headercount);
@@ -384,8 +425,12 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
   }
 
   uint8_t decrypt_byte = 0x39;
+  if(da_read(acc, &headerlens[0], headercount) < headercount){
+    printf("Format Incorrect: Hit end of file");
+    goto FAIL;
+  }
   for(int i = 0; i<headercount; i++){
-    headerlens[i] = (*ptr++) - decrypt_byte;
+    headerlens[i] -= decrypt_byte;
     if(headerlens[i] > 80){
       printf("Invalid Format: Header %d has a length over 80.\n", i);
       goto FAIL;
@@ -395,13 +440,14 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
       goto FAIL;
     }
     decrypt_byte += 13;
-    //printf("%d ", headerlens[i]);
   }
 
   for(int i = 0; i<headercount; i++){
     rawheaders[i] = malloc(headerlens[i]);
-    memcpy(rawheaders[i], ptr, headerlens[i]);
-    ptr += headerlens[i];
+    if(da_read(acc, rawheaders[i], headerlens[i]) != headerlens[i]){
+      printf("Format Incorrect: Hit end of file");
+      goto FAIL;
+    }
     //for(int j = 0; j<headerlens[i]; j++)
     //  printf(" %02x '%c'", *(rawheaders[i]+j), *(rawheaders[i]+j));
     //printf("\n");
@@ -458,18 +504,13 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
     get_MEDIA_hashtable(rawheaders, headerlens, headercount, table);
     ExtraStringLL** tail = &wt->urls;
     while(1){
-      ExtraStringLL* url = ExtraStringLL_create(table, ptr);
-      if(url == NULL){
-	ptr += 13;
-	//ExtraStringLL_free(url);
-	break;
-      }
+      ExtraStringLL* url = ExtraStringLL_create(table, acc);
+      if(url == NULL) break;
 
-      ptr += 13+url->len;
       *tail = url;
       tail = &url->next;
     }
-  }
+  };
 
   //EncodeType
   int typeindex = -1;
@@ -501,22 +542,22 @@ WLD3* wld3_extract(uint8_t* fbuff, size_t fsize){
     goto FAIL;
   }
 
-  wt->payload_len = fsize-(int)(ptr-fbuff);
+  wt->payload_len = da_remaining(acc);
   wt->payload_data = malloc(wt->payload_len);
   for(int i = 0; i < wt->payload_len; i++)
-    wt->payload_data[i] = decodeByte(table, *ptr++);
+    wt->payload_data[i] = decodeByte(table, acc);
 
   wt_cab_extract(wt);
 
-
  CLEANUP:
-  for(int i = 0; i<headercount; i++)
+  if(acc){free(acc); acc=0;}
+  for(int i = 0; i<sizeof(rawheaders)/sizeof(uint8_t*); i++)
     if(rawheaders[i]){free(rawheaders[i]);rawheaders[i]=0;}
   EncryptTable_free(table);
   return wt;
 
  FAIL:
-  wld3_free(wt);
+  if(wt){wld3_free(wt); wt=NULL;}
   goto CLEANUP;
 }
 
@@ -542,6 +583,8 @@ void wlkd_print(WLD3* wt){
   uuid_unparse(wt->resourceUUID, uuid_str);
   printf("UUID:          %s\n", uuid_str);
   printf("LicenseType:   %s\n", wt->licensetype);
+  printf("Comment:       %s\n", wt->comment);
+
   printf("EncodeVersion: %u\n", wt->encodeversion);
   printf("OutExt:        %s\n", wt->outext);
   printf("CabCompressed: %s\n", wt->cabcompression? "true":"false");

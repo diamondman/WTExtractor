@@ -10,19 +10,26 @@ int main(int args, char** argv){
     printf("Missing file path.\n");
     return 1;
   }
+
   FILE *fp = fopen(argv[1], "rb");
   fseek(fp, 0L, SEEK_END);
   size_t fsize = ftell(fp);
   rewind(fp);
   uint8_t *fbuff = malloc(fsize);
   fread(fbuff, 1, fsize, fp);
+  rewind(fp);
+
+  DataAccessor* acc = openBufferAccessor(fbuff, fsize);
+  WLD3* wt = wld3_extract(acc);
+  free(fbuff);
   fclose(fp);
 
-  WLD3* wt = wld3_extract(fbuff, fsize);
-  wlkd_print(wt);
+  if(wt){
+    wlkd_print(wt);
+    wld3_free(wt);
+  }else
+    printf("ERROR! DONE!\n");
 
-  free(fbuff);
-  wld3_free(wt);
   return 0;
 }
 

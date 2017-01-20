@@ -22,11 +22,23 @@ typedef struct ExtraStringLL {
   struct ExtraStringLL* next;
 } ExtraStringLL;
 
+typedef struct {
+  uint8_t type;
+  size_t length;
+  size_t offset;
+  union {
+    uint8_t* buff;
+    FILE* file;
+  } dat;
+} DataAccessor;
+
+DataAccessor* openBufferAccessor(uint8_t* buffer, size_t len);
+
 typedef struct WLD3{
-  uint8_t magic[4];
+  //uint8_t magic[4];
   uint8_t outext[EXT_BUFF_LEN];
   uint16_t formatver;
-  time_t created_unimportant;
+  //time_t created_unimportant;
   char* comment;
   bool cabcompression;
   // Packed Headers
@@ -45,7 +57,7 @@ typedef struct WLD3{
   uint8_t* payload_data;
 } WLD3;
 
-WLD3* wld3_extract(uint8_t*, size_t);
+WLD3* wld3_extract(DataAccessor*);
 
 void wlkd_print(WLD3* wt);
 
