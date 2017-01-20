@@ -205,7 +205,7 @@ static void wtloadUUID(uuid_t u, uint8_t* inbuff){
 ///////////////// EncryptTable methods
 static uint8_t decodeByte(EncryptTable* table, DataAccessor* acc){
   uint8_t inbyte;
-  da_read(acc, &inbyte, 1); //TODO HANDLE NO DATA
+  acc->read(acc, &inbyte, 1); //TODO HANDLE NO DATA
   uint8_t res = inbyte ^ table->last_crypt_byte ^
       table->buff[table->index % table->len];
   table->index += 1;
@@ -225,7 +225,7 @@ static char* read_str_crypt(EncryptTable* table, DataAccessor* acc,
 			    uint32_t cnt){
   char* outbuff = malloc(cnt+1);
   for(int i = 0; i < cnt; i++)
-    outbuff[i] = decodeByte(table, acc);//outbuff[i]);
+    outbuff[i] = decodeByte(table, acc);
   outbuff[cnt] = 0;
   return outbuff;
 }
@@ -366,18 +366,17 @@ WLD3* wld3_extract(DataAccessor* acc){
 
   table = createEncryptTable();
 
-  //res = da_read(acc, tmp, 4);
-  if(da_memcmp(acc, "WLD3", 4)){
+  if(acc->memcmp(acc, "WLD3", 4)){
     printf("Bad Magic\n");
     goto FAIL;
   }
 
-  if(da_memcmp(acc, ".", 1)){
+  if(acc->memcmp(acc, ".", 1)){
     printf("Invalid Format: Expected a dot after WLD3 magic.\n");
     goto FAIL;
   }
 
-  size_t typelen = da_strchrpos(acc, ' ');
+  size_t typelen = acc->strchrpos(acc, ' ');
   if(typelen == -1){
     printf("Invalid format: No end to typeext detected.\n");
     goto FAIL;
@@ -386,41 +385,41 @@ WLD3* wld3_extract(DataAccessor* acc){
     printf("Invalid format: Typeext too large (%zu).\n", typelen);
     goto FAIL;
   }
-  da_read(acc, wt->outext, typelen);
-  da_read(acc, NULL, 1); //Ignore Space
+  acc->read(acc, wt->outext, typelen);
+  acc->read(acc, NULL, 1); //Ignore Space
 
-  if(da_memcmp(acc, WT_HEADER_STR, sizeof(WT_HEADER_STR)-1) != 0){
+  if(acc->memcmp(acc, WT_HEADER_STR, sizeof(WT_HEADER_STR)-1) != 0){
     printf("Invalid format: Incorrect Magic line. Unknown format.\n");
     goto FAIL;
   }
   wt->formatver = 300;
 
   //Skip Text Header Create Time. It is unnecessary
-  uint32_t offset = da_strchrpos(acc, '\n');
-  da_read(acc, NULL, offset);
+  uint32_t offset = acc->strchrpos(acc, '\n');
+  acc->read(acc, NULL, offset);
 
-  if(da_memcmp(acc, "\n\r\n", 3) != 0){
+  if(acc->memcmp(acc, "\n\r\n", 3) != 0){
     printf("Format Incorrect: Expected newline after date string \n");
     goto FAIL;
   }
 
-  int commentend_offset = da_strstrpos(acc, ".START\n");
+  int commentend_offset = acc->strstrpos(acc, ".START\n");
   if(commentend_offset < 0){
     printf("Format Incorrect: Hit end of file");
     goto FAIL;
   }
   if(commentend_offset-2){
     wt->comment = malloc(commentend_offset-2+1);
-    da_read(acc, wt->comment, commentend_offset-2);
+    acc->read(acc, wt->comment, commentend_offset-2);
     wt->comment[commentend_offset-2] = 0;
   }else
     wt->comment = NULL;
 
-  da_read(acc, NULL, 9); //Consume "\r\n.START\n"
+  acc->read(acc, NULL, 9); //Consume "\r\n.START\n"
 
   /////////////// Being Encoded Headers
   uint8_t headercount;
-  if(da_read(acc, &headercount, 1)<0){
+  if(acc->read(acc, &headercount, 1)<0){
     printf("Format Incorrect: Hit end of file");
     goto FAIL;
   }
@@ -432,7 +431,7 @@ WLD3* wld3_extract(DataAccessor* acc){
   }
 
   uint8_t decrypt_byte = 0x39;
-  if(da_read(acc, &headerlens[0], headercount) < headercount){
+  if(acc->read(acc, &headerlens[0], headercount) < headercount){
     printf("Format Incorrect: Hit end of file");
     goto FAIL;
   }
@@ -451,7 +450,7 @@ WLD3* wld3_extract(DataAccessor* acc){
 
   for(int i = 0; i<headercount; i++){
     rawheaders[i] = malloc(headerlens[i]);
-    if(da_read(acc, rawheaders[i], headerlens[i]) != headerlens[i]){
+    if(acc->read(acc, rawheaders[i], headerlens[i]) != headerlens[i]){
       printf("Format Incorrect: Hit end of file");
       goto FAIL;
     }
@@ -549,7 +548,7 @@ WLD3* wld3_extract(DataAccessor* acc){
     goto FAIL;
   }
 
-  wt->payload_len = da_remaining(acc);
+  wt->payload_len = acc->remaining(acc);
   wt->payload_data = malloc(wt->payload_len);
   for(int i = 0; i < wt->payload_len; i++)
     wt->payload_data[i] = decodeByte(table, acc);
