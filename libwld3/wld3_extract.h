@@ -4,6 +4,8 @@
 #include <uuid/uuid.h>
 #include <stdbool.h>
 
+#include "dataaccessors.h"
+
 enum resource_class{
   model,
   media,
@@ -21,18 +23,6 @@ typedef struct ExtraStringLL {
   char* buff;
   struct ExtraStringLL* next;
 } ExtraStringLL;
-
-typedef struct {
-  uint8_t type;
-  size_t length;
-  size_t offset;
-  union {
-    uint8_t* buff;
-    FILE* file;
-  } dat;
-} DataAccessor;
-
-DataAccessor* openBufferAccessor(uint8_t* buffer, size_t len);
 
 typedef struct WLD3{
   //uint8_t magic[4];

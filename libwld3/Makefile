@@ -1,5 +1,5 @@
 CFLAGS=-std=gnu11
-CFILES=main.c wld3_extract.c multifh.c
+CFILES=main.c wld3_extract.c multifh.c dataaccessors.c
 LDFLAGS=-luuid -lmspack -lmagic
 
 all:

@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+
 #include "wld3_extract.h"
+#include "dataaccessors.h"
 //#include <argp.h>
 
 int main(int args, char** argv){
