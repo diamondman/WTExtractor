@@ -13,24 +13,16 @@ int main(int args, char** argv){
     return 1;
   }
 
-  FILE *fp = fopen(argv[1], "rb");
-  fseek(fp, 0L, SEEK_END);
-  size_t fsize = ftell(fp);
-  rewind(fp);
-  uint8_t *fbuff = malloc(fsize);
-  fread(fbuff, 1, fsize, fp);
-  rewind(fp);
-
-  DataAccessor* acc = openBufferAccessor(fbuff, fsize);
+  DataAccessor* acc = openFileAccessor(argv[1]);
   WLD3* wt = wld3_extract(acc);
-  free(fbuff);
-  fclose(fp);
 
   if(wt){
     wlkd_print(wt);
     wld3_free(wt);
   }else
     printf("ERROR! DONE!\n");
+
+  if(acc) freeFileAccessor(acc);
 
   return 0;
 }

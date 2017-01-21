@@ -385,8 +385,9 @@ WLD3* wld3_extract(DataAccessor* acc){
     printf("Invalid format: Typeext too large (%zu).\n", typelen);
     goto FAIL;
   }
+
   acc->read(acc, wt->outext, typelen);
-  acc->read(acc, NULL, 1); //Ignore Space
+  acc->seek(acc, 1); //Ignore Space
 
   if(acc->memcmp(acc, WT_HEADER_STR, sizeof(WT_HEADER_STR)-1) != 0){
     printf("Invalid format: Incorrect Magic line. Unknown format.\n");
@@ -396,7 +397,7 @@ WLD3* wld3_extract(DataAccessor* acc){
 
   //Skip Text Header Create Time. It is unnecessary
   uint32_t offset = acc->strchrpos(acc, '\n');
-  acc->read(acc, NULL, offset);
+  acc->seek(acc, offset);
 
   if(acc->memcmp(acc, "\n\r\n", 3) != 0){
     printf("Format Incorrect: Expected newline after date string \n");
@@ -405,7 +406,7 @@ WLD3* wld3_extract(DataAccessor* acc){
 
   int commentend_offset = acc->strstrpos(acc, ".START\n");
   if(commentend_offset < 0){
-    printf("Format Incorrect: Hit end of file");
+    printf("Format Incorrect: Hit end of file\n");
     goto FAIL;
   }
   if(commentend_offset-2){
@@ -415,7 +416,7 @@ WLD3* wld3_extract(DataAccessor* acc){
   }else
     wt->comment = NULL;
 
-  acc->read(acc, NULL, 9); //Consume "\r\n.START\n"
+  acc->seek(acc, 9); //Consume "\r\n.START\n"
 
   /////////////// Being Encoded Headers
   uint8_t headercount;
@@ -558,7 +559,6 @@ WLD3* wld3_extract(DataAccessor* acc){
     wt_detect_payload_type(wt);
 
  CLEANUP:
-  if(acc){free(acc); acc=0;}
   for(int i = 0; i<sizeof(rawheaders)/sizeof(uint8_t*); i++)
     if(rawheaders[i]){free(rawheaders[i]);rawheaders[i]=0;}
   EncryptTable_free(table);
