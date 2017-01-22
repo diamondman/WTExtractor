@@ -1,3 +1,5 @@
+#include <endian.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,6 +77,16 @@ static size_t da_file_remaining(DataAccessor* da){
 
 static size_t da_file_read(DataAccessor* da, void *buffer, size_t bytes){
   bytes = fread(buffer, 1, bytes, da->dat.file);
+  //uint8_t* b = buffer;
+  //printf(" %02x %02x %02x %02x\n", *b, *(b+1), *(b+2), *(b+3));
+  //float f2 = le32toh(*(int*)buffer);
+  //printf("F2 = %f\n", f2);
+  //
+  //float a = -1;
+  //uint8_t* b2 = &a;
+  //printf("BYTEBYBYTE %02x %02x %02x %02x\n", *b2, *(b2+1), *(b2+2), *(b2+3));
+  //printf("CORRECT    %08x\n", *((int*)b2));
+
   da->offset += bytes;
   return bytes;
 }

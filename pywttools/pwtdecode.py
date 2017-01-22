@@ -169,8 +169,8 @@ class ModelFrame(object):
         represent = (
             ("Name", "name"),
             ("Matrix", "matrix"),
-            #("HasAnimation", "has_animation"),
-            #("HasVisuals", "has_visuals"),
+            ("HasAnimation", "has_animation"),
+            ("HasVisuals", "has_visuals"),
             ("Animation", "animation"),
             ("Visuals", "visuals"),
             ("SubFrameCount", "subframe_count"),
@@ -256,7 +256,6 @@ class ModelVisuals(object):
         norm_bbz = struct.unpack('>B', bf.readbits(6))[0]
         self.normal_unused_bits = (norm_bbx, norm_bby, norm_bbz)
 
-
         scaled_normals = []
         for _ in range(self.normalcount):
             x = bf.readbits(self._pwt.normal_bit_accuracy-norm_bbx)
@@ -322,7 +321,7 @@ class ModelVisuals(object):
         ############### FACE DETAIL ###############
 
         #self.showpoints()
-        self.showpoly()
+        #self.showpoly()
         self.face_details = []
         try:
             for _ in range(self.fcount):
@@ -346,8 +345,8 @@ class ModelVisuals(object):
             self.textures = None
             if self.texturecount:
                 self.textures = []
-                datlen = self._read(1)[0]
                 for _ in range(self.texturecount):
+                    datlen = self._read(1)[0]
                     self.textures.append(self._read(datlen))
         except:
             self.textures.append("HIT EOF")
@@ -407,8 +406,10 @@ class ModelVisuals(object):
             ("bboxMIN", "bboxMIN"),
             ("VertexUnusedBits", "vertex_unused_bits"),
             ("NormalUnusedBits", "normal_unused_bits"),
-            #("Vertices", "vertices"),
-            #("Normals", "normals"),
+            ("Vertices", "vertices"),
+            ("Normals", "normals"),
+            ("NormBboxMIN", "norm_bboxMIN"),
+            ("NormBboxMAX", "norm_bboxMAX"),
             #("Faces", "faces"),
             #("FacesNormals", "facenormals"),
             #("FaceDetails", "face_details"),
