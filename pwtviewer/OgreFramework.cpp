@@ -6,7 +6,8 @@ using namespace Ogre;
 
 template<> OgreFramework* Ogre::Singleton<OgreFramework>::msSingleton = 0;
 
-OgreFramework::OgreFramework()
+OgreFramework::OgreFramework():
+  mOverlaySystem(0)
 {
 	m_MoveSpeed			= 0.1f;
 	m_RotateSpeed		        = 0.3f;
@@ -39,11 +40,15 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 	m_pRoot = new Ogre::Root();
 
-	if(!m_pRoot->showConfigDialog())
+	if(!m_pRoot->restoreConfig() && !m_pRoot->showConfigDialog())
+	//if(!m_pRoot->showConfigDialog())
 		return false;
 	m_pRenderWnd = m_pRoot->initialise(true, wndTitle);
 
 	m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
+	mOverlaySystem = new Ogre::OverlaySystem();
+	m_pSceneMgr->addRenderQueueListener(mOverlaySystem);
+
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
 
 	m_pCamera = m_pSceneMgr->createCamera("Camera");
@@ -105,13 +110,18 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pTimer = new Ogre::Timer();
 	m_pTimer->reset();
 
-	OgreBites::InputContext inputContext;
-	inputContext.mMouse = m_pMouse;
-	inputContext.mKeyboard = m_pKeyboard;
-	m_pTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", m_pRenderWnd, inputContext, this);
+	m_InputContext.mMouse = m_pMouse;
+	m_InputContext.mKeyboard = m_pKeyboard;
+
+	m_pTrayMgr = new OgreBites::SdkTrayManager
+	  ("TrayMgr", m_pRenderWnd, m_InputContext, this);
         m_pTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
         m_pTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
         m_pTrayMgr->hideCursor();
+
+	//OverlayManager::getSingleton().createOverlayElement("Panel", "myNewPanel");
+
+	std::cout << "OMANAGER: " << &OverlayManager::getSingleton() << std::endl;
 
 	m_pRenderWnd->setActive(true);
 
@@ -121,7 +131,9 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 OgreFramework::~OgreFramework()
 {
     if(m_pInputMgr) OIS::InputManager::destroyInputSystem(m_pInputMgr);
+    if (mOverlaySystem) delete mOverlaySystem;
     if(m_pTrayMgr)  delete m_pTrayMgr;
+
     if(m_pRoot)     delete m_pRoot;
 }
 
