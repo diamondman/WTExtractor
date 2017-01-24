@@ -3,8 +3,26 @@
 PWTViewer::PWTViewer(char* thing)
 {
   std::cout << thing << std::endl;
-	m_pOgreHeadNode		= 0;
-	m_pOgreHeadEntity		= 0;
+
+
+  DataAccessor* acc = openFileAccessor(thing);
+  PWT* pwt = pwt_extract(acc);
+
+  if(pwt){
+    pwt_print(pwt);
+    pwt_free(pwt);
+  }else
+    printf("ERROR! DONE!\n");
+
+  if(acc){
+    printf("OFFSET: %zu; Len %zu\n", ftell(acc->dat.file), acc->length);
+    freeFileAccessor(acc);
+  }
+
+
+
+  m_pOgreHeadNode		= 0;
+  m_pOgreHeadEntity		= 0;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

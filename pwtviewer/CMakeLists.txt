@@ -14,7 +14,7 @@
 #      http://www.ogre3d.org/tikiwiki/
 #-----------------------------------------------------------------------------
 #*/
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.11)
 
 project(PWTViewer)
 
@@ -109,13 +109,15 @@ include_directories( ${OIS_INCLUDE_DIRS}
 	${OGRE_INCLUDE_DIRS}
 	${OGRE_SAMPLES_INCLUDEPATH}
 	${OGRE_Overlay_INCLUDE_DIRS}
+	${WLD3_SOURCE_DIR}
 )
 
 add_executable(PWTViewer WIN32 ${HDRS} ${SRCS})
 
 set_target_properties(PWTViewer PROPERTIES DEBUG_POSTFIX _d)
 
-target_link_libraries(PWTViewer ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Overlay_LIBRARIES})
+target_link_libraries(PWTViewer ${OGRE_LIBRARIES} ${OIS_LIBRARIES}
+  ${OGRE_Overlay_LIBRARIES} WLD3)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/bin)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/media)

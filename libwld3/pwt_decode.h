@@ -1,3 +1,8 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #ifndef WLDS_EXTRACT
 #define WLDS_EXTRACT
 
@@ -83,5 +88,8 @@ void pwt_print(PWT* wt);
 
 void pwt_free(PWT* wt);
 
+#endif
 
+#ifdef __cplusplus
+}
 #endif

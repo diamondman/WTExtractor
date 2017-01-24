@@ -7,6 +7,8 @@
 
 //#include "TutorialConfig.h"
 #include "OgreFramework.hpp"
+#include "pwt_decode.h"
+#include "dataaccessors.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
