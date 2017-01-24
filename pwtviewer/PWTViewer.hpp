@@ -13,7 +13,7 @@
 class PWTViewer : public OIS::KeyListener
 {
 public:
-	PWTViewer();
+	PWTViewer(char*);
 	~PWTViewer();
 
 	void startDemo();
@@ -29,6 +29,8 @@ private:
 	Ogre::Entity*				m_pOgreHeadEntity;
 
 	bool					m_bShutdown;
+
+  char* pwtfile;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

@@ -10,3 +10,4 @@ CTestTestfile.cmake
 
 ogre.cfg
 *.log
+dist/
