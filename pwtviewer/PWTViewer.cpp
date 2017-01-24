@@ -2,34 +2,29 @@
 
 PWTViewer::PWTViewer(char* thing)
 {
-  std::cout << thing << std::endl;
-
-
-  DataAccessor* acc = openFileAccessor(thing);
-  PWT* pwt = pwt_extract(acc);
-
-  if(pwt){
-    pwt_print(pwt);
-    pwt_free(pwt);
-  }else
-    printf("ERROR! DONE!\n");
-
-  if(acc){
-    printf("OFFSET: %zu; Len %zu\n", ftell(acc->dat.file), acc->length);
-    freeFileAccessor(acc);
-  }
-
-
-
   m_pOgreHeadNode		= 0;
   m_pOgreHeadEntity		= 0;
+
+  std::cout << thing << std::endl;
+
+  acc = openFileAccessor(thing);
+  pwt = pwt_extract(acc);
+
+  if(pwt)
+    pwt_print(pwt);
+  else
+    printf("ERROR! DONE!\n");
+
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 PWTViewer::~PWTViewer()
 {
-       delete OgreFramework::getSingletonPtr();
+  delete OgreFramework::getSingletonPtr();
+  if(pwtfile)delete pwtfile;
+  if(pwt) pwt_free(pwt);
+  if(acc) freeFileAccessor(acc);
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

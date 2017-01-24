@@ -15,24 +15,28 @@
 class PWTViewer : public OIS::KeyListener
 {
 public:
-	PWTViewer(char*);
-	~PWTViewer();
+  PWTViewer(char*);
+  ~PWTViewer();
 
-	void startDemo();
+  void startDemo();
 
-	bool keyPressed(const OIS::KeyEvent &keyEventRef);
-	bool keyReleased(const OIS::KeyEvent &keyEventRef);
+  bool keyPressed(const OIS::KeyEvent &keyEventRef);
+  bool keyReleased(const OIS::KeyEvent &keyEventRef);
 
 private:
-        void setupDemoScene();
-	void runDemo();
+  void setupDemoScene();
+  void runDemo();
 
-	Ogre::SceneNode*			m_pOgreHeadNode;
-	Ogre::Entity*				m_pOgreHeadEntity;
+  Ogre::SceneNode*			m_pOgreHeadNode;
+  Ogre::Entity*				m_pOgreHeadEntity;
 
-	bool					m_bShutdown;
+  bool					m_bShutdown;
 
-  char* pwtfile;
+  char*                                 pwtfile;
+
+  DataAccessor*                         acc;
+  PWT*                                  pwt;
+
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

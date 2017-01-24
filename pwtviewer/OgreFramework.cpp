@@ -119,7 +119,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
         m_pTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
         m_pTrayMgr->hideCursor();
 
-	//OverlayManager::getSingleton().createOverlayElement("Panel", "myNewPanel");
+	OverlayManager::getSingleton().createOverlayElement("Panel", "myNewPanel");
 
 	std::cout << "OMANAGER: " << &OverlayManager::getSingleton() << std::endl;
 
@@ -130,11 +130,10 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 OgreFramework::~OgreFramework()
 {
-    if(m_pInputMgr) OIS::InputManager::destroyInputSystem(m_pInputMgr);
-    if (mOverlaySystem) delete mOverlaySystem;
-    if(m_pTrayMgr)  delete m_pTrayMgr;
-
-    if(m_pRoot)     delete m_pRoot;
+  if(m_pInputMgr) OIS::InputManager::destroyInputSystem(m_pInputMgr);
+  if(m_pTrayMgr)  delete m_pTrayMgr;
+  if (mOverlaySystem) delete mOverlaySystem;
+  if(m_pRoot)     delete m_pRoot;
 }
 
 bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
