@@ -18,14 +18,18 @@ namespace Demo
 {
   class EmptyProjectGameState : public TutorialGameState
   {
+    std::string filepath;
+
     Ogre::SceneNode* mWTNode;
 
     virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
-    Ogre::SceneNode* createStaticMesh( PWT* pwt );
+    Ogre::SceneNode* createStaticMesh(PWT_Frame* modelFrame, Ogre::SceneNode *ogreNode);
+
+    void setWireframe(bool wireframe);
 
   public:
-    EmptyProjectGameState( const Ogre::String &helpDescription );
+    EmptyProjectGameState( const Ogre::String &helpDescription, const std::string fin );
 
     virtual void createScene01(void);
     virtual void destroyScene(void);

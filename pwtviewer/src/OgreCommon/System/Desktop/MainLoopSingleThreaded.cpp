@@ -55,8 +55,12 @@ int Demo::MainEntryPoints::mainAppSingleThreaded( int argc, const char *argv[] )
     GameState *logicGameState = 0;
     LogicSystem *logicSystem = 0;
 
+    #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    //Make argc/argv from windows stuff.
+    #endif
+
     MainEntryPoints::createSystems( &graphicsGameState, &graphicsSystem,
-                                    &logicGameState, &logicSystem );
+                                    &logicGameState, &logicSystem, argc, argv);
 
     try
     {

@@ -75,7 +75,7 @@ int Demo::MainEntryPoints::mainAppMultiThreaded( int argc, const char *argv[] )
     Ogre::Barrier barrier( 2 );
 
     MainEntryPoints::createSystems( &graphicsGameState, &graphicsSystem,
-                                    &logicGameState, &logicSystem );
+                                    &logicGameState, &logicSystem, argc, argv );
 
     GameEntityManager gameEntityManager( graphicsSystem, logicSystem );
 

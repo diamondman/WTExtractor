@@ -62,7 +62,7 @@ namespace Demo
         mThreadGameEntityToUpdate( 0 ),
         mThreadWeight( 0 ),
         mQuit( false ),
-        mAlwaysAskForConfig( true ),
+        mAlwaysAskForConfig( false ),
         mBackgroundColour( backgroundColour )
     {
     }
