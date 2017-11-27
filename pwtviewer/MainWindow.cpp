@@ -43,6 +43,8 @@ MainWindow::MainWindow(const QString& modelFilePath)
   connect(ui->modelFrameTree, SIGNAL(onSelectedFrameChange(const QModelIndex, const QModelIndex)),
           this, SLOT(onSelectedFrameChange(const QModelIndex, const QModelIndex)) );
 
+  ui->ogrePane->setModel(pwt);
+
   if(wt) {
     freeBufferAccessor(acc);
     wld3_free(wt);

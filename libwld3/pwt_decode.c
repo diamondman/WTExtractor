@@ -87,7 +87,7 @@ uint8_t bfr_readsubbyte(BitfieldReader* ba, uint8_t bitcount){
 
 uint32_t bfr_readbits(BitfieldReader* ba, uint8_t bitcount){
   if(bitcount > 32){
-    printf("Only works for up to 32 bits.\n");
+    printf("Only works for up to 32 bits, not %d.\n", bitcount);
     exit(1);
   }
   uint32_t res = 0;

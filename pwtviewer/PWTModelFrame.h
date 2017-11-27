@@ -4,6 +4,10 @@
 #include <OgreRenderWindow.h>
 #include <QShowEvent>
 
+#include "OgreSceneManager.h"
+
+#include "pwt_decode.h"
+
 class PWTModelFrame : public QWidget {
   Q_OBJECT;
 
@@ -20,9 +24,15 @@ class PWTModelFrame : public QWidget {
   virtual void render(QPainter *painter) {Q_UNUSED(painter);} //Suggested. IDK why.
   virtual void render();
 
+  void createScene();
+  void setWireframe(bool wireframe);
+  void setModel(PWT* pwt);
+
  protected:
   virtual bool event(QEvent *event) override;
   virtual void paintEvent(QPaintEvent *event) override {}; //Prevent flicker.
+
+  Ogre::SceneNode* createPWTMesh(PWT_Frame* modelFrame, Ogre::SceneNode *ogreNode);
 
  private:
   void initialize();
@@ -34,6 +44,10 @@ class PWTModelFrame : public QWidget {
   Ogre::SceneManager* mSceneManager;
   Ogre::Camera* mCamera;
   Ogre::SceneNode* mCameraNode;
+
+  Ogre::SceneNode* mWTNode;
+
+  PWT* pwt;
 
   bool mUpdatePending;
   bool mIsAnimating;

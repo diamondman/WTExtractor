@@ -57,9 +57,10 @@ add_executable(pwtviewer
   main.cpp MainWindow.cpp
   PWTModelFrame.cpp FrameTreeItem.cpp FrameTreeModel.cpp ModelFrameTreeView.cpp
   resource.qrc)
-target_link_libraries(pwtviewer Qt5::Widgets WLD3 ${OGRE_LIBRARIES})
+target_link_libraries(pwtviewer Qt5::Widgets WLD3 ${OGRE_LIBRARIES} OgreHlmsPbs OgreHlmsUnlit)
 
-copyWithSymLink(${OGRE_RenderSystem_GL3Plus_LIBRARY_DBG} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+#copyWithSymLink(${OGRE_RenderSystem_GL3Plus_LIBRARY_DBG} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 #${CMAKE_CURRENT_BINARY_DIR}/bin)
 copyWithSymLink(${OGRE_RenderSystem_GL3Plus_LIBRARY_REL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 #${CMAKE_CURRENT_BINARY_DIR}/bin)
+file( COPY ${PROJECT_SOURCE_DIR}/Hlms DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
