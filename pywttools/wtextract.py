@@ -188,9 +188,9 @@ class WTDecoder(object):
             self.comment += s
 
         fieldcount = rev_offset(ord(self._read(1)), 0xC5)
-        if fieldcount != 9:
+        if fieldcount != 8 and fieldcount != 9:
             raise WTFormatException(
-                "Only know how to use files with 9 headers, not %s. Exiting."%fieldcount, -6)
+                "WT archives must have either 8 or 9 headers, not %s. Exiting."%fieldcount, -6)
         fieldlens = [rev_offset(ord(self._read(1)), 0x39 + (13*i)) for i in range(fieldcount)]
         self.rawfields = [self._read(fieldlen) for fieldlen in fieldlens]
 
@@ -218,6 +218,12 @@ class WTDecoder(object):
         for i, rawfield in enumerate(self.rawfields):
             size, func, name = WTDecoder.field_interpretation[i]
             self.fields[name] = func(rawfield[:size] if size else rawfield)
+
+        #Write fake version header for v 1.0 format
+        if len(self.rawfields) == 8:
+            _, _, name = WTDecoder.field_interpretation[8]
+            self.fields[name] = 100
+
 
     ########### HASH BYTE CALCULATION
     def calc_hash_byte_TYPEMEDIADATA(self):
@@ -294,7 +300,7 @@ class WTDecoder(object):
         s.append("OUTEXT    %s" % decoder.out_ext)
         s.append("CREATED:  %s" % decoder.created)
         s.append("COMMENT:  %s" % decoder.comment)
-        s.append("FieldCnt: %s" % len(decoder.fields))
+        s.append("Metadata Headers:")
         max_name_len = max((len(fi[2]) for fi in WTDecoder.field_interpretation))
         for k, v in decoder.fields.items():
             s.append(("  {:<%s}: {}" % max_name_len).format(k,v))

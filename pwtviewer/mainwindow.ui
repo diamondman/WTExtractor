@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+  <class>MainWindow</class>
+  <widget class="QMainWindow" name="MainWindow">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>948</width>
+        <height>635</height>
+      </rect>
+    </property>
+    <property name="windowTitle">
+      <string>WildTangent Model Viewer</string>
+    </property>
+    <property name="windowIcon">
+      <iconset resource="resource.qrc">
+      <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
+    </property>
+    <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+          </sizepolicy>
+        </property>
+        <property name="currentIndex">
+          <number>0</number>
+        </property>
+
+
+        <widget class="QWidget" name="tab_meta">
+          <attribute name="title">
+            <string>Archive Metadata</string>
+          </attribute>
+
+          <layout class="QVBoxLayout">
+
+            <item>
+              <widget class="QScrollArea">
+                <property name="widgetResizable">
+                  <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents">
+
+                  <layout class="QVBoxLayout">
+
+                    <item>
+                      <widget class="QGroupBox" name="groupBoxWTMeta">
+                        <property name="title">
+                          <string>WT Archive</string>
+                        </property>
+                        <layout class="QVBoxLayout">
+
+                          <item>
+                            <widget class="QLabel" name="labelWTData">
+                              <property name="textInteractionFlags">
+                                <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                              </property>
+                            </widget>
+                          </item>
+
+                        </layout>
+                      </widget>
+                    </item>
+
+                    <item>
+                      <widget class="QGroupBox" name="groupBoxPWTMeta">
+                        <property name="title">
+                          <string>PWT Model</string>
+                        </property>
+                        <layout class="QVBoxLayout">
+
+                          <item>
+                            <widget class="QLabel" name="labelPWTData">
+                              <property name="textInteractionFlags">
+                                <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                              </property>
+                            </widget>
+                          </item>
+
+                        </layout>
+                      </widget>
+                    </item>
+
+                    <item>
+                      <spacer name="verticalSpacer">
+                        <property name="orientation"><enum>Qt::Vertical</enum></property>
+                      </spacer>
+                    </item>
+                  </layout>
+
+                </widget>
+              </widget>
+
+            </item>
+          </layout>
+        </widget>
+
+
+        <widget class="QWidget" name="tab_frames">
+          <attribute name="title">
+            <string>Model Data</string>
+          </attribute>
+          <layout class="QVBoxLayout">
+
+            <item>
+              <widget class="QSplitter">
+                <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                </property>
+
+
+                <widget class="QGroupBox" name="groupBoxModelFrames">
+                  <property name="title">
+                    <string>Frames</string>
+                  </property>
+                  <layout class="QVBoxLayout">
+                    <property name="leftMargin"><number>0</number></property>
+                    <property name="topMargin"><number>0</number></property>
+                    <property name="rightMargin"><number>0</number></property>
+                    <property name="bottomMargin"><number>0</number></property>
+
+                    <item>
+                      <widget class="ModelFrameTreeView" name="modelFrameTree"/>
+                    </item>
+
+                  </layout>
+                </widget>
+
+                <layout class="QVBoxLayout">
+
+                  <item>
+                    <widget class="QScrollArea">
+                      <property name="widgetResizable">
+                        <bool>true</bool>
+                      </property>
+                      <widget class="QWidget">
+                        <layout class="QVBoxLayout">
+
+                          <item>
+                            <widget class="QGroupBox" name="groupBoxFrameMeta">
+                              <property name="title">
+                                <string>Frame Metadata</string>
+                              </property>
+                              <layout class="QVBoxLayout">
+                                <property name="leftMargin"><number>0</number></property>
+                                <property name="topMargin"><number>0</number></property>
+                                <property name="rightMargin"><number>0</number></property>
+                                <property name="bottomMargin"><number>0</number></property>
+
+                                <item>
+                                  <widget class="QLabel" name="labelFrameData">
+                                    <property name="textInteractionFlags">
+                                      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                                    </property>
+                                    <property name="alignment"><enum>Qt::AlignTop</enum></property>
+                                  </widget>
+                                </item>
+
+                              </layout>
+                            </widget>
+                          </item>
+
+                          <item>
+                            <widget class="QGroupBox" name="groupBoxVisualsMeta">
+                              <property name="title">
+                                <string>Frame Visuals Metadata</string>
+                              </property>
+                              <layout class="QVBoxLayout">
+                                <property name="leftMargin"><number>0</number></property>
+                                <property name="topMargin"><number>0</number></property>
+                                <property name="rightMargin"><number>0</number></property>
+                                <property name="bottomMargin"><number>0</number></property>
+
+                                <item>
+                                  <widget class="QLabel" name="labelVisualsData">
+                                    <property name="textInteractionFlags">
+                                      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                                    </property>
+                                  </widget>
+                                </item>
+
+                              </layout>
+                            </widget>
+                          </item>
+
+                          <item>
+                            <widget class="QGroupBox" name="groupBoxModelTextures">
+                              <property name="title">
+                                <string>Textures</string>
+                              </property>
+                              <layout class="QVBoxLayout">
+                                <property name="leftMargin"><number>0</number></property>
+                                <property name="topMargin"><number>0</number></property>
+                                <property name="rightMargin"><number>0</number></property>
+                                <property name="bottomMargin"><number>0</number></property>
+
+                                <item>
+                                  <widget class="QListView" name="listViewModelTexture"/>
+                                </item>
+
+                              </layout>
+                            </widget>
+                          </item>
+
+                        </layout>
+                      </widget>
+                    </widget>
+                  </item>
+
+                </layout>
+              </widget>
+            </item>
+
+          </layout>
+        </widget>
+
+      </widget>
+      <widget class="PWTModelFrame" name="ogrePane" native="true"/>
+    </widget>
+  </widget>
+
+  <customwidgets>
+    <customwidget>
+      <class>PWTModelFrame</class>
+      <extends>QWidget</extends>
+      <header>PWTModelFrame.h</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>ModelFrameTreeView</class>
+      <extends>QTreeView</extends>
+      <header>ModelFrameTreeView.h</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
+  <resources>
+    <include location="resource.qrc"/>
+  </resources>
+  <connections/>
+</ui>

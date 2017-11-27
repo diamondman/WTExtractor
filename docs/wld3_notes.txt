@@ -32,3 +32,10 @@ for each valid buffer
 
 maxlen = 15h
 ENC_TABLE: 2, 86h, 0D5h, 2Ah, 0D4h, 0F2h, 0A1h, 84h, 0A5h, 0E1h, 7Dh, 82h, 25h, 0ADh, 11h, 90h, 3Eh, 0F5h, 7Bh, 0A8h, 0A6h
+
+
+WT archives with 8 headers are version 1.0 files. Version 2.0 and
+above include a 9th header to store the version (100 = "1.0"). The
+differences in these versions seem to be additional headers like the
+url/string fields. At some point it may be necessary to check the
+version and not do some checks.

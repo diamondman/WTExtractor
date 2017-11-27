@@ -425,8 +425,8 @@ WLD3* wld3_extract(DataAccessor* acc){
     goto FAIL;
   }
   headercount -= 0xC5;
-  if(headercount != 9){
-    printf("Only know how to use files with 9 headers, not %d. Exiting.",
+  if(headercount != 8 && headercount != 9) {
+    printf("WT archives must have either 8 or 9 headers, not %d. Exiting.",
 	   headercount);
     goto FAIL;
   }
@@ -499,11 +499,14 @@ WLD3* wld3_extract(DataAccessor* acc){
   }
 
   //Encodeversion
-  wt->encodeversion = le32toh(*((uint32_t*)rawheaders[8]));
-  if(wt->encodeversion != 200 && wt->encodeversion != 300){
-    printf("Invalid Format: Unknown Encode Type %d\n", wt->encodeversion);
-    goto FAIL;
-  }
+  if(headercount == 9){
+    wt->encodeversion = le32toh(*((uint32_t*)rawheaders[8]));
+    if(wt->encodeversion != 200 && wt->encodeversion != 300){
+      printf("Invalid Format: Unknown Encode Type %d\n", wt->encodeversion);
+      goto FAIL;
+    }
+  } else
+    wt->encodeversion = 100;
   //printf("EncodeVersion: %u\n", wt->encodeversion);
 
   //ExtraURLs
@@ -569,7 +572,7 @@ WLD3* wld3_extract(DataAccessor* acc){
   goto CLEANUP;
 }
 
-void wlkd_print(WLD3* wt){
+void wld3_print(WLD3* wt){
   char uuid_str[37];
   struct tm* timeinfo;
 

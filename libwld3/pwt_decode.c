@@ -369,10 +369,10 @@ void pwt_visuals_print(PWT_Visuals* visuals){
   printf("unusedbits: {%u, %u, %u}\n", visuals->unused_vbits_x,
 	 visuals->unused_vbits_y, visuals->unused_vbits_z);
 
-  for(int i=0; i <visuals->vertex_count; i++){
+  /*for(int i=0; i <visuals->vertex_count; i++){
     PWT_XYZ* currxyz = &visuals->vertices[i];
     printf("  (%f, %f, %f)\n", currxyz->X,currxyz->Y,currxyz->Z);
-  }
+    }*/
 
   printf("NormalCount:     %d\n", visuals->normal_count);
   printf("NormalCompCount: %d\n", visuals->normalcomp_count);
@@ -385,7 +385,7 @@ void pwt_visuals_print(PWT_Visuals* visuals){
   printf("Normunusedbits: {%u, %u, %u}\n", visuals->unused_nbits_x,
 	 visuals->unused_nbits_y, visuals->unused_nbits_z);
 
-  for(int i=0; i < visuals->normal_count; i++){
+  /*for(int i=0; i < visuals->normal_count; i++){
     PWT_XYZ* curr = &visuals->normals[i];
     printf("  (%f, %f, %f)\n", curr->X,curr->Y,curr->Z);
   }
@@ -417,7 +417,7 @@ void pwt_visuals_print(PWT_Visuals* visuals){
 	   visuals->face_details[i].specularity.X,
 	   visuals->face_details[i].specularity.Y,
 	   visuals->face_details[i].specularity.Z);
-  }
+           }*/
 
 
   for(int i = 0; i < visuals->texture_count; i++)
