@@ -12,7 +12,8 @@
 #include <iostream>
 
 MainWindow::MainWindow(const QString& modelFilePath)
-  : QMainWindow(), pwt(0), ui(new Ui::MainWindow), textureListModel(new QStringListModel(this)) {
+  : QMainWindow(), pwt(0), ui(new Ui::MainWindow), textureListModel(new QStringListModel(this)),
+    isWireframe(false) {
   ui->setupUi(this);
   ui->splitter->setSizes(QList<int> {200, 500}); //TODO: FIX HACK
   ui->listViewModelTexture->setModel(textureListModel);
@@ -82,6 +83,18 @@ void MainWindow::onSelectedFrameChange(const QModelIndex &current, const QModelI
     ui->labelVisualsData->setText("");
   }
   textureListModel->setStringList(texlist);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* ke){
+  switch(ke->key()){
+  case Qt::Key_F8:
+    ke->accept();
+    isWireframe = !isWireframe;
+    ui->ogrePane->setWireframe(isWireframe);
+    return;
+  default:
+    QMainWindow::keyPressEvent(ke);
+  }
 }
 
 void MainWindow::setWTMetaLabel(WLD3* wt){

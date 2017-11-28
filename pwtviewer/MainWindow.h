@@ -1,5 +1,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QStringListModel>
+#include <QKeyEvent>
+
 #include "pwt_decode.h"
 #include "wld3_extract.h"
 
@@ -18,6 +20,7 @@ class MainWindow : public QMainWindow {
 
  public slots:
   void onSelectedFrameChange(const QModelIndex &current, const QModelIndex &previous);
+  void keyPressEvent(QKeyEvent*);
 
  private:
   void setWTMetaLabel(WLD3* wt);
@@ -29,4 +32,6 @@ class MainWindow : public QMainWindow {
   QStringListModel* textureListModel;
   void setFrameDataLabel(const PWT_Frame* frame);
   void setVisualsDataLabel(const PWT_Visuals* visuals);
+
+  bool isWireframe;
 };
