@@ -26,7 +26,7 @@
 
 PWTModelFrame::PWTModelFrame(QWidget* parent) :
   QWidget(parent), mRoot(0), mRenderWindow(0), mWTNode(0), pwt(0),
-  mUpdatePending(false), mIsAnimating(true), leftMouseDragging(false) {
+  mUpdatePending(false), mIsAnimating(true), leftMouseDragging(false), rightMouseDragging(false) {
 
   setAttribute(Qt::WA_OpaquePaintEvent); //No partial redraw. No need for blanking widget.
   setAttribute(Qt::WA_PaintOnScreen); //No double buffering (handled by GL)
@@ -233,22 +233,36 @@ void PWTModelFrame::mousePressEvent(QMouseEvent *event){
     lastMouseX = event->x();
     lastMouseY = event->y();
   }
+  if(event->button() == Qt::RightButton){
+    rightMouseDragging = true;
+    lastMouseX = event->x();
+    lastMouseY = event->y();
+  }
 }
 
 
 void PWTModelFrame::mouseMoveEvent(QMouseEvent *event){
-  if((event->buttons() & Qt::LeftButton) && leftMouseDragging){
+  if((event->buttons() & (Qt::LeftButton | Qt::RightButton)) &&
+     (leftMouseDragging || rightMouseDragging)) {
     int deltaX = event->x() - lastMouseX;
     int deltaY = event->y() - lastMouseY;
 
-    //Rotate the mouse movement vector 90 degrees ccw. deltaY inverted because of Qt's coordinate space.
-    Ogre::Vector3 axis = Ogre::Vector3(deltaY, deltaX, 0);
-    axis.normalise();
+    if((event->buttons() & Qt::LeftButton) && leftMouseDragging){
+      //Rotate the mouse movement vector 90 degrees ccw. deltaY inverted because of Qt's coordinate space.
+      Ogre::Vector3 axis = Ogre::Vector3(deltaY, deltaX, 0);
+      axis.normalise();
 
-    Ogre::Real distance = Ogre::Math::Sqrt((deltaX * deltaX) + (deltaY * deltaY));
+      Ogre::Real distance = Ogre::Math::Sqrt((deltaX * deltaX) + (deltaY * deltaY));
 
-    mWTNode->rotate(Ogre::Quaternion(Ogre::Degree(distance), axis),
-                    Ogre::Node::TransformSpace::TS_WORLD);
+      mWTNode->rotate(Ogre::Quaternion(Ogre::Degree(distance), axis),
+                      Ogre::Node::TransformSpace::TS_WORLD);
+    }
+
+    if((event->buttons() & Qt::RightButton) && rightMouseDragging) {
+      mCameraNode->translate(((Ogre::Real)-deltaX) / 100,
+                             ((Ogre::Real) deltaY) / 100,
+                             0, Ogre::Node::TransformSpace::TS_WORLD);
+    }
 
     lastMouseX = event->x();
     lastMouseY = event->y();
@@ -259,6 +273,16 @@ void PWTModelFrame::mouseReleaseEvent(QMouseEvent *event){
   if(event->button() == Qt::LeftButton){
     leftMouseDragging = false;
   }
+  if(event->button() == Qt::RightButton){
+    rightMouseDragging = false;
+  }
+}
+
+void PWTModelFrame::wheelEvent(QWheelEvent * event) {
+  Ogre::Real s = 1+(((Ogre::Real)event->pixelDelta().y())/1000);
+  mWTNode->scale(s, s, s);
+
+  event->accept();
 }
 
 Ogre::SceneNode* PWTModelFrame::createPWTMesh(PWT_Frame* modelFrame, Ogre::SceneNode *ogreNode)

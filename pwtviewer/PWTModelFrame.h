@@ -33,6 +33,7 @@ class PWTModelFrame : public QWidget {
   virtual void mousePressEvent(QMouseEvent *event) override;
   virtual void mouseMoveEvent(QMouseEvent *event) override;
   virtual void mouseReleaseEvent(QMouseEvent *event) override;
+  virtual void wheelEvent(QWheelEvent *event) override;
 
   Ogre::SceneNode* createPWTMesh(PWT_Frame* modelFrame, Ogre::SceneNode *ogreNode);
 
@@ -54,6 +55,7 @@ class PWTModelFrame : public QWidget {
   bool mUpdatePending;
   bool mIsAnimating;
   bool leftMouseDragging;
+  bool rightMouseDragging;
   int lastMouseX;
   int lastMouseY;
 };
