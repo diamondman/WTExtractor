@@ -1,3 +1,10 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef _WLD3_MULTIFH
+#define _WLD3_MULTIFH
+
 struct mspack_system multi_system;
 
 const char *create_filename(const char *filename);
@@ -8,3 +15,9 @@ const char *create_filename_from_memory(void *data, size_t length);
 void set_filename_printable_name(const char *filename, const char *name);
 
 void free_filename(const char *filename);
+
+#endif
+
+#ifdef __cplusplus
+}
+#endif

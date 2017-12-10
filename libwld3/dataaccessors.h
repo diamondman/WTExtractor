@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _WLD3_DATAACCESSORS
 #define _WLD3_DATAACCESSORS
 
@@ -26,4 +30,8 @@ void freeBufferAccessor(DataAccessor* da);
 DataAccessor* openFileAccessor(const char *filename);
 void freeFileAccessor(DataAccessor* da);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

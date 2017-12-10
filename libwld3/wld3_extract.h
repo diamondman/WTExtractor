@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef WLDS_EXTRACT
 #define WLDS_EXTRACT
 
@@ -49,8 +53,11 @@ typedef struct WLD3{
 
 WLD3* wld3_extract(DataAccessor*);
 
-void wlkd_print(WLD3* wt);
+void wld3_print(WLD3* wt);
 
 void wld3_free(WLD3* wt);
+#endif
 
+#ifdef __cplusplus
+}
 #endif
