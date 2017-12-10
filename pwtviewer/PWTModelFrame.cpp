@@ -15,6 +15,9 @@
 #include <OgreHlmsSamplerblock.h>
 #include <OgreHlms.h>
 #include <OgreArchiveManager.h>
+#include <OgreQuaternion.h>
+#include <OgreMath.h>
+#include <OgreVector3.h>
 
 #include <iostream>
 #include <stdio.h>
@@ -23,7 +26,7 @@
 
 PWTModelFrame::PWTModelFrame(QWidget* parent) :
   QWidget(parent), mRoot(0), mRenderWindow(0), mWTNode(0), pwt(0),
-  mUpdatePending(false), mIsAnimating(true) {
+  mUpdatePending(false), mIsAnimating(true), leftMouseDragging(false) {
 
   setAttribute(Qt::WA_OpaquePaintEvent); //No partial redraw. No need for blanking widget.
   setAttribute(Qt::WA_PaintOnScreen); //No double buffering (handled by GL)
@@ -222,6 +225,40 @@ bool PWTModelFrame::event(QEvent *event) {
     default:
       return QWidget::event(event);
     }
+}
+
+void PWTModelFrame::mousePressEvent(QMouseEvent *event){
+  if(event->button() == Qt::LeftButton){
+    leftMouseDragging = true;
+    lastMouseX = event->x();
+    lastMouseY = event->y();
+  }
+}
+
+
+void PWTModelFrame::mouseMoveEvent(QMouseEvent *event){
+  if((event->buttons() & Qt::LeftButton) && leftMouseDragging){
+    int deltaX = event->x() - lastMouseX;
+    int deltaY = event->y() - lastMouseY;
+
+    //Rotate the mouse movement vector 90 degrees ccw. deltaY inverted because of Qt's coordinate space.
+    Ogre::Vector3 axis = Ogre::Vector3(deltaY, deltaX, 0);
+    axis.normalise();
+
+    Ogre::Real distance = Ogre::Math::Sqrt((deltaX * deltaX) + (deltaY * deltaY));
+
+    mWTNode->rotate(Ogre::Quaternion(Ogre::Degree(distance), axis),
+                    Ogre::Node::TransformSpace::TS_WORLD);
+
+    lastMouseX = event->x();
+    lastMouseY = event->y();
+  }
+}
+
+void PWTModelFrame::mouseReleaseEvent(QMouseEvent *event){
+  if(event->button() == Qt::LeftButton){
+    leftMouseDragging = false;
+  }
 }
 
 Ogre::SceneNode* PWTModelFrame::createPWTMesh(PWT_Frame* modelFrame, Ogre::SceneNode *ogreNode)

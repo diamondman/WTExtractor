@@ -20,7 +20,6 @@ class PWTModelFrame : public QWidget {
   //Avoid "QWidget::paintEngine: Should no longer be called"
   virtual QPaintEngine *paintEngine() const override {return NULL;}
 
-
   virtual void render(QPainter *painter) {Q_UNUSED(painter);} //Suggested. IDK why.
   virtual void render();
 
@@ -31,6 +30,9 @@ class PWTModelFrame : public QWidget {
  protected:
   virtual bool event(QEvent *event) override;
   virtual void paintEvent(QPaintEvent *event) override {}; //Prevent flicker.
+  virtual void mousePressEvent(QMouseEvent *event) override;
+  virtual void mouseMoveEvent(QMouseEvent *event) override;
+  virtual void mouseReleaseEvent(QMouseEvent *event) override;
 
   Ogre::SceneNode* createPWTMesh(PWT_Frame* modelFrame, Ogre::SceneNode *ogreNode);
 
@@ -51,4 +53,7 @@ class PWTModelFrame : public QWidget {
 
   bool mUpdatePending;
   bool mIsAnimating;
+  bool leftMouseDragging;
+  int lastMouseX;
+  int lastMouseY;
 };
