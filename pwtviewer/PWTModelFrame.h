@@ -58,4 +58,15 @@ class PWTModelFrame : public QWidget {
   bool rightMouseDragging;
   int lastMouseX;
   int lastMouseY;
+
+  //Initializing the Ogre widget in QT causes render to be called
+  //several times before it should, and then not at all once the
+  //widget is ready. This results in a black screen until user
+  //interaction causes render to be called again. To handle this,
+  //requiredRedrawCount holds the number of extra frames to
+  //render. This number's default should be high enough to handle the
+  //random calls to renderand still have at least one frame to render
+  //once the widget it ready. This is a hack, and a better solution is
+  //welcome.
+  unsigned int requiredRedrawCount;
 };

@@ -11,6 +11,7 @@
 
 #include <Hlms/Pbs/OgreHlmsPbsDatablock.h>
 #include <Hlms/Pbs/OgreHlmsPbs.h>
+#include <Hlms/Unlit/OgreHlmsUnlitDatablock.h>
 #include <Hlms/Unlit/OgreHlmsUnlit.h>
 #include <OgreHlmsSamplerblock.h>
 #include <OgreHlms.h>
@@ -26,7 +27,8 @@
 
 PWTModelFrame::PWTModelFrame(QWidget* parent) :
   QWidget(parent), mRoot(0), mRenderWindow(0), mWTNode(0), pwt(0),
-  mUpdatePending(false), mIsAnimating(true), leftMouseDragging(false), rightMouseDragging(false) {
+  mUpdatePending(false), mIsAnimating(false), leftMouseDragging(false), rightMouseDragging(false),
+  requiredRedrawCount(10) {
 
   setAttribute(Qt::WA_OpaquePaintEvent); //No partial redraw. No need for blanking widget.
   setAttribute(Qt::WA_PaintOnScreen); //No double buffering (handled by GL)
@@ -44,12 +46,14 @@ void PWTModelFrame::resizeEvent(QResizeEvent *event) {
     //#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
     mRenderWindow->resize(width(), height());
     this->update(); //Not sure if this does anything.
+    requiredRedrawCount++;
     renderNow();
   }
 }
 
 void PWTModelFrame::showEvent(QShowEvent *event) {
   QWidget::showEvent(event);
+  requiredRedrawCount++;
   if(isVisible())
     renderNow();
 }
@@ -61,13 +65,18 @@ void PWTModelFrame::renderNow() {
   if(mRoot == NULL)
     initialize();
 
-  if(pwt && !mWTNode)
+  if(pwt && !mWTNode){
+    requiredRedrawCount++;
     createScene();
+  }
 
   render();
 
-  if (mIsAnimating)
+  if (mIsAnimating || requiredRedrawCount){
+    if(requiredRedrawCount)
+      requiredRedrawCount--;
     renderLater();
+  }
 }
 
 void PWTModelFrame::renderLater() {
@@ -266,6 +275,8 @@ void PWTModelFrame::mouseMoveEvent(QMouseEvent *event){
 
     lastMouseX = event->x();
     lastMouseY = event->y();
+
+    renderNow();
   }
 }
 
@@ -282,6 +293,7 @@ void PWTModelFrame::wheelEvent(QWheelEvent * event) {
   Ogre::Real s = 1+(((Ogre::Real)event->pixelDelta().y())/1000);
   mWTNode->scale(s, s, s);
 
+  renderNow();
   event->accept();
 }
 
@@ -448,4 +460,6 @@ void PWTModelFrame::setWireframe(bool wireframe) {
 
       ++itor;
     }
+
+  renderNow();
 }
