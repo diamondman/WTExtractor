@@ -34,7 +34,7 @@ int WTEvent::getY(){
   return 0;
 }
 
-void* WTEvent::getData(){}
+VARIANT WTEvent::getData(){}
 
 WTObject* WTEvent::getStage(){
   return 0;

@@ -301,7 +301,7 @@ public:
   WTFont* createFont(int Reserved = 0);
 
   ///Gets the value of a WT option.
-  VARIANT* getOption(int Option_Number);
+  VARIANT getOption(int Option_Number);
 
   ///Sets a WT option.
   void setOption(int Option_Number,

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "basetypes.hpp"
+
 class WTObject;
 
 class WTEvent {
@@ -22,7 +24,7 @@ public:
 
   int getY();
 
-  void* getData();
+  VARIANT getData();
 
   WTObject* getStage();
 

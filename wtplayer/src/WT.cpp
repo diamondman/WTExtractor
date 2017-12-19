@@ -387,7 +387,7 @@ WTFont* WT::createFont(int Reserved){
 }
 
 ///Gets the value of a WT option.
-VARIANT* WT::getOption(int Option_Number){
+VARIANT WT::getOption(int Option_Number){
   return 0;
 }
 
