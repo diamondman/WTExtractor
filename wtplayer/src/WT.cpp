@@ -40,7 +40,7 @@ WTStage* WT::createStage(){
 
 ///Create a model using data loaded from the specified .wt file.
 WTModel* WT::createModel(char* File_Name,
-                     int WTCache_Type){
+                         int WTCache_Type){
   return 0;
 }
 
@@ -61,27 +61,27 @@ WTGroup* WT::createGroup(){
 
 ///Creates an empty WTBitmap object.
 WTBitmap* WT::createBlankBitmap(int Width,
-                            int Height){
+                                int Height){
   return 0;
 }
 
 ///Creates a WTBitmap object from a media file.
 WTBitmap* WT::createBitmap(char* File_Name,
-                       int WTCache_Type){
+                           int WTCache_Type){
   return 0;
 }
 
 ///Creates a WTAudioClip object from a media file.
 WTAudioClip* WT::createAudioClip(char* File_Name,
-                             int WTCache_Type){
+                                 int WTCache_Type){
   return 0;
 }
 
 ///Creates a WTVisualizer object.
 WTVisualizer* WT::createAudioVisualizer(char* Visualizer_Type,
-                                    char* Get_Audio_From,
-                                    int Number_Of_Data_Bins,
-                                    int Reserved){
+                                        char* Get_Audio_From,
+                                        int Number_Of_Data_Bins,
+                                        int Reserved){
   return 0;
 }
 
@@ -90,7 +90,7 @@ void WT::setMouseCursorState(int Mouse_Cursor_Type){}
 
 ///Sets the position of the mouse pointer.
 void WT::setMousePosition(int WT_X,
-                      int WT_Y){}
+                          int WT_Y){}
 
 ///Starts the scene rendering.
 void WT::start(){}
@@ -100,52 +100,52 @@ void WT::stop(){}
 
 ///Creates a line model.
 WTModel* WT::createLine(float X1,
-                    float Y1,
-                    float Z1,
-                    float X2,
-                    float Y2,
-                    float Z2,
-                    float Radius,
-                    int Number_Of_Sides,
-                    int Cap_Type,
-                    int Line_Type){
+                        float Y1,
+                        float Z1,
+                        float X2,
+                        float Y2,
+                        float Z2,
+                        float Radius,
+                        int Number_Of_Sides,
+                        int Cap_Type,
+                        int Line_Type){
   return 0;
 }
 
 ///Creates a cone model.
 WTModel* WT::createCone(float Height,
-                    float Radius,
-                    int Number_Of_Sides,
-                    int Cap_Type){
-  return 0;
-}
-
-///Creates a cylinder model.
-WTModel* WT::createCylinder(float Height,
                         float Radius,
                         int Number_Of_Sides,
                         int Cap_Type){
   return 0;
 }
 
+///Creates a cylinder model.
+WTModel* WT::createCylinder(float Height,
+                            float Radius,
+                            int Number_Of_Sides,
+                            int Cap_Type){
+  return 0;
+}
+
 ///Creates a plane model.
 WTModel* WT::createPlane(float Width,
-                     float Height,
-                     bool Make_Plane_With_Two_Sides,
-                     float X_Center,
-                     float Y_Center,
-                     int Number_Of_Tiles_Per_Edge){
+                         float Height,
+                         bool Make_Plane_With_Two_Sides,
+                         float X_Center,
+                         float Y_Center,
+                         int Number_Of_Tiles_Per_Edge){
   return 0;
 }
 
 ///Creates a patch model.
 WTModel* WT::createPatch(int Number_Of_S_Points,
-                     int Number_Of_T_Points,
-                     float Size_Of_Each_S_Tile,
-                     float Size_Of_Each_T_Tile,
-                     float x,
-                     float Z,
-                     bool Make_Patch_With_Two_Sides){
+                         int Number_Of_T_Points,
+                         float Size_Of_Each_S_Tile,
+                         float Size_Of_Each_T_Tile,
+                         float x,
+                         float Z,
+                         bool Make_Patch_With_Two_Sides){
   return 0;
 }
 
@@ -154,15 +154,15 @@ void WT::setHWND(int hWnd){}
 
 //[id(0x00000018), hidden]
 void WT::setClientRect(int x,
-                   int y,
-                   int w,
-                   int h){}
+                       int y,
+                       int w,
+                       int h){}
 
 //[id(0x00000019), hidden]
 void WT::setClipRect(int x,
-                 int y,
-                 int w,
-                 int h){}
+                     int y,
+                     int w,
+                     int h){}
 
 ///Gets the last event that occured.
 WTEvent* WT::getEvent(){
@@ -209,7 +209,7 @@ bool WT::getNotifyExceptionEvent(){
 
 ///Overrides the default behaviour for WT exceptions.
 void WT::overrideExceptionEvent(int Exception_Type_To_Change,
-                            bool New_Value){}
+                                bool New_Value){}
 
 ///Gets status driver initializations.
 bool WT::getInitStatus(int Status_To_Get){
@@ -239,7 +239,7 @@ char* WT::getVersion(){
 
 //Compares Web Driver versions.
 int WT::checkVersion(char* Version,
-                 char* Check_Against){
+                     char* Check_Against){
   return 0;
 }
 
@@ -264,8 +264,8 @@ int WT::getErrorHandling(){
 
 ///Switches to a full screen display mode.
 bool WT::setResolution(int Screen_Width,
-                   int Screen_Height,
-                   int Bits_Per_Pixel){
+                       int Screen_Height,
+                       int Bits_Per_Pixel){
   return 0;
 }
 
@@ -282,8 +282,8 @@ int WT::getMaxDownloads(){
 
 ///Opens a remote or local file for reading.
 WTFile* WT::readFile(char* File_Name,
-                 int WTCache_Type,
-                 int endian){
+                     int WTCache_Type,
+                     int endian){
   return 0;
 }
 
@@ -316,7 +316,7 @@ void WT::sleep(int Number_Of_Milliseconds){}
 
 ///Creates a sphere model.
 WTModel* WT::createSphere(float Radius,
-                      int Number_Of_Points_Around){
+                          int Number_Of_Points_Around){
   return 0;
 }
 
@@ -330,15 +330,15 @@ WTJoystick* WT::createJoystick(){
 
 ///Creates group from a WTStudio level file.
 WTGroup* WT::createGroupFromFile(char* File_Name,
-                             int WTCache_Type,
-                             int Load_Order_Offset,
-                             int Reserved){
+                                 int WTCache_Type,
+                                 int Load_Order_Offset,
+                                 int Reserved){
   return 0;
 }
 
 ///Create a WTActor from .wsad file.
 WTActor* WT::createActor(char* File_Name,
-                     int WTCache_Type){
+                         int WTCache_Type){
   return 0;
 }
 
@@ -347,7 +347,7 @@ void WT::NSActivate(int hWnd){}
 
 ///Allows you to modify how the scene is rendered.
 void WT::setRenderOption(int Option_To_Set,
-                     int Option_Value){}
+                         int Option_Value){}
 
 ///Gets a render option value.
 int WT::getRenderOption(int Option_To_Get){
@@ -356,8 +356,8 @@ int WT::getRenderOption(int Option_To_Get){
 
 ///Specifies the desired feature set.
 int WT::designedForVersion(char* Version,
-                       char* Flavor,
-                       int Reserved){
+                           char* Flavor,
+                           int Reserved){
   return 0;
 }
 
@@ -393,17 +393,17 @@ VARIANT WT::getOption(int Option_Number){
 
 ///Sets a WT option.
 void WT::setOption(int Option_Number,
-               VARIANT New_Value){}
+                   VARIANT New_Value){}
 
 ///Gets the information associated with the WT object.
 double WT::getInfo(int Info_Type,
-               int Reserved){
+                   int Reserved){
   return 0;
 }
 
 ///This method creates a 3D Audio Clip object.
 WTAudioClip3D* WT::createAudioClip3D(char* File_Name,
-                                 int WTCache_Type){
+                                     int WTCache_Type){
   return 0;
 }
 
@@ -418,7 +418,7 @@ void WT::setMasterVolume(int vol){}
 ///Allows the user to read from the registry relative to the
 ///[HKEY_CURRENT_USER]\Software\WildTangent\UserRegStrings\ key.
 char* WT::getRegistryStringValue(char* Sub_Key,
-                             char* Value_Name){
+                                 char* Value_Name){
   return 0;
 }
 
@@ -429,17 +429,17 @@ WTSpout* WT::createSpout(){
 
 ///Creates a WTPortal object.
 WTPortal* WT::createPortal(float Width,
-                       float Height,
-                       WTCamera* pCam,
-                       int mappingOption,
-                       bool doubleSided,
-                       bool renderOnlyChildren){
+                           float Height,
+                           WTCamera* pCam,
+                           int mappingOption,
+                           bool doubleSided,
+                           bool renderOnlyChildren){
   return 0;
 }
 
 ///Gets download information.
 int WT::getDownloadInfo(int WhichCounter,
-                    int Param){
+                        int Param){
   return 0;
 }
 
@@ -460,7 +460,7 @@ void WT::resetDownloadInfo(){}
   int UV_Lower_Bound,
   int Color_Lower_Bound){
   return 0;
-}*/
+  }*/
 
 ///Creates a blank Generic Mesh WTModel.
 WTModel* WT::createBlankMesh(){
@@ -482,13 +482,13 @@ WTString3D* WT::createString3D(){
 
 ///This method creates a WTShadow object.
 WTShadow* WT::createShadow(int Type,
-                       int Width,
-                       int Height){
+                           int Width,
+                           int Height){
   return 0;
 }
 
 //[id(0x0000005b), hidden]
 void WT::setOptionString(char* GUID,
-                     char* key,
-                     char* Data,
-                     int Parameter){}
+                         char* key,
+                         char* Data,
+                         int Parameter){}
