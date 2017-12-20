@@ -73,10 +73,75 @@ swig_link_libraries( WTEngine wtapi )
 
 ############################
 
-add_jar(wildtangent ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTVector3D.java)
+add_jar(wildtangent
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTActor.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTAudioClip3D.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTAudioClip.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTBitmap.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTCamera.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTCollisionInfo.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTContainer.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTDrop.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTEngine.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTEngineJNI.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTEventCallback.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTEvent.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTFile.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTFont.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTGroup.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WT.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTJoystick.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTKeyboardPollInfo.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTLight.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTModel.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTMousePollInfo.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTObject.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTOnLoadEvent.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTOrientation3D.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTPortal.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTShadow.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTSpout.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTStage.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTString3D.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTSurfaceShader.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTSysInfo.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTVector3D.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/WTVisualizer.java
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTConstants.java
+  )
 add_dependencies( wildtangent WTEngine )
 
 ############################
 
-add_jar(main Main.java ENTRY_POINT Main)
-add_dependencies(main wildtangent)
+set(RTSRC ${CMAKE_CURRENT_SOURCE_DIR}/javasrc)
+add_jar(rt
+  ${RTSRC}/com/ms/com/_Guid.java ${RTSRC}/com/ms/com/IUnknown.java
+  ${RTSRC}/com/ms/com/NoAutoScripting.java
+  ${RTSRC}/com/ms/com/SafeArray.java ${RTSRC}/com/ms/com/Variant.java
+
+  ${RTSRC}/com/ms/security/PermissionDataSet.java
+  ${RTSRC}/com/ms/security/PermissionID.java
+  ${RTSRC}/com/ms/security/PermissionSet.java
+  ${RTSRC}/com/ms/security/PolicyEngine.java
+  ${RTSRC}/com/ms/security/SecurityClassLoader.java
+
+  ${RTSRC}/com/ms/wfc/util/Debug.java
+
+  ${RTSRC}/java/applet/Applet.java
+
+  ${RTSRC}/netscape/javascript/JSObject
+  )
+
+############################
+
+set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_BINARY_DIR}/wildtangent.jar:${CMAKE_BINARY_DIR}/rt.jar)
+add_jar(Main Main.java)# ENTRY_POINT Main)
+add_dependencies(Main wildtangent rt)
+
+############################
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/templates/run.sh.template
+  ${CMAKE_CURRENT_BINARY_DIR}/run.sh
+  COPYONLY)
