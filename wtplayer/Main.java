@@ -1,5 +1,7 @@
 import wildtangent.webdriver.WTVector3D;
 import wildtangent.webdriver.WTObject;
+import com.ms.com.Variant;
+import java.applet.Applet;
 
 public class Main
 {
@@ -21,5 +23,9 @@ public class Main
         Object o = new String("HELLO");
         wto.setUserData(o);
         System.out.println(wto.getUserData());
+
+        Variant var = new Variant(0);
+
+        Applet a = new Applet();
     }
 }
