@@ -1,7 +1,8 @@
 #include "WTObject.hpp"
+#include <iostream>
 
 int WTObject::getObjectType(){
-  return 0;
+  return 14;
 }
 
 //[id(0x000003ea), hidden]
@@ -18,6 +19,7 @@ WTObject* WTObject::getOwner(){
 }
 
 char* WTObject::getName(){
+  std::cout << "Hello from cout in native." << std::endl;
   return (char*)"TEST";
 }
 

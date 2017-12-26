@@ -4,3 +4,4 @@ venv/
 *~
 .dir-locals.el
 *.log
+.#*

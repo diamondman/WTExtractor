@@ -25,8 +25,10 @@
 #include "WTSysInfo.hpp"
 #include "WTVisualizer.hpp"
 
+#include "WTObject.hpp"
+
 ///Creates a box model.
-WTModel* createBox(float Width,
+WTModel* WT::createBox(float Width,
                    float Height,
                    float Depth,
                    int Number_Of_Tiles_Per_Edge){
@@ -446,21 +448,23 @@ int WT::getDownloadInfo(int WhichCounter,
 ///Resets all of the download and time counters.
 void WT::resetDownloadInfo(){}
 
-/*///Create a new Generic Mesh WTModel.
-  WTModel* WT::createMesh([in, optional] VARIANT Vertex_Array,
-  [in, optional] VARIANT Face_Array,
-  [in, optional] VARIANT Normal_Array,
-  [in, optional] VARIANT UV_Array,
-  [in, optional] VARIANT Color_Array,
+///Create a new Generic Mesh WTModel.
+WTModel* WT::createMesh(
+  float Vertex_Array[],
+  int Face_Array[],
+  float Normal_Array[],
+  float UV_Array[],
+  uint8_t Color_Array[],
   int Vertex_Array_Size,
   int Face_Array_Size,
   int Vertex_Lower_Bound,
   int Face_Lower_Bound,
   int Normal_Lower_Bound,
   int UV_Lower_Bound,
-  int Color_Lower_Bound){
-  return 0;
-  }*/
+  int Color_Lower_Bound
+){
+    return 0;
+}
 
 ///Creates a blank Generic Mesh WTModel.
 WTModel* WT::createBlankMesh(){
@@ -474,6 +478,12 @@ bool WT::RenderMode(){
 
 //[id(0x00000058), propput]
 void WT::RenderMode(bool pValue){}
+
+int WT::getRenderMode(){
+  return 0;
+}
+
+void WT::setRenderMode(int mode){}
 
 ///Creates a new WTString3D object.
 WTString3D* WT::createString3D(){

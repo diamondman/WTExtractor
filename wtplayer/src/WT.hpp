@@ -26,9 +26,12 @@ class WTSurfaceShader;
 class WTSysInfo;
 class WTVisualizer;
 
+class WTObject;
+
 class WT {
 
 public:
+
   ///Creates a box model.
   WTModel* createBox(float Width,
                      float Height,
@@ -42,7 +45,7 @@ public:
   WTModel* createModel(char* File_Name,
                        int WTCache_Type = 0);
 
-  ///Creates a container for a model or bitmap.
+  //Creates a container for a model or bitmap.
   WTContainer* createContainer();
 
   ///Creates a light.
@@ -344,19 +347,19 @@ public:
   ///Resets all of the download and time counters.
   void resetDownloadInfo();
 
-  /*///Create a new Generic Mesh WTModel.
-  WTModel* createMesh([in, optional] VARIANT Vertex_Array,
-                      [in, optional] VARIANT Face_Array,
-                      [in, optional] VARIANT Normal_Array,
-                      [in, optional] VARIANT UV_Array,
-                      [in, optional] VARIANT Color_Array,
+  ///Create a new Generic Mesh WTModel.
+  WTModel* createMesh(float Vertex_Array[] = 0,
+                      int Face_Array[] = 0,
+                      float Normal_Array[] = 0,
+                      float UV_Array[] = 0,
+                      uint8_t Color_Array[] = 0,
                       int Vertex_Array_Size = -1,
                       int Face_Array_Size = -1,
                       int Vertex_Lower_Bound = 0,
                       int Face_Lower_Bound = 0,
                       int Normal_Lower_Bound = 0,
                       int UV_Lower_Bound = 0,
-                      int Color_Lower_Bound = 0);*/
+                      int Color_Lower_Bound = 0);
 
   ///Creates a blank Generic Mesh WTModel.
   WTModel* createBlankMesh();
@@ -366,6 +369,10 @@ public:
 
   //[id(0x00000058), propput]
   void RenderMode(bool pValue);
+
+  int getRenderMode();
+
+  void setRenderMode(int mode);
 
   ///Creates a new WTString3D object.
   WTString3D* createString3D();

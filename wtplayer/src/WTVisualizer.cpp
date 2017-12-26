@@ -33,8 +33,8 @@ int WTVisualizer::getPlaybackLength(){
   return 0;
 }
 
-int WTVisualizer::updateProperties(){
-  return 0;
+bool WTVisualizer::updateProperties(){
+  return false;
 }
 
 char* WTVisualizer::getPropertyAsString(char* Name,

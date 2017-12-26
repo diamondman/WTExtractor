@@ -1,5 +1,12 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #java -Djava.library.path=$DIR -cp $DIR/wildtangent.jar:$DIR/ms.jar:$DIR -Xbootclasspath/p:$DIR/rt.jar -jar main.jar
-java -Djava.library.path=$DIR -cp $DIR/wildtangent.jar:$DIR/Main.jar:. \
-     -Xbootclasspath/p:$DIR/rt.jar Main
+
+VERBOSEFLAGS=""
+if [[ $* == *-v* ]]
+then
+    VERBOSEFLAGS="-verbose:class"
+fi
+
+java ${VERBOSEFLAGS} -Djava.library.path=$DIR -cp $DIR/wildtangent.jar:$DIR/WTPlayerMain.jar:.:/home/diamondman/.wine/drive_c/Program\ Files\ \(x86\)/WildTangent/Apps/GameChannel/Games/02554DAA-470F-40BC-BF60-675C5BD9920F/localver/darkorbit \
+     -Xbootclasspath/p:$DIR/rt.jar WTPlayerMain "${@: -1}"

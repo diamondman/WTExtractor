@@ -251,8 +251,8 @@ void WTModel::setVertexPosition(int Vertex,
 void WTModel::setFaceSurfaceShader(int Face,
                                    WTSurfaceShader* Surface_Shader){}
 
-void WTModel::setFaces(VARIANT Index_Array,
-                       VARIANT Face_Array,
+void WTModel::setFaces(int Index_Array[],
+                       int Face_Array[],
                        int Index_Array_Size,
                        int Index_Lower_Bound,
                        int Face_Lower_Bound){}
@@ -268,8 +268,8 @@ int WTModel::addVertex(float x,
   return 0;
 }
 
-int WTModel::addVertices(VARIANT Vertex_Array,
-                         VARIANT Normal_Array, //optional
+int WTModel::addVertices(float Vertex_Array[],
+                         float Normal_Array[], //optional
                          int Vertex_Array_Size,
                          int Vertex_Lower_Bound,
                          int Normal_Lower_Bound){
@@ -280,7 +280,7 @@ int WTModel::removeVertex(int Vertex){
   return 0;
 }
 
-int WTModel::removeVertices(VARIANT Vertex_Array){
+int WTModel::removeVertices(int Vertex_Array[]){
   return 0;
 }
 
@@ -290,7 +290,7 @@ int WTModel::addFace(int Vertex1,
   return 0;
 }
 
-int WTModel::addFaces(VARIANT Face_Array,
+int WTModel::addFaces(int Face_Array[],
                       int Face_Array_Size,
                       int Face_Lower_Bound){
   return 0;
@@ -300,20 +300,20 @@ int WTModel::removeFace(int Face){
   return 0;
 }
 
-int WTModel::removeFaces(VARIANT Face_Array){
+int WTModel::removeFaces(int Face_Array[]){
   return 0;
 }
 
-void WTModel::setVerticesPositions(VARIANT Vertex_Array,
-                                   VARIANT Positions_Array,
+void WTModel::setVerticesPositions(int Vertex_Array[],
+                                   float Positions_Array[],
                                    int Vertex_Array_Size,
                                    int Vertex_Lower_Bound,
                                    int Pos_Lower_Bound){}
 
 void WTModel::setUVMapping(int Mapping){}
 
-void WTModel::setVerticesUVs(VARIANT Vertex_Array,
-                             VARIANT UVs_Array,
+void WTModel::setVerticesUVs(int Vertex_Array[],
+                             float UVs_Array[],
                              int Vertex_Array_Size,
                              int Vertex_Lower_Bound,
                              int UV_Lower_Bound){}
