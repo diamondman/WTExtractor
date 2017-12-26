@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WTObject.hpp"
+#include "basetypes.hpp"
 
 class WTBitmap : public WTObject {
 
@@ -90,7 +91,7 @@ public:
   //[id(0x00002341), hidden]
   void drawPolygonWithString(char* str);
 
-  void copyRectFromIntArray(VARIANT Source_Array,
+  void copyRectFromIntArray(int Source_Array[],
                             int Blit_Type = -1,
                             int x = -1,
                             int y = -1,
@@ -103,7 +104,7 @@ public:
                             int Total_Array_Image_Width = -1,
                             int Total_Array_Image_Height = -1);
 
-  void copyRectFromByteArray(VARIANT Source_Array,
+  void copyRectFromByteArray(uint8_t Source_Array[],
                              int Blit_Type = -1,
                              int x = -1,
                              int y = 20,

@@ -89,7 +89,7 @@ void WTBitmap::drawPixelWithString(char* str){}
 //[id(0x00002341), hidden]
 void WTBitmap::drawPolygonWithString(char* str){}
 
-void WTBitmap::copyRectFromIntArray(VARIANT Source_Array,
+void WTBitmap::copyRectFromIntArray(int Source_Array[],
                                     int Blit_Type,
                                     int x,
                                     int y,
@@ -102,7 +102,7 @@ void WTBitmap::copyRectFromIntArray(VARIANT Source_Array,
                                     int Total_Array_Image_Width,
                                     int Total_Array_Image_Height){}
 
-void WTBitmap::copyRectFromByteArray(VARIANT Source_Array,
+void WTBitmap::copyRectFromByteArray(uint8_t Source_Array[],
                                      int Blit_Type,
                                      int x,
                                      int y,

@@ -1,55 +1,36 @@
 package wildtangent.webdriver.impl;
 
-//import wildtangent.webdriver.WT;
-//import wildtangent.webdriver.WTOnLoadEvent;
-
-public abstract class WTObject extends wildtangent.webdriver.jni.WTObject
+public class WTObject extends wildtangent.webdriver.jni.WTObject
     implements wildtangent.webdriver.WTObject {
-    //public WTObject getOwner();
-    //
-    //public boolean isLoadedWithChildren();
-    //
-    //public boolean isValid();
-    //
-    //public void setOnLoad(WTOnLoadEvent var1);
-    //
-    //public boolean getIsValid();
 
-    public int getObjectType(){
-        return 8;
+    public WTObject(long cPtr, boolean cMemoryOwn) {
+        super(cPtr, cMemoryOwn);
     }
 
-    //public Object getOption(int var1);
-    //
-    //public void setOption(int var1, Object var2);
-    //
-    //public void setOption(int var1, boolean var2);
-    //
-    //public void setOption(int var1, double var2);
-    //
-    //public void setOption(int var1, float var2);
-    //
-    //public void setOption(int var1, int var2);
-    //
-    //public WTObject duplicate();
-    //
-    //public boolean isLoaded();
-    //
-    //public WT getCreator();
-    //
-    //public void setOnLoadedWithChildren(WTOnLoadEvent var1);
-    //
-    //public int getErrorNumber();
-    //
-    //public void setErrorNumber(int var1);
-    //
-    //public String getName();
-    //
-    //public void setName(String var1);
-    //
-    //public void setUserData(Object var1);
-    //
-    //public Object getUserData();
-    //
-    //public boolean getIsLoaded();
+    public WTObject() {
+        super();
+    }
+
+
+    public void setOption(int n, Object object) {
+        //this.internal_setOption(n, object);
+        //this.setOption_xfer(n, object);
+    }
+
+    public void setOption(int n, boolean bl) {
+        this.setOption(n, new Boolean(bl));
+    }
+
+    public void setOption(int n, double d) {
+        this.setOption(n, new Double(d));
+    }
+
+    public void setOption(int n, float f) {
+        this.setOption(n, new Float(f));
+    }
+
+    public void setOption(int n, int n2) {
+        this.setOption(n, new Integer(n2));
+    }
+
 }

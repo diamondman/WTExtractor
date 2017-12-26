@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <jni.h>
+#include <stdint.h>
 
 class jobject_wrap {
 public:

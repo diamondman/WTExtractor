@@ -241,8 +241,8 @@ public:
   void setFaceSurfaceShader(int Face,
                             WTSurfaceShader* Surface_Shader);
 
-  void setFaces(VARIANT Index_Array,
-                VARIANT Face_Array,
+  void setFaces(int Index_Array[],
+                int Face_Array[],
                 int Index_Array_Size = -1,
                 int Index_Lower_Bound = 0,
                 int Face_Lower_Bound = 0);
@@ -256,38 +256,38 @@ public:
                 float y,
                 float Z);
 
-  int addVertices(VARIANT Vertex_Array,
-                  VARIANT Normal_Array, //optional
+  int addVertices(float Vertex_Array[],
+                  float Normal_Array[] = 0, //optional
                   int Vertex_Array_Size = -1,
                   int Vertex_Lower_Bound = 0,
                   int Normal_Lower_Bound = 0);
 
   int removeVertex(int Vertex);
 
-  int removeVertices(VARIANT Vertex_Array);
+  int removeVertices(int Vertex_Array[]);
 
   int addFace(int Vertex1,
               int Vertex2,
               int Vertex3);
 
-  int addFaces(VARIANT Face_Array,
+  int addFaces(int Face_Array[],
                int Face_Array_Size = -1,
                int Face_Lower_Bound = 0);
 
   int removeFace(int Face);
 
-  int removeFaces(VARIANT Face_Array);
+  int removeFaces(int Face_Array[]);
 
-  void setVerticesPositions(VARIANT Vertex_Array,
-                            VARIANT Positions_Array,
+  void setVerticesPositions(int Vertex_Array[],
+                            float Positions_Array[],
                             int Vertex_Array_Size = -1,
                             int Vertex_Lower_Bound = 0,
                             int Pos_Lower_Bound = 0);
 
   void setUVMapping(int Mapping);
 
-  void setVerticesUVs(VARIANT Vertex_Array,
-                      VARIANT UVs_Array,
+  void setVerticesUVs(int Vertex_Array[],
+                      float UVs_Array[],
                       int Vertex_Array_Size = -1,
                       int Vertex_Lower_Bound = 0,
                       int UV_Lower_Bound = 0);

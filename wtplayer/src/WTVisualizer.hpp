@@ -24,7 +24,7 @@ public:
 
   int getPlaybackLength();
 
-  int updateProperties();
+  bool updateProperties();
 
   char* getPropertyAsString(char* Name,
                             int mostRecent = 1);
