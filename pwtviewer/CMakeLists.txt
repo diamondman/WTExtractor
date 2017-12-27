@@ -25,7 +25,7 @@ function( copyWithSymLink SRC DST )
 endfunction()
 
 #OGRE
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
 find_package(OGRE REQUIRED)
 include_directories( ${OGRE_INCLUDE_DIRS} )
 
