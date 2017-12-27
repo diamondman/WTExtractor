@@ -12,15 +12,6 @@ public class WTAudioClip extends wildtangent.webdriver.jni.WTAudioClip
     }
 
 
-    public void start(boolean bl, boolean bl2) {
-        this.start(bl ? 1 : 0, bl2 ? 1 : 0);
-    }
-
-    public void start(boolean bl) {
-        this.start(bl ? 1 : 0, 0);
-    }
-
-
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);
         //this.setOption_xfer(n, object);

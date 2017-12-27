@@ -62,7 +62,6 @@ public class WTPlayerMain
 
         try{
             Class<?> gameMainClass = loader.loadClass("dark.Main");
-            Class<?> class2 = loader.loadClass("dark.cGameLoader");
             Object gameMain = gameMainClass.newInstance();
             System.out.println("OBJECT MADE: " + gameMain);
 

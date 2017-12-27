@@ -26,6 +26,7 @@
 #include "WTVisualizer.hpp"
 
 #include "WTObject.hpp"
+#include <iostream>
 
 ///Creates a box model.
 WTModel* WT::createBox(float Width,
@@ -37,7 +38,8 @@ WTModel* WT::createBox(float Width,
 
 ///Create the main stage for the scene.
 WTStage* WT::createStage(){
-  return 0;
+  std::cout << "*** Calling createStage" << std::endl;
+  return new WTStage();
 }
 
 ///Create a model using data loaded from the specified .wt file.
@@ -215,7 +217,22 @@ void WT::overrideExceptionEvent(int Exception_Type_To_Change,
 
 ///Gets status driver initializations.
 bool WT::getInitStatus(int Status_To_Get){
-  return 0;
+  switch(Status_To_Get){
+  case 0: //DirectX version out of date?
+    return false;
+  case 1: //Unsupported Color Depth?
+    return false;
+  case 2: //No hardware acceleration found?
+    return false;
+  case 3: //No ADPCM (sound) support?
+    return false;
+  case 7: //24 bit color?
+    return false;
+  case 8: //32 bit color?
+    return true;
+  default:
+    return false;
+  }
 }
 
 ///Controls the use of hardware rendering capability.
