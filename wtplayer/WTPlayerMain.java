@@ -4,9 +4,12 @@ import wildtangent.webdriver.WTObject;
 import wildtangent.webdriver.wt3dLib;
 import netscape.javascript.JSObject;
 import com.ms.com.Variant;
+
 import java.applet.Applet;
 import java.net.URLClassLoader;
 import java.net.URL;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -14,39 +17,18 @@ import java.lang.reflect.InvocationTargetException;
 public class WTPlayerMain
 {
 
+	public enum Message {
+	    Quit
+	}
+
     static {
         System.loadLibrary("WTEngine");
     }
 
-    public static void main(String[] args)
-    {
-        for(String arg : args)
-            System.out.println("ARG: " + arg);
+    private ArrayBlockingQueue<Message> q = new ArrayBlockingQueue<Message>(128);
+    private boolean loop = true;
 
-        //WTVector3D v = new wildtangent.webdriver.impl.WTVector3D();
-        //v.setX(4.04f);
-        //System.out.printf("X is %f\n", v.getX());
-        //
-        //WTObject wto = new wildtangent.webdriver.impl.WTObject();
-        //System.out.printf("Name: %s\n", wto.getName());
-        ////System.out.println(wto.getUserData());
-        //
-        //Object o = new String("HELLO");
-        //wto.setUserData(o);
-        //System.out.println(wto.getUserData());
-        //
-        //Variant var = new Variant(0);
-        //
-        //WT wt = new wildtangent.webdriver.impl.WT();
-        //
-        //WT wt2 = wt3dLib.getWT(wt);
-        //
-        //Applet a = new Applet();
-        //
-        //JSObject host = JSObject.getWindow(a);
-        //host.eval("alert(\"" + "DEPR" + "\");");
-
-        //Print class loader name loaded this class
+    public WTPlayerMain(){
         System.out.println("Current Class Loader : "
                            + WTPlayerMain.class.getClassLoader().getClass().getName());
 
@@ -62,7 +44,7 @@ public class WTPlayerMain
 
         try{
             Class<?> gameMainClass = loader.loadClass("dark.Main");
-            Object gameMain = gameMainClass.newInstance();
+            Applet gameMain = (Applet)gameMainClass.newInstance();
             System.out.println("OBJECT MADE: " + gameMain);
 
             Class[] arrclass = {Object.class, int.class};
@@ -74,8 +56,42 @@ public class WTPlayerMain
                  IllegalAccessException | NoSuchMethodException |
                  InvocationTargetException e){
             e.printStackTrace();
+        } catch (ClassCastException e) {
+            System.err.println("Error! Failed to load game: The game's main class must extend java.applet.Applet.");
+            e.printStackTrace();
         }
 
-        //oMain m = new Main();
+        /*Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                System.out.println("CTRLC hit");
+                loop = false;
+                q.add(Message.Quit);
+            }
+         });*/
+
+        while(loop) {
+			try {
+				Message val = q.take();
+				switch(val) {
+				case Quit:
+					System.out.println("QUIT MESSAGE");
+					loop = false;
+					break;
+				}
+			} catch (InterruptedException e) {
+				System.out.println("INTERRUPT " + e.toString());
+			}
+		}
+
+        System.out.println("MAIN ENDING NORMALLY");
+
+    }
+
+    public static void main(String[] args)
+    {
+        for(String arg : args)
+            System.out.println("ARG: " + arg);
+
+        new WTPlayerMain();
     }
 }
