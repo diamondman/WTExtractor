@@ -4,6 +4,8 @@
 #include <jni.h>
 #include <stdint.h>
 
+#define APILOG {printf("Calling WTAPI {%s}:%d\n", __PRETTY_FUNCTION__, __LINE__);}
+
 class jobject_wrap {
 public:
   jobject_wrap(JNIEnv *env, jobject obj);

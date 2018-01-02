@@ -33,51 +33,59 @@ WTModel* WT::createBox(float Width,
                    float Height,
                    float Depth,
                    int Number_Of_Tiles_Per_Edge){
+  APILOG;
   return 0;
 }
 
 ///Create the main stage for the scene.
 WTStage* WT::createStage(){
-  std::cout << "*** Calling createStage" << std::endl;
+  APILOG;
   return new WTStage();
 }
 
 ///Create a model using data loaded from the specified .wt file.
 WTModel* WT::createModel(char* File_Name,
                          int WTCache_Type){
+  APILOG;
   return 0;
 }
 
 ///Creates a container for a model or bitmap.
 WTContainer* WT::createContainer(){
+  APILOG;
   return 0;
 }
 
 ///Creates a light.
 WTLight* WT::createLight(int Type){
+  APILOG;
   return 0;
 }
 
 ///Creates a group to use for placement of child objects.
 WTGroup* WT::createGroup(){
+  APILOG;
   return 0;
 }
 
 ///Creates an empty WTBitmap object.
 WTBitmap* WT::createBlankBitmap(int Width,
                                 int Height){
+  APILOG;
   return 0;
 }
 
 ///Creates a WTBitmap object from a media file.
 WTBitmap* WT::createBitmap(char* File_Name,
                            int WTCache_Type){
+  APILOG;
   return 0;
 }
 
 ///Creates a WTAudioClip object from a media file.
 WTAudioClip* WT::createAudioClip(char* File_Name,
                                  int WTCache_Type){
+  APILOG;
   return 0;
 }
 
@@ -86,21 +94,30 @@ WTVisualizer* WT::createAudioVisualizer(char* Visualizer_Type,
                                         char* Get_Audio_From,
                                         int Number_Of_Data_Bins,
                                         int Reserved){
+  APILOG;
   return 0;
 }
 
 ///Sets the state of the mouse (arrow) cursor to on or off.
-void WT::setMouseCursorState(int Mouse_Cursor_Type){}
+void WT::setMouseCursorState(int Mouse_Cursor_Type){
+  APILOG;
+}
 
 ///Sets the position of the mouse pointer.
 void WT::setMousePosition(int WT_X,
-                          int WT_Y){}
+                          int WT_Y){
+  APILOG;
+}
 
 ///Starts the scene rendering.
-void WT::start(){}
+void WT::start(){
+  APILOG;
+}
 
 ///Stops all events from firing and stops rendering the scene.
-void WT::stop(){}
+void WT::stop(){
+  APILOG;
+}
 
 ///Creates a line model.
 WTModel* WT::createLine(float X1,
@@ -113,6 +130,7 @@ WTModel* WT::createLine(float X1,
                         int Number_Of_Sides,
                         int Cap_Type,
                         int Line_Type){
+  APILOG;
   return 0;
 }
 
@@ -121,6 +139,7 @@ WTModel* WT::createCone(float Height,
                         float Radius,
                         int Number_Of_Sides,
                         int Cap_Type){
+  APILOG;
   return 0;
 }
 
@@ -129,6 +148,7 @@ WTModel* WT::createCylinder(float Height,
                             float Radius,
                             int Number_Of_Sides,
                             int Cap_Type){
+  APILOG;
   return 0;
 }
 
@@ -139,6 +159,7 @@ WTModel* WT::createPlane(float Width,
                          float X_Center,
                          float Y_Center,
                          int Number_Of_Tiles_Per_Edge){
+  APILOG;
   return 0;
 }
 
@@ -150,73 +171,97 @@ WTModel* WT::createPatch(int Number_Of_S_Points,
                          float x,
                          float Z,
                          bool Make_Patch_With_Two_Sides){
+  APILOG;
   return 0;
 }
 
 //[id(0x00000017), hidden]
-void WT::setHWND(int hWnd){}
+void WT::setHWND(int hWnd){
+  APILOG;
+}
 
 //[id(0x00000018), hidden]
 void WT::setClientRect(int x,
                        int y,
                        int w,
-                       int h){}
+                       int h){
+  APILOG;
+}
 
 //[id(0x00000019), hidden]
 void WT::setClipRect(int x,
                      int y,
                      int w,
-                     int h){}
+                     int h){
+  APILOG;
+}
 
 ///Gets the last event that occured.
 WTEvent* WT::getEvent(){
+  APILOG;
   return 0;
 }
 
 //[id(0x0000001c), hidden]
 WTEvent* WT::getRenderEvent(){
+  APILOG;
   return 0;
 }
 
 ///Asks the WT object to start or stop sending WTEvents to a RenderEvent handler.
-void WT::setNotifyRenderEvent(bool Turn_Render_Events_On){}
+void WT::setNotifyRenderEvent(bool Turn_Render_Events_On){
+  APILOG;
+}
 
 ///Returns a value indicating whether render events are turned on or off.
 bool WT::getNotifyRenderEvent(){
+  APILOG;
   return 0;
 }
 
 ///Sets the detail level of mouse events that the WT Object will send.
-void WT::setNotifyMouseEvent(int Level_Of_Detail){}
+void WT::setNotifyMouseEvent(int Level_Of_Detail){
+  APILOG;
+}
 
 ///Returns a value indicating what detail level of mouse events are
 ///being sent to a mouse event handler.
 int WT::getNotifyMouseEvent(){
+  APILOG;
   return 0;
 }
 
 ///Starts or stops sending keyboard events to an event handler.
-void WT::setNotifyKeyboardEvent(bool Turn_Keyboard_Events_On){}
+void WT::setNotifyKeyboardEvent(bool Turn_Keyboard_Events_On){
+  APILOG;
+}
 
 ///Returns a value indicating whther keyboard events are turned on or off.
 bool WT::getNotifyKeyboardEvent(){
+  APILOG;
   return 0;
 }
 
 ///Starts or stops sending exception events to an event handler.
-void WT::setNotifyExceptionEvent(bool Turn_Exception_Events_On){}
+void WT::setNotifyExceptionEvent(bool Turn_Exception_Events_On){
+  APILOG;
+}
 
 ///Returns a value indicating whether exception events are turned on or off.
 bool WT::getNotifyExceptionEvent(){
+  APILOG;
   return 0;
 }
 
 ///Overrides the default behaviour for WT exceptions.
 void WT::overrideExceptionEvent(int Exception_Type_To_Change,
-                                bool New_Value){}
+                                bool New_Value){
+  APILOG;
+}
 
 ///Gets status driver initializations.
 bool WT::getInitStatus(int Status_To_Get){
+  APILOG;
   switch(Status_To_Get){
   case 0: //DirectX version out of date?
     return false;
@@ -236,48 +281,64 @@ bool WT::getInitStatus(int Status_To_Get){
 }
 
 ///Controls the use of hardware rendering capability.
-void WT::setUseHAL(bool Use_Hardware_If_Possible){}
+void WT::setUseHAL(bool Use_Hardware_If_Possible){
+  APILOG;
+}
 
 //[id(0x00000028), hidden]
 bool WT::getIsUsable(){
+  APILOG;
   return 0;
 }
 
 ///Gets the current framerate cap.
 int WT::getMaxFramesPerSecond(){
+  APILOG;
   return 0;
 }
 
 ///Sets a speed limiter on the number of frames per second.
-void WT::setMaxFramesPerSecond(int Frame_Rate_Cap){}
+void WT::setMaxFramesPerSecond(int Frame_Rate_Cap){
+  APILOG;
+}
 
 ///Gets the currently installed version of the Web Driver.
 char* WT::getVersion(){
+  APILOG;
   return 0;
 }
 
 //Compares Web Driver versions.
 int WT::checkVersion(char* Version,
                      char* Check_Against){
+  APILOG;
   return 0;
 }
 
 ///Sets the current working directory (not for web pages).
-void WT::setFilesPath(char* Default_File_Path){}
+void WT::setFilesPath(char* Default_File_Path){
+  APILOG;
+}
 
 ///Gets the current working directory.
 char* WT::getFilesPath(){
+  APILOG;
   return 0;
 }
 
 ///Forces a single render.
-void WT::exec(){}
+void WT::exec(){
+  APILOG;
+}
 
 ///Sets the severity of error handling for the WT object.
-void WT::setErrorHandling(int How_To_Handle_Errors){}
+void WT::setErrorHandling(int How_To_Handle_Errors){
+  APILOG;
+}
 
 ///Gets an integer value indicating the current severity of error handling.
 int WT::getErrorHandling(){
+  APILOG;
   return 0;
 }
 
@@ -285,17 +346,23 @@ int WT::getErrorHandling(){
 bool WT::setResolution(int Screen_Width,
                        int Screen_Height,
                        int Bits_Per_Pixel){
+  APILOG;
   return 0;
 }
 
 ///Restore the display to windowed mode.
-void WT::restoreResolution(){}
+void WT::restoreResolution(){
+  APILOG;
+}
 
 ///Sets the maximum number of files to download at once.
-void WT::setMaxDownloads(int Max_Simultaneous_Downloads){}
+void WT::setMaxDownloads(int Max_Simultaneous_Downloads){
+  APILOG;
+}
 
 ///Gets the maximum number of files that will be downloaded simultaneously.
 int WT::getMaxDownloads(){
+  APILOG;
   return 0;
 }
 
@@ -303,47 +370,64 @@ int WT::getMaxDownloads(){
 WTFile* WT::readFile(char* File_Name,
                      int WTCache_Type,
                      int endian){
+  APILOG;
   return 0;
 }
 
 ///Opens a debug window.
-void WT::debugWindow(bool Display_the_Window){}
+void WT::debugWindow(bool Display_the_Window){
+  APILOG;
+}
 
 ///Writes a string to the debug window.
-void WT::outDebugString(char* String_To_Display){}
+void WT::outDebugString(char* String_To_Display){
+  APILOG;
+  std::cout << "WTDebug: " << String_To_Display << std::endl;
+}
 
 //[id(0x00000038), hidden]
-void WT::setLeftHanded(bool newVal){}
+void WT::setLeftHanded(bool newVal){
+  APILOG;
+}
 
 ///Returns the height of the driver window.
 int WT::getHeight(){
+  APILOG;
   return 0;
 }
 
 ///Gets the width of the driver window.
 int WT::getWidth(){
+  APILOG;
   return 0;
 }
 
 ///Returns system performance information.
 WTSysInfo* WT::getPerformanceInfo(){
+  APILOG;
   return 0;
 }
 
 ///Suspends browser execution for a specified period.
-void WT::sleep(int Number_Of_Milliseconds){}
+void WT::sleep(int Number_Of_Milliseconds){
+  APILOG;
+}
 
 ///Creates a sphere model.
 WTModel* WT::createSphere(float Radius,
                           int Number_Of_Points_Around){
+  APILOG;
   return 0;
 }
 
 //[id(0x0000003d), hidden]
-void WT::freeDev(){}
+void WT::freeDev(){
+  APILOG;
+}
 
 ///Creates a joystick access object.
 WTJoystick* WT::createJoystick(){
+  APILOG;
   return 0;
 }
 
@@ -352,24 +436,31 @@ WTGroup* WT::createGroupFromFile(char* File_Name,
                                  int WTCache_Type,
                                  int Load_Order_Offset,
                                  int Reserved){
+  APILOG;
   return 0;
 }
 
 ///Create a WTActor from .wsad file.
 WTActor* WT::createActor(char* File_Name,
                          int WTCache_Type){
+  APILOG;
   return 0;
 }
 
 //[id(0x00000041), hidden]
-void WT::NSActivate(int hWnd){}
+void WT::NSActivate(int hWnd){
+  APILOG;
+}
 
 ///Allows you to modify how the scene is rendered.
 void WT::setRenderOption(int Option_To_Set,
-                         int Option_Value){}
+                         int Option_Value){
+  APILOG;
+}
 
 ///Gets a render option value.
 int WT::getRenderOption(int Option_To_Get){
+  APILOG;
   return 0;
 }
 
@@ -377,72 +468,88 @@ int WT::getRenderOption(int Option_To_Get){
 int WT::designedForVersion(char* Version,
                            char* Flavor,
                            int Reserved){
+  APILOG;
   return 0;
 }
 
 ///Give your code the ability to control the mouse cursor.
 int WT::requestMouseControl(){
+  APILOG;
   return 0;
 }
 
 ///Gets a snapshot of the keyboard state.
 WTKeyboardPollInfo* WT::pollKeyboard(){
+  APILOG;
   return 0;
 }
 
 ///Gets a snapshot of the mouse state.
 WTMousePollInfo* WT::pollMouse(){
+  APILOG;
   return 0;
 }
 
 ///Creates a WTSurfaceShader object.
 WTSurfaceShader* WT::createSurfaceShader(){
+  APILOG;
   return 0;
 }
 
 ///This method creates a WTFont object.
 WTFont* WT::createFont(int Reserved){
+  APILOG;
   return 0;
 }
 
 ///Gets the value of a WT option.
 VARIANT WT::getOption(int Option_Number){
+  APILOG;
   return 0;
 }
 
 ///Sets a WT option.
 void WT::setOption(int Option_Number,
-                   VARIANT New_Value){}
+                   VARIANT New_Value){
+  APILOG;
+}
 
 ///Gets the information associated with the WT object.
 double WT::getInfo(int Info_Type,
                    int Reserved){
+  APILOG;
   return 0;
 }
 
 ///This method creates a 3D Audio Clip object.
 WTAudioClip3D* WT::createAudioClip3D(char* File_Name,
                                      int WTCache_Type){
+  APILOG;
   return 0;
 }
 
 ///Returns the current master volume setting for all audio in the program.
 int WT::getMasterVolume(){
+  APILOG;
   return 0;
 }
 
 ///Sets the master volume level for all audio in the program.
-void WT::setMasterVolume(int vol){}
+void WT::setMasterVolume(int vol){
+  APILOG;
+}
 
 ///Allows the user to read from the registry relative to the
 ///[HKEY_CURRENT_USER]\Software\WildTangent\UserRegStrings\ key.
 char* WT::getRegistryStringValue(char* Sub_Key,
                                  char* Value_Name){
+  APILOG;
   return 0;
 }
 
 ///This method creates a WTSpout object.
 WTSpout* WT::createSpout(){
+  APILOG;
   return 0;
 }
 
@@ -453,17 +560,21 @@ WTPortal* WT::createPortal(float Width,
                            int mappingOption,
                            bool doubleSided,
                            bool renderOnlyChildren){
+  APILOG;
   return 0;
 }
 
 ///Gets download information.
 int WT::getDownloadInfo(int WhichCounter,
                         int Param){
+  APILOG;
   return 0;
 }
 
 ///Resets all of the download and time counters.
-void WT::resetDownloadInfo(){}
+void WT::resetDownloadInfo(){
+  APILOG;
+}
 
 ///Create a new Generic Mesh WTModel.
 WTModel* WT::createMesh(
@@ -480,30 +591,39 @@ WTModel* WT::createMesh(
   int UV_Lower_Bound,
   int Color_Lower_Bound
 ){
-    return 0;
+  APILOG;
+  return 0;
 }
 
 ///Creates a blank Generic Mesh WTModel.
 WTModel* WT::createBlankMesh(){
+  APILOG;
   return 0;
 }
 
 //[id(0x00000058), propget]
 bool WT::RenderMode(){
+  APILOG;
   return 0;
 }
 
 //[id(0x00000058), propput]
-void WT::RenderMode(bool pValue){}
+void WT::RenderMode(bool pValue){
+  APILOG;
+}
 
 int WT::getRenderMode(){
+  APILOG;
   return 0;
 }
 
-void WT::setRenderMode(int mode){}
+void WT::setRenderMode(int mode){
+  APILOG;
+}
 
 ///Creates a new WTString3D object.
 WTString3D* WT::createString3D(){
+  APILOG;
   return 0;
 }
 
@@ -511,6 +631,7 @@ WTString3D* WT::createString3D(){
 WTShadow* WT::createShadow(int Type,
                            int Width,
                            int Height){
+  APILOG;
   return 0;
 }
 
@@ -518,4 +639,6 @@ WTShadow* WT::createShadow(int Type,
 void WT::setOptionString(char* GUID,
                          char* key,
                          char* Data,
-                         int Parameter){}
+                         int Parameter){
+  APILOG;
+}

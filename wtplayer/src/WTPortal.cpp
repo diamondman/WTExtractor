@@ -1,28 +1,44 @@
+#include "basetypes.hpp"
 #include "WTPortal.hpp"
 #include "WTBitmap.hpp"
 #include "WTCamera.hpp"
 #include "WTSurfaceShader.hpp"
 
 void WTPortal::setMappingOption(int mappingOption,
-                      float zScale){}
+                      float zScale){
+  APILOG;
+}
 
-void WTPortal::setCamera(WTCamera* newPCam){}
+void WTPortal::setCamera(WTCamera* newPCam){
+  APILOG;
+}
 
-void WTPortal::setDoubleSided(bool doubleSided){}
+void WTPortal::setDoubleSided(bool doubleSided){
+  APILOG;
+}
 
 void WTPortal::setCustomTransform(int transformOption,
                         float xAxis,
                         float yAxis,
-                        float zAxis){}
+                        float zAxis){
+  APILOG;
+}
 
 void WTPortal::setTexture(WTBitmap* pBitmap,
-                int newAlpha){}
+                int newAlpha){
+  APILOG;
+}
 
-void WTPortal::setRenderOnlyChildren(bool renderOnlyChildren){}
+void WTPortal::setRenderOnlyChildren(bool renderOnlyChildren){
+  APILOG;
+}
 
 WTCamera* WTPortal::getCamera(){
+  APILOG;
   return 0;
 }
 
 void WTPortal::setSurfaceShader(WTSurfaceShader* pShader,
-                      int newAlpha){}
+                      int newAlpha){
+  APILOG;
+}

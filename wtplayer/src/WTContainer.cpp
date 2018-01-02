@@ -1,39 +1,53 @@
+#include "basetypes.hpp"
 #include "WTContainer.hpp"
 
 void WTContainer::setPosition(float x,
                               float y,
-                              float Z){}
+                              float Z){
+  APILOG;
+}
 
 WTVector3D* WTContainer::getPosition(){
+  APILOG;
   return 0;
 }
 
 void WTContainer::setAbsolutePosition(float x,
                                       float y,
-                                      float Z){}
+                                      float Z){
+  APILOG;
+}
 
 WTVector3D* WTContainer::getAbsolutePosition(){
+  APILOG;
   return 0;
 }
 
 void WTContainer::moveBy(float x,
                          float y,
-                         float Z){}
+                         float Z){
+  APILOG;
+}
 
 void WTContainer::setOrientation(float x,
                                  float y,
                                  float Z,
-                                 float Angle){}
+                                 float Angle){
+  APILOG;
+}
 
 WTOrientation3D* WTContainer::getOrientation(){
+  APILOG;
   return 0;
 }
 
 WTVector3D* WTContainer::getOrientationVector(){
+  APILOG;
   return 0;
 }
 
 WTVector3D* WTContainer::getOrientationUp(){
+  APILOG;
   return 0;
 }
 
@@ -42,14 +56,19 @@ void WTContainer::setOrientationVector(float X_Forward,
                                        float Z_Forward,
                                        float X_Up,
                                        float Y_Up,
-                                       float Z_Up){}
+                                       float Z_Up){
+  APILOG;
+}
 
 void WTContainer::setConstantRotation(float x,
                                       float y,
                                       float Z,
-                                      float Angle){}
+                                      float Angle){
+  APILOG;
+}
 
 WTOrientation3D* WTContainer::getConstantRotation(){
+  APILOG;
   return 0;
 }
 
@@ -57,84 +76,123 @@ void WTContainer::setRotation(float x,
                               float y,
                               float Z,
                               float Angle,
-                              int Relative_To_World){}
+                              int Relative_To_World){
+  APILOG;
+}
 
 void WTContainer::setLookAt(WTContainer* Container_To_Look_At,
-                            int Look_Type){}
+                            int Look_Type){
+  APILOG;
+}
 
-void WTContainer::unsetLookAt(){}
+void WTContainer::unsetLookAt(){
+  APILOG;
+}
 
 WTContainer* WTContainer::getLookAt(){
+  APILOG;
   return 0;
 }
 
-void WTContainer::attach(WTObject* Object_To_Attach){}
+void WTContainer::attach(WTObject* Object_To_Attach){
+  APILOG;
+}
 
 void WTContainer::attachBitmap(WTObject* Bitmap_To_Add,
                                float Scale_Width,
                                float Scale_Height,
                                int X_Center,
-                               int Y_Center){}
+                               int Y_Center){
+  APILOG;
+}
 
-void WTContainer::detach(){}
+void WTContainer::detach(){
+  APILOG;
+}
 
 WTObject* WTContainer::getAttached(){
+  APILOG;
   return 0;
 }
 
 void WTContainer::setBitmapSize(float Scale_Width,
-                                float Scale_Height){}
+                                float Scale_Height){
+  APILOG;
+}
 
-void WTContainer::setBitmapOpacity(int Opacity){}
+void WTContainer::setBitmapOpacity(int Opacity){
+  APILOG;
+}
 
 void WTContainer::setScale(float x,
                            float y,
-                           float Z){}
+                           float Z){
+  APILOG;
+}
 
 void WTContainer::setAbsoluteScale(float x,
                                    float y,
-                                   float Z){}
+                                   float Z){
+  APILOG;
+}
 
-void WTContainer::setScaleTare(){}
+void WTContainer::setScaleTare(){
+  APILOG;
+}
 
-void WTContainer::setPickPriority(int Pick_Priority){}
+void WTContainer::setPickPriority(int Pick_Priority){
+  APILOG;
+}
 
 int WTContainer::getPickPriority(){
+  APILOG;
   return 0;
 }
 
-void WTContainer::highlight(bool Turn_On_Highlight){}
+void WTContainer::highlight(bool Turn_On_Highlight){
+  APILOG;
+}
 
 bool WTContainer::isHighlighted(){
+  APILOG;
   return false;
 }
 
-void WTContainer::setVisible(bool Turn_On_Visibility){}
+void WTContainer::setVisible(bool Turn_On_Visibility){
+  APILOG;
+}
 
 bool WTContainer::getVisible(){
+  APILOG;
   return true;
 }
 
 char* WTContainer::getPositionAsString(){
+  APILOG;
   return (char*)"";
 }
 
 char* WTContainer::getAbsolutePositionAsString(){
+  APILOG;
   return (char*)"";
 }
 
 char* WTContainer::getOrientationVectorAsString(){
+  APILOG;
   return (char*)"";
 }
 
 char* WTContainer::getOrientationUpAsString(){
+  APILOG;
   return (char*)"";
 }
 
 void WTContainer::setAbsoluteOrientation(float x,
                                          float y,
                                          float Z,
-                                         float Angle){}
+                                         float Angle){
+  APILOG;
+}
 
 WTCollisionInfo* WTContainer::checkCollision(float x,
                                              float y,
@@ -144,14 +202,17 @@ WTCollisionInfo* WTContainer::checkCollision(float x,
                                              int Collision_Detail,
                                              int Collision_Flags,
                                              int Reserved){
+  APILOG;
   return 0;
 }
 
 WTVector3D* WTContainer::getAbsoluteOrientationVector(){
+  APILOG;
   return 0;
 }
 
 WTVector3D* WTContainer::getAbsoluteOrientationUp(){
+  APILOG;
   return 0;
 }
 
@@ -160,7 +221,9 @@ void WTContainer::setAbsoluteOrientationVector(float X_Forward,
                                                float Z_Forward,
                                                float X_Up,
                                                float Y_Up,
-                                               float Z_Up){}
+                                               float Z_Up){
+  APILOG;
+}
 
 void WTContainer::setCollisionBox(float X1,
                                   float X2,
@@ -168,33 +231,47 @@ void WTContainer::setCollisionBox(float X1,
                                   float Y2,
                                   float Z1,
                                   float Z2,
-                                  int Reserved){}
+                                  int Reserved){
+  APILOG;
+}
 
 void WTContainer::setCollisionMask(int Mask,
-                                   int Reserved){}
+                                   int Reserved){
+  APILOG;
+}
 
 int WTContainer::getCollisionMask(){
+  APILOG;
   return 0;
 }
 
 void WTContainer::makeCollisionBox(int Box_Type,
                                    int Box_Flags,
-                                   int Reserved){}
+                                   int Reserved){
+  APILOG;
+}
 
 void WTContainer::attachSurfaceShader(WTSurfaceShader* Shader_To_Add,
                                       float Scale_Width,
                                       float Scale_Height,
                                       int X_Center,
-                                      int Y_Center){}
+                                      int Y_Center){
+  APILOG;
+}
 
-void WTContainer::setBitmapOrientation(float Amount){}
+void WTContainer::setBitmapOrientation(float Amount){
+  APILOG;
+}
 
 void WTContainer::setBitmapTextureRect(float u0,
                                        float v0,
                                        float U1,
-                                       float V1){}
+                                       float V1){
+  APILOG;
+}
 
 WTVector3D* WTContainer::getGeometryExtents(bool Max_Extents,
                                             bool With_Children){
+  APILOG;
   return 0;
 }
