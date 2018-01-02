@@ -14,7 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
-public class WTPlayerMain
+public class WTPlayerMain implements wildtangent.webdriver.WTEventCallback
 {
 
 	public enum Message {
@@ -33,16 +33,21 @@ public class WTPlayerMain
                            + WTPlayerMain.class.getClassLoader().getClass().getName());
 
         ClassLoader loader = ClassLoader.getSystemClassLoader();
-        //ClassLoader loader = classVar.getClassLoader();
 
         URL[] urls = ((URLClassLoader)loader).getURLs();
         for(URL url: urls){
             System.out.println(url.getFile());
         }
 
-        WT wt = new wildtangent.webdriver.impl.WT();
+        wildtangent.webdriver.WT wt = new wildtangent.webdriver.impl.WT();
 
-        try{
+        wt.setOnRenderEvent(this);
+        wt.setOnExceptionEvent(this);
+        wt.setOnMouseEvent(this);
+        wt.setOnKeyboardEvent(this);
+        wt.start();
+
+        /*try{
             Class<?> gameMainClass = loader.loadClass("dark.Main");
             Applet gameMain = (Applet)gameMainClass.newInstance();
             System.out.println("OBJECT MADE: " + gameMain);
@@ -59,7 +64,7 @@ public class WTPlayerMain
         } catch (ClassCastException e) {
             System.err.println("Error! Failed to load game: The game's main class must extend java.applet.Applet.");
             e.printStackTrace();
-        }
+        }*/
 
         /*Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -68,6 +73,19 @@ public class WTPlayerMain
                 q.add(Message.Quit);
             }
          });*/
+
+		try {
+			Thread.sleep(5000);
+			wt.stop();
+			Thread.sleep(5000);
+			wt.start();
+			Thread.sleep(5000);
+			wt.stop();
+			Thread.sleep(5000);
+			wt.start();
+		} catch (InterruptedException e) {
+
+        }
 
         while(loop) {
 			try {
@@ -86,6 +104,17 @@ public class WTPlayerMain
         System.out.println("MAIN ENDING NORMALLY");
 
     }
+
+
+    public void onExceptionEvent(wildtangent.webdriver.WTEvent var1) {}
+
+    public void onKeyboardEvent(wildtangent.webdriver.WTEvent var1) {}
+
+	public void onRenderEvent(wildtangent.webdriver.WTEvent var1) {
+		System.out.println("CALL FROM JAVA RENDER EVENT HANDLER!!!!!!!!!!!!!!!!");
+	}
+
+    public void onMouseEvent(wildtangent.webdriver.WTEvent var1) {}
 
     public static void main(String[] args)
     {

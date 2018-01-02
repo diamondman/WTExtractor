@@ -1,6 +1,7 @@
-%module WTEngine
+%module(directors="1") WTEngine
 %{
 #include "basetypes.hpp"
+#include "InternalCallbackWrapper.hpp"
 
 /* Includes the header in the wrapper code */
 #include "WTObject.hpp"
@@ -69,6 +70,10 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 ///////////////////////////////////////////////
 
 /* Parse the header file to generate wrappers */
+
+%feature("director") InternalCallbackWrapper;
+
+%include "InternalCallbackWrapper.hpp"
 
 %include "WTObject.hpp"
 %include "WTContainer.hpp"

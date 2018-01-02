@@ -1,8 +1,5 @@
 package wildtangent.webdriver.impl;
 
-//import wildtangent.webdriver.WTActor;
-//import wildtangent.webdriver.WTGroup;
-
 public class WT extends wildtangent.webdriver.jni.WT
     implements wildtangent.webdriver.WT {
 
@@ -45,12 +42,24 @@ public class WT extends wildtangent.webdriver.jni.WT
     }
 
 
-    public void setOnKeyboardEvent(wildtangent.webdriver.WTEventCallback var1){};
+    public void setOnKeyboardEvent(wildtangent.webdriver.WTEventCallback callback){
+        System.out.println("calling JAVA WTAPI {void WT.setOnKeyboardEvent(WTEventCallback)}");
+        this.setOnKeyboardEvent(new InternalKeyboardEvent(callback));
+    };
 
-    public void setOnRenderEvent(wildtangent.webdriver.WTEventCallback var1){};
+    public void setOnRenderEvent(wildtangent.webdriver.WTEventCallback callback){
+        System.out.println("calling JAVA WTAPI {void WT.setOnRenderEvent(WTEventCallback)}");
+        this.setOnRenderEvent(new InternalRenderEvent(callback));
+    };
 
-    public void setOnMouseEvent(wildtangent.webdriver.WTEventCallback var1){};
+    public void setOnMouseEvent(wildtangent.webdriver.WTEventCallback callback){
+        System.out.println("calling JAVA WTAPI {void WT.setOnMouseEvent(WTEventCallback)}");
+        this.setOnMouseEvent(new InternalMouseEvent(callback));
+    };
 
-    public void setOnExceptionEvent(wildtangent.webdriver.WTEventCallback var1){};
+    public void setOnExceptionEvent(wildtangent.webdriver.WTEventCallback callback){
+        System.out.println("calling JAVA WTAPI {void WT.setOnExceptionEvent(WTEventCallback)}");
+        this.setOnExceptionEvent(new InternalExceptionEvent(callback));
+    };
 
 }

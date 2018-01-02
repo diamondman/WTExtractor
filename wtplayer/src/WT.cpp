@@ -1,5 +1,6 @@
 #include "WT.hpp"
 #include "basetypes.hpp"
+#include "InternalCallbackWrapper.hpp"
 
 #include "WTActor.hpp"
 #include "WTAudioClip.hpp"
@@ -24,9 +25,12 @@
 #include "WTSurfaceShader.hpp"
 #include "WTSysInfo.hpp"
 #include "WTVisualizer.hpp"
-
 #include "WTObject.hpp"
+
 #include <iostream>
+#include <unistd.h>
+
+WT::WT(){}
 
 ///Creates a box model.
 WTModel* WT::createBox(float Width,
@@ -112,11 +116,17 @@ void WT::setMousePosition(int WT_X,
 ///Starts the scene rendering.
 void WT::start(){
   APILOG;
+  this->wtThreadRun = true;
+  this->wtThreadActive = true;
+  wtMainThread = std::thread(thread_bootstrap, this);
 }
 
 ///Stops all events from firing and stops rendering the scene.
 void WT::stop(){
   APILOG;
+  this->wtThreadRun = false;
+  this->wtMainThread.join();
+  this->wtThreadActive = false;
 }
 
 ///Creates a line model.
@@ -208,51 +218,6 @@ WTEvent* WT::getRenderEvent(){
   return 0;
 }
 
-///Asks the WT object to start or stop sending WTEvents to a RenderEvent handler.
-void WT::setNotifyRenderEvent(bool Turn_Render_Events_On){
-  APILOG;
-}
-
-///Returns a value indicating whether render events are turned on or off.
-bool WT::getNotifyRenderEvent(){
-  APILOG;
-  return 0;
-}
-
-///Sets the detail level of mouse events that the WT Object will send.
-void WT::setNotifyMouseEvent(int Level_Of_Detail){
-  APILOG;
-}
-
-///Returns a value indicating what detail level of mouse events are
-///being sent to a mouse event handler.
-int WT::getNotifyMouseEvent(){
-  APILOG;
-  return 0;
-}
-
-///Starts or stops sending keyboard events to an event handler.
-void WT::setNotifyKeyboardEvent(bool Turn_Keyboard_Events_On){
-  APILOG;
-}
-
-///Returns a value indicating whther keyboard events are turned on or off.
-bool WT::getNotifyKeyboardEvent(){
-  APILOG;
-  return 0;
-}
-
-///Starts or stops sending exception events to an event handler.
-void WT::setNotifyExceptionEvent(bool Turn_Exception_Events_On){
-  APILOG;
-}
-
-///Returns a value indicating whether exception events are turned on or off.
-bool WT::getNotifyExceptionEvent(){
-  APILOG;
-  return 0;
-}
-
 ///Overrides the default behaviour for WT exceptions.
 void WT::overrideExceptionEvent(int Exception_Type_To_Change,
                                 bool New_Value){
@@ -291,17 +256,6 @@ bool WT::getIsUsable(){
   return 0;
 }
 
-///Gets the current framerate cap.
-int WT::getMaxFramesPerSecond(){
-  APILOG;
-  return 0;
-}
-
-///Sets a speed limiter on the number of frames per second.
-void WT::setMaxFramesPerSecond(int Frame_Rate_Cap){
-  APILOG;
-}
-
 ///Gets the currently installed version of the Web Driver.
 char* WT::getVersion(){
   APILOG;
@@ -323,23 +277,12 @@ void WT::setFilesPath(char* Default_File_Path){
 ///Gets the current working directory.
 char* WT::getFilesPath(){
   APILOG;
-  return 0;
+  return (char*)"/";
 }
 
 ///Forces a single render.
 void WT::exec(){
   APILOG;
-}
-
-///Sets the severity of error handling for the WT object.
-void WT::setErrorHandling(int How_To_Handle_Errors){
-  APILOG;
-}
-
-///Gets an integer value indicating the current severity of error handling.
-int WT::getErrorHandling(){
-  APILOG;
-  return 0;
 }
 
 ///Switches to a full screen display mode.
@@ -641,4 +584,19 @@ void WT::setOptionString(char* GUID,
                          char* Data,
                          int Parameter){
   APILOG;
+}
+
+void WT::thread_bootstrap(void* This){
+  ((WT*)This)->wtMainThreadFunc();
+}
+
+void WT::wtMainThreadFunc(){
+  while(this->wtThreadRun){
+    std::cout << "HELLO FROM WT THREAD" << std::endl;
+    if(this->RenderCallback != 0){
+      WTEvent *event = new WTEvent();
+      this->RenderCallback->run(event);
+    }
+    usleep(1 * 1000 * 1000);
+  }
 }

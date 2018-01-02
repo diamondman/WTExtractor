@@ -1,6 +1,11 @@
 #pragma once
 
 #include "basetypes.hpp"
+#include "InternalCallbackWrapper.hpp"
+
+#include <thread>
+
+class WTExceptionEvent;
 
 class WTActor;
 class WTAudioClip;
@@ -25,12 +30,26 @@ class WTString3D;
 class WTSurfaceShader;
 class WTSysInfo;
 class WTVisualizer;
-
 class WTObject;
 
 class WT {
 
+  //private:
+  //InternalCallbackWrapper *callbackTest;
+
 public:
+
+  WT();
+
+  /*void setCallbackTest(InternalCallbackWrapper *callback) {
+    this->callbackTest = callback;
+  }
+
+  void callCallbackTest() {
+    if(this->callbackTest != 0){
+      this->callbackTest->run();
+    }
+    }*/
 
   ///Creates a box model.
   WTModel* createBox(float Width,
@@ -148,29 +167,76 @@ public:
   WTEvent* getRenderEvent();
 
   ///Asks the WT object to start or stop sending WTEvents to a RenderEvent handler.
-  void setNotifyRenderEvent(bool Turn_Render_Events_On);
+  void setNotifyRenderEvent(bool Turn_Render_Events_On){
+      APILOG;
+      this->NotifyRenderEvent = Turn_Render_Events_On;
+  }
 
   ///Returns a value indicating whether render events are turned on or off.
-  bool getNotifyRenderEvent();
+  bool getNotifyRenderEvent(){
+    APILOG;
+    return this->NotifyRenderEvent;
+  }
 
   ///Sets the detail level of mouse events that the WT Object will send.
-  void setNotifyMouseEvent(int Level_Of_Detail);
+  void setNotifyMouseEvent(bool Turn_Mouse_Events_On){
+    APILOG;
+    this->NotifyMouseEvent = Turn_Mouse_Events_On;
+  }
+  void setNotifyMouseEvent(int Turn_Mouse_Events_On) {
+    setNotifyMouseEvent((bool)Turn_Mouse_Events_On);
+  }
 
   ///Returns a value indicating what detail level of mouse events are
   ///being sent to a mouse event handler.
-  int getNotifyMouseEvent();
+  int getNotifyMouseEvent(){
+    APILOG;
+    return this->NotifyMouseEvent;
+  }
 
   ///Starts or stops sending keyboard events to an event handler.
-  void setNotifyKeyboardEvent(bool Turn_Keyboard_Events_On);
+  void setNotifyKeyboardEvent(bool Turn_Keyboard_Events_On){
+    APILOG;
+    this->NotifyKeyboardEvent = Turn_Keyboard_Events_On;
+  }
 
   ///Returns a value indicating whther keyboard events are turned on or off.
-  bool getNotifyKeyboardEvent();
+  bool getNotifyKeyboardEvent(){
+    APILOG;
+    return this->NotifyKeyboardEvent;
+  }
 
   ///Starts or stops sending exception events to an event handler.
-  void setNotifyExceptionEvent(bool Turn_Exception_Events_On);
+  void setNotifyExceptionEvent(bool Turn_Exception_Events_On){
+    APILOG;
+    this->NotifyExceptionEvent = Turn_Exception_Events_On;
+  }
 
   ///Returns a value indicating whether exception events are turned on or off.
-  bool getNotifyExceptionEvent();
+  bool getNotifyExceptionEvent(){
+    APILOG;
+    return this->NotifyExceptionEvent;
+  }
+
+  void setOnExceptionEvent(InternalCallbackWrapper *callback){
+    APILOG;
+    this->ExceptionCallback = callback;
+  }
+
+  void setOnKeyboardEvent(InternalCallbackWrapper *callback){
+    APILOG;
+    this->KeyboardCallback = callback;
+  }
+
+  void setOnMouseEvent(InternalCallbackWrapper *callback){
+    APILOG;
+    this->MouseCallback = callback;
+  }
+
+  void setOnRenderEvent(InternalCallbackWrapper *callback){
+    APILOG;
+    this->RenderCallback = callback;
+  }
 
   ///Overrides the default behaviour for WT exceptions.
   void overrideExceptionEvent(int Exception_Type_To_Change,
@@ -186,10 +252,16 @@ public:
   bool getIsUsable();
 
   ///Gets the current framerate cap.
-  int getMaxFramesPerSecond();
+  int getMaxFramesPerSecond(){
+    APILOG;
+    return this->MaxFramesPerSecond;
+  }
 
   ///Sets a speed limiter on the number of frames per second.
-  void setMaxFramesPerSecond(int Frame_Rate_Cap);
+  void setMaxFramesPerSecond(int Frame_Rate_Cap){
+    APILOG;
+    this->MaxFramesPerSecond = Frame_Rate_Cap;
+  }
 
   ///Gets the currently installed version of the Web Driver.
   char* getVersion();
@@ -207,11 +279,20 @@ public:
   ///Forces a single render.
   void exec();
 
-  ///Sets the severity of error handling for the WT object.
-  void setErrorHandling(int How_To_Handle_Errors);
+  /**Sets the severity of error handling for the WT object.
+    WTHANDLEERROR_QUIET  = 0; Indicates silent errors - no error messages.
+    WTHANDLEERROR_MSGBOX = 1; Indicates that dialog boxes mark errors.
+  **/
+  void setErrorHandling(int How_To_Handle_Errors){
+    APILOG;
+    this->ErrorHandling = How_To_Handle_Errors;
+  }
 
   ///Gets an integer value indicating the current severity of error handling.
-  int getErrorHandling();
+  int getErrorHandling(){
+    APILOG;
+    return this->ErrorHandling;
+  }
 
   ///Switches to a full screen display mode.
   bool setResolution(int Screen_Width,
@@ -387,4 +468,25 @@ public:
                        char* key,
                        char* Data,
                        int Parameter = 0);
+
+private:
+  static void thread_bootstrap(void*);
+  void wtMainThreadFunc();
+
+  std::thread wtMainThread;
+  bool wtThreadRun = true;
+  bool wtThreadActive = false;
+
+  bool NotifyRenderEvent = false;
+  bool NotifyMouseEvent = false;
+  bool NotifyKeyboardEvent = false;
+  bool NotifyExceptionEvent = false;
+
+  InternalCallbackWrapper *ExceptionCallback = 0;
+  InternalCallbackWrapper *KeyboardCallback = 0;
+  InternalCallbackWrapper *MouseCallback = 0;
+  InternalCallbackWrapper *RenderCallback = 0;
+
+  int ErrorHandling = 1;
+  int MaxFramesPerSecond = 25;
 };

@@ -24,6 +24,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_library( wtapi SHARED
   src/basetypes.cpp
+  src/InternalCallbackWrapper.hpp
 
   src/WTActor.cpp
   src/WTAudioClip3D.cpp
@@ -55,7 +56,6 @@ add_library( wtapi SHARED
   src/WTVector3D.cpp
   src/WTVisualizer.cpp
 
-  #////////src/WTEventCallback.cpp
   #///////src/WTOnLoadEvent.cpp
   )
 
@@ -85,6 +85,7 @@ function ( postprocess_swig TARGET_NAME )
 endfunction( postprocess_swig )
 
 postprocess_swig(WTEngine
+  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
@@ -93,7 +94,6 @@ postprocess_swig(WTEngine
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTCollisionInfo.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTContainer.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTDrop.java
-  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEventCallback.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEvent.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFile.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFont.java
@@ -105,7 +105,6 @@ postprocess_swig(WTEngine
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTModel.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTMousePollInfo.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTObject.java
-  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTOnLoadEvent.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTOrientation3D.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTPortal.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTShadow.java
@@ -121,6 +120,8 @@ postprocess_swig(WTEngine
 ############################
 
 add_jar(wildtangent
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
+
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
@@ -131,7 +132,6 @@ add_jar(wildtangent
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTDrop.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEngine.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
-  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEventCallback.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEvent.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFile.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFont.java
@@ -188,6 +188,10 @@ add_jar(wildtangent
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTVector3D.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTVisualizer.java
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalExceptionEvent.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalKeyboardEvent.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalMouseEvent.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalRenderEvent.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTActor.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTAudioClip3D.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTAudioClip.java
@@ -196,7 +200,6 @@ add_jar(wildtangent
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTCollisionInfo.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTContainer.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTDrop.java
-  #${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTEventCallback.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTEvent.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTFile.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTFont.java
