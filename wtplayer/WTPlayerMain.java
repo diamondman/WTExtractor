@@ -1,25 +1,20 @@
-import wildtangent.webdriver.WT;
-import wildtangent.webdriver.WTVector3D;
-import wildtangent.webdriver.WTObject;
-import wildtangent.webdriver.wt3dLib;
-import netscape.javascript.JSObject;
-import com.ms.com.Variant;
-
 import java.applet.Applet;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URLClassLoader;
 import java.net.URL;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+import wildtangent.webdriver.WT;
+import wildtangent.webdriver.wt3dLib;
 
-public class WTPlayerMain implements wildtangent.webdriver.WTEventCallback
-{
 
-	public enum Message {
-	    Quit
-	}
+public class WTPlayerMain {
+
+    public enum Message {
+        Quit
+    }
 
     static {
         System.loadLibrary("WTEngine");
@@ -39,15 +34,9 @@ public class WTPlayerMain implements wildtangent.webdriver.WTEventCallback
             System.out.println(url.getFile());
         }
 
-        wildtangent.webdriver.WT wt = new wildtangent.webdriver.impl.WT();
+        WT wt = new wildtangent.webdriver.impl.WT();
 
-        wt.setOnRenderEvent(this);
-        wt.setOnExceptionEvent(this);
-        wt.setOnMouseEvent(this);
-        wt.setOnKeyboardEvent(this);
-        wt.start();
-
-        /*try{
+        try{
             Class<?> gameMainClass = loader.loadClass("dark.Main");
             Applet gameMain = (Applet)gameMainClass.newInstance();
             System.out.println("OBJECT MADE: " + gameMain);
@@ -64,7 +53,7 @@ public class WTPlayerMain implements wildtangent.webdriver.WTEventCallback
         } catch (ClassCastException e) {
             System.err.println("Error! Failed to load game: The game's main class must extend java.applet.Applet.");
             e.printStackTrace();
-        }*/
+        }
 
         /*Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -74,7 +63,7 @@ public class WTPlayerMain implements wildtangent.webdriver.WTEventCallback
             }
          });*/
 
-		try {
+		/*try {
 			Thread.sleep(5000);
 			wt.stop();
 			Thread.sleep(5000);
@@ -85,7 +74,7 @@ public class WTPlayerMain implements wildtangent.webdriver.WTEventCallback
 			wt.start();
 		} catch (InterruptedException e) {
 
-        }
+        }*/
 
         while(loop) {
 			try {
@@ -104,17 +93,6 @@ public class WTPlayerMain implements wildtangent.webdriver.WTEventCallback
         System.out.println("MAIN ENDING NORMALLY");
 
     }
-
-
-    public void onExceptionEvent(wildtangent.webdriver.WTEvent var1) {}
-
-    public void onKeyboardEvent(wildtangent.webdriver.WTEvent var1) {}
-
-	public void onRenderEvent(wildtangent.webdriver.WTEvent var1) {
-		System.out.println("CALL FROM JAVA RENDER EVENT HANDLER!!!!!!!!!!!!!!!!");
-	}
-
-    public void onMouseEvent(wildtangent.webdriver.WTEvent var1) {}
 
     public static void main(String[] args)
     {

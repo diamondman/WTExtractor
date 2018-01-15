@@ -4,6 +4,13 @@
 #include "WTSurfaceShader.hpp"
 #include "WTVector3D.hpp"
 
+WTModel::WTModel(){
+}
+
+WTModel::WTModel(char* File_Name,
+                 int WTCache_Type){
+}
+
 void setColor(int Red,
               int Green,
               int Blue,
@@ -44,7 +51,7 @@ void WTModel::setTextureRect(char* Face_Name,
 WTVector3D* WTModel::getVertex(int Vertex_Number,
                                char* Part_Name){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 void WTModel::setOpacity(int Opacity,

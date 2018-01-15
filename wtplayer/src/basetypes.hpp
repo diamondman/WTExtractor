@@ -3,6 +3,7 @@
 #include <memory>
 #include <jni.h>
 #include <stdint.h>
+#include <iostream>
 
 #define APILOG {printf("Calling WTAPI {%s}:%d\n", __PRETTY_FUNCTION__, __LINE__);}
 

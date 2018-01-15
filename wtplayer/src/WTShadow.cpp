@@ -1,6 +1,14 @@
 #include "basetypes.hpp"
 #include "WTShadow.hpp"
 
+WTShadow::WTShadow(){
+}
+
+WTShadow::WTShadow(int Type,
+                   int Width,
+                   int Height){
+}
+
 int WTShadow::getType(){
   APILOG;
   return 0;

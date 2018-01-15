@@ -3,6 +3,8 @@
 class WTVector3D {
 
 public:
+  WTVector3D();
+
   float getY();
 
   void setY(float y);

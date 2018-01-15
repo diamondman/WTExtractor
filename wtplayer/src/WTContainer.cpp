@@ -1,5 +1,7 @@
 #include "basetypes.hpp"
 #include "WTContainer.hpp"
+#include "WTVector3D.hpp"
+#include "WTOrientation3D.hpp"
 
 void WTContainer::setPosition(float x,
                               float y,
@@ -9,7 +11,7 @@ void WTContainer::setPosition(float x,
 
 WTVector3D* WTContainer::getPosition(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 void WTContainer::setAbsolutePosition(float x,
@@ -20,7 +22,7 @@ void WTContainer::setAbsolutePosition(float x,
 
 WTVector3D* WTContainer::getAbsolutePosition(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 void WTContainer::moveBy(float x,
@@ -43,12 +45,12 @@ WTOrientation3D* WTContainer::getOrientation(){
 
 WTVector3D* WTContainer::getOrientationVector(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 WTVector3D* WTContainer::getOrientationUp(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 void WTContainer::setOrientationVector(float X_Forward,
@@ -69,7 +71,7 @@ void WTContainer::setConstantRotation(float x,
 
 WTOrientation3D* WTContainer::getConstantRotation(){
   APILOG;
-  return 0;
+  return new WTOrientation3D();
 }
 
 void WTContainer::setRotation(float x,
@@ -208,12 +210,12 @@ WTCollisionInfo* WTContainer::checkCollision(float x,
 
 WTVector3D* WTContainer::getAbsoluteOrientationVector(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 WTVector3D* WTContainer::getAbsoluteOrientationUp(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 void WTContainer::setAbsoluteOrientationVector(float X_Forward,
@@ -273,5 +275,5 @@ void WTContainer::setBitmapTextureRect(float u0,
 WTVector3D* WTContainer::getGeometryExtents(bool Max_Extents,
                                             bool With_Children){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }

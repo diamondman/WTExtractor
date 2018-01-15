@@ -1,6 +1,9 @@
 #include "basetypes.hpp"
 #include "WTVector3D.hpp"
 
+WTVector3D::WTVector3D(){
+}
+
 float WTVector3D::getY(){
   APILOG;
   return this->y;

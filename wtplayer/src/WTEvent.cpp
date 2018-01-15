@@ -4,7 +4,7 @@
 
 int WTEvent::getType(){
   APILOG;
-  return 0;
+  return _Type;
 }
 
 int WTEvent::getTime(){
@@ -25,22 +25,22 @@ int WTEvent::getId(){
 
 int WTEvent::getWTX(){
   APILOG;
-  return 0;
+  return _WTX;
 }
 
 int WTEvent::getWTY(){
   APILOG;
-  return 0;
+  return _WTY;
 }
 
 int WTEvent::getX(){
   APILOG;
-  return 0;
+  return _X;
 }
 
 int WTEvent::getY(){
   APILOG;
-  return 0;
+  return _Y;
 }
 
 VARIANT WTEvent::getData(){
@@ -49,42 +49,42 @@ VARIANT WTEvent::getData(){
 
 WTObject* WTEvent::getStage(){
   APILOG;
-  return 0;
+  return _Stage;
 }
 
 WTObject* WTEvent::getCamera(){
   APILOG;
-  return 0;
+  return _Camera;
 }
 
 WTObject* WTEvent::getObject(){
   APILOG;
-  return 0;
+  return _Object;
 }
 
 int WTEvent::getButtonState(){
   APILOG;
-  return 0;
+  return _ButtonState;
 }
 
 int WTEvent::getExceptionType(){
   APILOG;
-  return 0;
+  return _ExceptionType;
 }
 
 int WTEvent::getExceptionData(){
   APILOG;
-  return 0;
+  return _ExceptionData;
 }
 
 int WTEvent::getKey(){
   APILOG;
-  return 0;
+  return _Key;
 }
 
 int WTEvent::getKeyState(){
   APILOG;
-  return 0;
+  return _KeyState;
 }
 
 //[id(0x00001398), hidden]

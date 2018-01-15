@@ -71,8 +71,16 @@ swig_add_module( WTEngine JAVA WTEngine.i )
 #set_target_properties( WTEngine PROPERTIES CMAKE_SWIG_OUTDIR "wildtangent/webdriver")
 swig_link_libraries( WTEngine wtapi )
 
-function ( postprocess_swig TARGET_NAME )
+function ( postprocess_swig TARGET_NAME INTERMEDIATE)
   set ( sourcefiles ${ARGN} )
+
+    add_custom_command(
+      TARGET ${TARGET_NAME}
+      POST_BUILD
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/greatreplacer.py
+      --swigintermediary
+      ${INTERMEDIATE}
+      )
 
   foreach ( target ${sourcefiles} )
     add_custom_command(
@@ -85,6 +93,8 @@ function ( postprocess_swig TARGET_NAME )
 endfunction( postprocess_swig )
 
 postprocess_swig(WTEngine
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
+
   #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java

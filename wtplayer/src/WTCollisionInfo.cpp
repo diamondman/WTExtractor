@@ -15,12 +15,12 @@ WTObject* WTCollisionInfo::getAttachedObject(){
 
 WTVector3D* WTCollisionInfo::getNewPosition(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 WTVector3D* WTCollisionInfo::getImpactNormal(){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 float WTCollisionInfo::getImpactDistance(){

@@ -1,6 +1,13 @@
 #include "basetypes.hpp"
 #include "WTAudioClip.hpp"
 
+WTAudioClip::WTAudioClip(){
+}
+
+WTAudioClip::WTAudioClip(char* File_Name,
+                         int WTCache_Type){
+}
+
 void WTAudioClip::start(int Play_Sound_Forever,
                         int Wait_Until_Loaded){
   APILOG;

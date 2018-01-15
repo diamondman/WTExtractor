@@ -6,6 +6,14 @@
 class WTBitmap : public WTObject {
 
 public:
+  WTBitmap();
+
+  WTBitmap(int width,
+           int height);
+
+  WTBitmap(char* File_Name,
+           int WTCache_Type);
+
   void setColorKey(unsigned char Red,
                    unsigned char Green,
                    unsigned char Blue);

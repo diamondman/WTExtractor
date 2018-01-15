@@ -38,7 +38,7 @@ WTModel* WT::createBox(float Width,
                    float Depth,
                    int Number_Of_Tiles_Per_Edge){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 ///Create the main stage for the scene.
@@ -51,46 +51,46 @@ WTStage* WT::createStage(){
 WTModel* WT::createModel(char* File_Name,
                          int WTCache_Type){
   APILOG;
-  return 0;
+  return new WTModel(File_Name, WTCache_Type);
 }
 
 ///Creates a container for a model or bitmap.
 WTContainer* WT::createContainer(){
   APILOG;
-  return 0;
+  return new WTContainer();
 }
 
 ///Creates a light.
 WTLight* WT::createLight(int Type){
   APILOG;
-  return 0;
+  return new WTLight(Type);
 }
 
 ///Creates a group to use for placement of child objects.
 WTGroup* WT::createGroup(){
   APILOG;
-  return 0;
+  return new WTGroup();
 }
 
 ///Creates an empty WTBitmap object.
 WTBitmap* WT::createBlankBitmap(int Width,
                                 int Height){
   APILOG;
-  return 0;
+  return new WTBitmap(Width, Height);
 }
 
 ///Creates a WTBitmap object from a media file.
 WTBitmap* WT::createBitmap(char* File_Name,
                            int WTCache_Type){
   APILOG;
-  return 0;
+  return new WTBitmap(File_Name, WTCache_Type);
 }
 
 ///Creates a WTAudioClip object from a media file.
 WTAudioClip* WT::createAudioClip(char* File_Name,
                                  int WTCache_Type){
   APILOG;
-  return 0;
+  return new WTAudioClip(File_Name, WTCache_Type);
 }
 
 ///Creates a WTVisualizer object.
@@ -99,7 +99,9 @@ WTVisualizer* WT::createAudioVisualizer(char* Visualizer_Type,
                                         int Number_Of_Data_Bins,
                                         int Reserved){
   APILOG;
-  return 0;
+  return new WTVisualizer(Visualizer_Type,
+                          Get_Audio_From,
+                          Number_Of_Data_Bins);
 }
 
 ///Sets the state of the mouse (arrow) cursor to on or off.
@@ -141,7 +143,7 @@ WTModel* WT::createLine(float X1,
                         int Cap_Type,
                         int Line_Type){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 ///Creates a cone model.
@@ -150,7 +152,7 @@ WTModel* WT::createCone(float Height,
                         int Number_Of_Sides,
                         int Cap_Type){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 ///Creates a cylinder model.
@@ -159,7 +161,7 @@ WTModel* WT::createCylinder(float Height,
                             int Number_Of_Sides,
                             int Cap_Type){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 ///Creates a plane model.
@@ -170,7 +172,7 @@ WTModel* WT::createPlane(float Width,
                          float Y_Center,
                          int Number_Of_Tiles_Per_Edge){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 ///Creates a patch model.
@@ -182,7 +184,7 @@ WTModel* WT::createPatch(int Number_Of_S_Points,
                          float Z,
                          bool Make_Patch_With_Two_Sides){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 //[id(0x00000017), hidden]
@@ -360,7 +362,7 @@ void WT::sleep(int Number_Of_Milliseconds){
 WTModel* WT::createSphere(float Radius,
                           int Number_Of_Points_Around){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 //[id(0x0000003d), hidden]
@@ -371,7 +373,7 @@ void WT::freeDev(){
 ///Creates a joystick access object.
 WTJoystick* WT::createJoystick(){
   APILOG;
-  return 0;
+  return new WTJoystick();
 }
 
 ///Creates group from a WTStudio level file.
@@ -380,14 +382,17 @@ WTGroup* WT::createGroupFromFile(char* File_Name,
                                  int Load_Order_Offset,
                                  int Reserved){
   APILOG;
-  return 0;
+  return new WTGroup(File_Name,
+                     WTCache_Type,
+                     Load_Order_Offset);
 }
 
 ///Create a WTActor from .wsad file.
 WTActor* WT::createActor(char* File_Name,
                          int WTCache_Type){
   APILOG;
-  return 0;
+  return new WTActor(File_Name,
+                     WTCache_Type);
 }
 
 //[id(0x00000041), hidden]
@@ -436,13 +441,13 @@ WTMousePollInfo* WT::pollMouse(){
 ///Creates a WTSurfaceShader object.
 WTSurfaceShader* WT::createSurfaceShader(){
   APILOG;
-  return 0;
+  return new WTSurfaceShader();
 }
 
 ///This method creates a WTFont object.
 WTFont* WT::createFont(int Reserved){
   APILOG;
-  return 0;
+  return new WTFont();
 }
 
 ///Gets the value of a WT option.
@@ -468,7 +473,8 @@ double WT::getInfo(int Info_Type,
 WTAudioClip3D* WT::createAudioClip3D(char* File_Name,
                                      int WTCache_Type){
   APILOG;
-  return 0;
+  return new WTAudioClip3D(File_Name,
+                           WTCache_Type);
 }
 
 ///Returns the current master volume setting for all audio in the program.
@@ -493,7 +499,7 @@ char* WT::getRegistryStringValue(char* Sub_Key,
 ///This method creates a WTSpout object.
 WTSpout* WT::createSpout(){
   APILOG;
-  return 0;
+  return new WTSpout();
 }
 
 ///Creates a WTPortal object.
@@ -504,7 +510,12 @@ WTPortal* WT::createPortal(float Width,
                            bool doubleSided,
                            bool renderOnlyChildren){
   APILOG;
-  return 0;
+  return new WTPortal(Width,
+                      Height,
+                      pCam,
+                      mappingOption,
+                      doubleSided,
+                      renderOnlyChildren);
 }
 
 ///Gets download information.
@@ -535,13 +546,13 @@ WTModel* WT::createMesh(
   int Color_Lower_Bound
 ){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 ///Creates a blank Generic Mesh WTModel.
 WTModel* WT::createBlankMesh(){
   APILOG;
-  return 0;
+  return new WTModel();
 }
 
 //[id(0x00000058), propget]
@@ -567,7 +578,7 @@ void WT::setRenderMode(int mode){
 ///Creates a new WTString3D object.
 WTString3D* WT::createString3D(){
   APILOG;
-  return 0;
+  return new WTString3D();
 }
 
 ///This method creates a WTShadow object.
@@ -575,7 +586,9 @@ WTShadow* WT::createShadow(int Type,
                            int Width,
                            int Height){
   APILOG;
-  return 0;
+  return new WTShadow(Type,
+                      Width,
+                      Height);
 }
 
 //[id(0x0000005b), hidden]
@@ -595,6 +608,7 @@ void WT::wtMainThreadFunc(){
     std::cout << "HELLO FROM WT THREAD" << std::endl;
     if(this->RenderCallback != 0){
       WTEvent *event = new WTEvent();
+      event->_Type = 8;
       this->RenderCallback->run(event);
     }
     usleep(1 * 1000 * 1000);

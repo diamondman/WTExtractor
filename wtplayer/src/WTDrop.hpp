@@ -7,6 +7,11 @@ class WTBitmap;
 class WTDrop : public WTObject {
 
 public:
+  WTDrop();
+
+  WTDrop(WTBitmap* Bitmap_To_Use_As_Drop,
+         int Z_Order);
+
   int getWidth();
 
   int getHeight();

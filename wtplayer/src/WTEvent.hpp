@@ -44,4 +44,20 @@ public:
 
   //[id(0x00001398), hidden]
   void eventDone();
+
+  //private:
+  int _Type;
+  int _WTX;
+  int _WTY;
+  int _X;
+  int _Y;
+  //VARIANT Data;
+  WTObject* _Stage;
+  WTObject* _Camera;
+  WTObject* _Object;
+  int _ButtonState;
+  int _ExceptionType;
+  int _ExceptionData;
+  int _Key;
+  int _KeyState;
 };

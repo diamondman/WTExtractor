@@ -3,6 +3,12 @@
 class WTVisualizer {
 
 public:
+  WTVisualizer();
+
+  WTVisualizer(char* Visualizer_Type,
+               char* Get_Audio_From,
+               int Number_Of_Data_Bins);
+
   float getBinData(int Bin_Number);
 
   char* getBinDataAsString(int Start_Bin_Number,

@@ -10,6 +10,11 @@ class WTVector3D;
 class WTModel : public WTObject {
 
 public:
+  WTModel();
+
+  WTModel(char* File_Name,
+          int WTCache_Type);
+
   void setColor(int Red,
                 int Green,
                 int Blue,

@@ -7,6 +7,12 @@ class WTObject;
 class WTGroup : public WTContainer {
 
 public:
+  WTGroup();
+
+  WTGroup(char* File_Name,
+          int WTCache_Type,
+          int Load_Order_Offset);
+
   int addObject(WTContainer* Object_To_Add);
 
   void removeObject(WTContainer* Object_To_Remove);

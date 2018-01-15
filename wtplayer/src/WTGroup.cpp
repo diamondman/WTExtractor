@@ -1,6 +1,14 @@
 #include "basetypes.hpp"
 #include "WTGroup.hpp"
 
+WTGroup::WTGroup(){
+}
+
+WTGroup::WTGroup(char* File_Name,
+                 int WTCache_Type,
+                 int Load_Order_Offset){
+}
+
 int WTGroup::addObject(WTContainer* Object_To_Add){
   APILOG;
   return 0;

@@ -5,6 +5,11 @@
 class WTAudioClip : public WTObject {
 
 public:
+  WTAudioClip();
+
+  WTAudioClip(char* File_Name,
+              int WTCache_Type);
+
   void start(int Play_Sound_Forever = 0,
              int Wait_Until_Loaded = 0);
 

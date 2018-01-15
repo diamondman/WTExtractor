@@ -3,6 +3,13 @@
 #include "WTBitmap.hpp"
 #include "WTSurfaceShader.hpp"
 
+WTActor::WTActor(){
+}
+
+WTActor::WTActor(char* File_Name,
+                 int WTCache_Type){
+}
+
 int WTActor::getMaterialCount(){
   APILOG;
   return 0;

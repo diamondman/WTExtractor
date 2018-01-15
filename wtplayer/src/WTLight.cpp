@@ -1,6 +1,12 @@
 #include "basetypes.hpp"
 #include "WTLight.hpp"
 
+WTLight::WTLight(){
+}
+
+WTLight::WTLight(int Type){
+}
+
 void WTLight::setColor(int Red,
                        int Green,
                        int Blue){

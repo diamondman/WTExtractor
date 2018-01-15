@@ -1,10 +1,9 @@
 #include "basetypes.hpp"
 #include "WTCamera.hpp"
-
-class WTBitmap;
-class WTDrop;
-class WTVector3D;
-class WTCollisionInfo;
+#include "WTBitmap.hpp"
+#include "WTDrop.hpp"
+#include "WTVector3D.hpp"
+#include "WTCollisionInfo.hpp"
 
 void WTCamera::setZoom(int Zoom_Factor){
   APILOG;
@@ -64,14 +63,14 @@ WTVector3D* WTCamera::screenPointToWorldPoint(int x,
                                               int y,
                                               float Distance_From_Camera){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 WTVector3D* WTCamera::worldPointToScreenPoint(float x,
                                               float y,
                                               float Z){
   APILOG;
-  return 0;
+  return new WTVector3D();
 }
 
 WTCollisionInfo* WTCamera::pick(int x,

@@ -1,6 +1,17 @@
 #include "basetypes.hpp"
 #include "WTBitmap.hpp"
 
+WTBitmap::WTBitmap(){}
+
+WTBitmap::WTBitmap(int width, int height){
+  std::cout << "New WTBitmap(width=" << width << ", height=" << height << ");" << std::endl;
+}
+
+
+WTBitmap::WTBitmap(char* File_Name,
+                   int WTCache_Type){
+}
+
 void WTBitmap::setColorKey(unsigned char Red,
                            unsigned char Green,
                            unsigned char Blue){
@@ -25,6 +36,7 @@ void WTBitmap::drawText(int x,
                         int y,
                         char* Text_To_Draw){
   APILOG;
+  std::cout << "X: " << x << "; Y: " << y << "; STR: " << Text_To_Draw << std::endl;
 }
 
 void WTBitmap::setTextBold(int Draw_Text_In_Bold){

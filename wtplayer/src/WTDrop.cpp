@@ -2,6 +2,13 @@
 #include "WTDrop.hpp"
 #include "WTBitmap.hpp"
 
+WTDrop::WTDrop(){
+}
+
+WTDrop::WTDrop(WTBitmap* Bitmap_To_Use_As_Drop,
+               int Z_Order){
+}
+
 int WTDrop::getWidth(){
   APILOG;
   return 0;
@@ -35,7 +42,8 @@ int WTDrop::getBitmapHeight(){
 WTDrop* WTDrop::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
                         int Z_Order){
   APILOG;
-  return 0;
+  return new WTDrop(Bitmap_To_Use_As_Drop,
+                    Z_Order);
 }
 
 void WTDrop::removeDrop(WTDrop* Drop_To_Remove){
