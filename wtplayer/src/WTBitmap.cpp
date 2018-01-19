@@ -36,7 +36,7 @@ void WTBitmap::drawText(int x,
                         int y,
                         char* Text_To_Draw){
   APILOG;
-  std::cout << "X: " << x << "; Y: " << y << "; STR: " << Text_To_Draw << std::endl;
+  std::cout << "  (X: " << x << "; Y: " << y << "; STR: " << Text_To_Draw << ")" << std::endl;
 }
 
 void WTBitmap::setTextBold(int Draw_Text_In_Bold){

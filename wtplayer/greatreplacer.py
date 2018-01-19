@@ -49,6 +49,8 @@ def process_intermediary(filename, verbose=False):
         for i, line in enumerate(lines):
             if line == "    jself.run((event == 0) ? null : new WTEvent(event, false));\n":
                 line = "    jself.run((event == 0) ? null : new wildtangent.webdriver.impl.WTEvent(event, false));\n"
+            if line == "    jself.run((o == 0) ? null : new WTObject(o, false));\n":
+                line = "    jself.run((o == 0) ? null : new wildtangent.webdriver.impl.WTObject(o, false));\n"
 
             if verbose:
                 print(line[:-1])

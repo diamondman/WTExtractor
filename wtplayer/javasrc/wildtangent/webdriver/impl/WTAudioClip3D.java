@@ -33,5 +33,15 @@ public class WTAudioClip3D extends wildtangent.webdriver.jni.WTAudioClip3D
         this.setOption(n, new Integer(n2));
     }
 
+    public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTAudioClip3D.setOnLoad(WTOnLoadEvent)}");
+        this.setOnLoad(new InternalLoadEvent(callback));
+    };
+
+    public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTAudioClip3D.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
+    };
+
 }
 

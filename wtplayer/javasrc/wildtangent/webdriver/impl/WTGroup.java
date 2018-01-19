@@ -33,5 +33,15 @@ public class WTGroup extends wildtangent.webdriver.jni.WTGroup
         this.setOption(n, new Integer(n2));
     }
 
+    public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTGroup.setOnLoad(WTOnLoadEvent)}");
+        this.setOnLoad(new InternalLoadEvent(callback));
+    };
+
+    public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTGroup.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
+    };
+
 }
 

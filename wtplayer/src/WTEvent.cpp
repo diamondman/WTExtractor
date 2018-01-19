@@ -14,7 +14,7 @@ int WTEvent::getTime(){
 
 int WTEvent::getInterval(){
   APILOG;
-  return 0;
+  return 90;
 }
 
 //[id(0x0000138b), hidden]

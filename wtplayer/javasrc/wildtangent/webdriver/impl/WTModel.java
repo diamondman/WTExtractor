@@ -69,4 +69,14 @@ public class WTModel extends wildtangent.webdriver.jni.WTModel
         this.setOption(n, new Integer(n2));
     }
 
+    public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTModel.setOnLoad(WTOnLoadEvent)}");
+        this.setOnLoad(new InternalLoadEvent(callback));
+    };
+
+    public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTModel.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
+    };
+
 }

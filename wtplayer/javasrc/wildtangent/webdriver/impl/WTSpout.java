@@ -33,5 +33,15 @@ public class WTSpout extends wildtangent.webdriver.jni.WTSpout
         this.setOption(n, new Integer(n2));
     }
 
+    public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTSpout.setOnLoad(WTOnLoadEvent)}");
+        this.setOnLoad(new InternalLoadEvent(callback));
+    };
+
+    public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
+        System.out.println("calling JAVA WTAPI {void WTSpout.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
+    };
+
 }
 

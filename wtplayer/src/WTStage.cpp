@@ -13,7 +13,7 @@ void WTStage::removeObject(WTContainer* Object_To_Remove){
 
 WTCamera* WTStage::createCamera(){
   APILOG;
-  return 0;
+  return new WTCamera();
 }
 
 bool WTStage::getFogEnabled(){
@@ -83,5 +83,5 @@ WTObject* WTStage::getChildByIndex(int Child_Number){
 WTCamera* WTStage::createBitmapCamera(int iWidth,
                                       int iHeight){
   APILOG;
-  return 0;
+  return new WTCamera();
 }

@@ -1,5 +1,6 @@
 #include "basetypes.hpp"
 #include "WTObject.hpp"
+#include "InternalOnLoadCallbackWrapper.hpp"
 #include <iostream>
 
 int WTObject::getObjectType(){
@@ -31,6 +32,7 @@ char* WTObject::getName(){
 
 void WTObject::setName(char* Name_Of_Object){
   APILOG;
+  std::cout << "  (Name_Of_Object = \"" << Name_Of_Object << "\")" << std::endl;
 }
 
 bool WTObject::getIsValid(){
@@ -62,10 +64,6 @@ void WTObject::setUserData(VARIANT User_Data){
   this->userdata = User_Data;
 }
 
-void WTObject::setOnLoad(WTOnLoadEvent* callback){
-  APILOG;
-}
-
 bool WTObject::isValid(){
   APILOG;
   return true;
@@ -88,8 +86,5 @@ void WTObject::setOption(int Option_Number,
 
 VARIANT WTObject::getOption(int Option_Number){
   APILOG;
-}
-
-void WTObject::setOnLoadedWithChildren(WTOnLoadEvent* callback){
-  APILOG;
+  return 0;
 }

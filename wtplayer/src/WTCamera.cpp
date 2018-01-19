@@ -19,7 +19,7 @@ void WTCamera::setViewRect(int x,
 WTDrop* WTCamera::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
                           bool Put_Drop_In_Front){
   APILOG;
-  return 0;
+  return new WTDrop();
 }
 
 void WTCamera::removeDrop(WTDrop* Drop_To_Remove){

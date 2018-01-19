@@ -83,6 +83,7 @@ WTBitmap* WT::createBlankBitmap(int Width,
 WTBitmap* WT::createBitmap(char* File_Name,
                            int WTCache_Type){
   APILOG;
+  std::cout << "  (\"" << File_Name << "\", " << WTCache_Type << ")" << std::endl;
   return new WTBitmap(File_Name, WTCache_Type);
 }
 
@@ -316,7 +317,8 @@ WTFile* WT::readFile(char* File_Name,
                      int WTCache_Type,
                      int endian){
   APILOG;
-  return 0;
+  std::cout << "  (\"" << File_Name << "\", " << WTCache_Type << ", " << endian << ")" << std::endl;
+  return new WTFile();
 }
 
 ///Opens a debug window.
@@ -605,12 +607,12 @@ void WT::thread_bootstrap(void* This){
 
 void WT::wtMainThreadFunc(){
   while(this->wtThreadRun){
-    std::cout << "HELLO FROM WT THREAD" << std::endl;
+    std::cout << std::endl << "HELLO FROM WT THREAD" << std::endl;
     if(this->RenderCallback != 0){
       WTEvent *event = new WTEvent();
       event->_Type = 8;
       this->RenderCallback->run(event);
     }
-    usleep(1 * 1000 * 1000);
+    usleep(0.01 * 1000 * 1000);
   }
 }

@@ -25,6 +25,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_library( wtapi SHARED
   src/basetypes.cpp
   src/InternalCallbackWrapper.hpp
+  src/InternalOnLoadCallbackWrapper.hpp
 
   src/WTActor.cpp
   src/WTAudioClip3D.cpp
@@ -96,6 +97,7 @@ postprocess_swig(WTEngine
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
 
   #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
+  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalOnLoadCallbackWrapper.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
@@ -131,6 +133,7 @@ postprocess_swig(WTEngine
 
 add_jar(wildtangent
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
+  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalOnLoadCallbackWrapper.java
 
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
   ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
@@ -202,6 +205,7 @@ add_jar(wildtangent
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalKeyboardEvent.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalMouseEvent.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalRenderEvent.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalLoadEvent.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTActor.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTAudioClip3D.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTAudioClip.java

@@ -1,9 +1,10 @@
 #pragma once
 
 #include "basetypes.hpp"
-#include "InternalCallbackWrapper.hpp"
 
 #include <thread>
+
+class InternalCallbackWrapper;
 
 class WTExceptionEvent;
 

@@ -2,7 +2,8 @@
 
 #include "basetypes.hpp"
 
-class WTOnLoadEvent;
+class InternalOnLoadCallbackWrapper;
+
 class WT;
 
 class WTObject {
@@ -33,7 +34,15 @@ public:
 
   void setUserData(VARIANT User_Data);
 
-  void setOnLoad(WTOnLoadEvent* callback);
+  void setOnLoad(InternalOnLoadCallbackWrapper* callback){
+    APILOG;
+    this->OnLoadCallback = callback;
+  };
+
+  void setOnLoadedWithChildren(InternalOnLoadCallbackWrapper* callback){
+    APILOG;
+    this->OnLoadCallback = callback;
+  };
 
   bool isValid();
 
@@ -46,8 +55,7 @@ public:
 
   VARIANT getOption(int Option_Number);
 
-  void setOnLoadedWithChildren(WTOnLoadEvent* callback);
-
 private:
   VARIANT userdata;
+  InternalOnLoadCallbackWrapper *OnLoadCallback = 0;
 };

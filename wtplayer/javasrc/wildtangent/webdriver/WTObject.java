@@ -7,7 +7,7 @@ public interface WTObject {
 
     public boolean isValid();
 
-    //public void setOnLoad(WTOnLoadEvent var1);
+    public void setOnLoad(WTOnLoadEvent var1);
 
     public boolean getIsValid();
 
@@ -31,7 +31,7 @@ public interface WTObject {
 
     public WT getCreator();
 
-    //public void setOnLoadedWithChildren(WTOnLoadEvent var1);
+    public void setOnLoadedWithChildren(WTOnLoadEvent var1);
 
     public int getErrorNumber();
 

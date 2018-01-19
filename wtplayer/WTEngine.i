@@ -2,6 +2,7 @@
 %{
 #include "basetypes.hpp"
 #include "InternalCallbackWrapper.hpp"
+#include "InternalOnLoadCallbackWrapper.hpp"
 
 /* Includes the header in the wrapper code */
 #include "WTObject.hpp"
@@ -72,8 +73,10 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 /* Parse the header file to generate wrappers */
 
 %feature("director") InternalCallbackWrapper;
+%feature("director") InternalOnLoadCallbackWrapper;
 
 %include "InternalCallbackWrapper.hpp"
+%include "InternalOnLoadCallbackWrapper.hpp"
 
 %include "WTObject.hpp"
 %include "WTContainer.hpp"
