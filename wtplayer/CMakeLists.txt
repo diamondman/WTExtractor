@@ -94,79 +94,79 @@ function ( postprocess_swig TARGET_NAME INTERMEDIATE)
 endfunction( postprocess_swig )
 
 postprocess_swig(WTEngine
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
 
-  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
-  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalOnLoadCallbackWrapper.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTBitmap.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTCamera.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTCollisionInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTContainer.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTDrop.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEvent.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFile.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFont.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTGroup.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WT.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTJoystick.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTKeyboardPollInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTLight.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTModel.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTMousePollInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTObject.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTOrientation3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTPortal.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTShadow.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTSpout.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTStage.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTString3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTSurfaceShader.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTSysInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTVector3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTVisualizer.java
+  #${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
+  #${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/InternalOnLoadCallbackWrapper.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTBitmap.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTCamera.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTCollisionInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTContainer.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTDrop.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEvent.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTFile.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTFont.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTGroup.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WT.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTJoystick.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTKeyboardPollInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTLight.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTModel.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTMousePollInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTObject.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTOrientation3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTPortal.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTShadow.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSpout.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTStage.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTString3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSurfaceShader.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSysInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTVector3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTVisualizer.java
 )
 
 ############################
 
 add_jar(wildtangent
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/InternalOnLoadCallbackWrapper.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/InternalOnLoadCallbackWrapper.java
 
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTBitmap.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTCamera.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTCollisionInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTContainer.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTDrop.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEngine.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTEvent.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFile.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTFont.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTGroup.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WT.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTJoystick.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTKeyboardPollInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTLight.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTModel.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTMousePollInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTObject.java
-  #${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTOnLoadEvent.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTOrientation3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTPortal.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTShadow.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTSpout.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTStage.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTString3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTSurfaceShader.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTSysInfo.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTVector3D.java
-  ${CMAKE_BINARY_DIR}/wildtangent/webdriver/jni/WTVisualizer.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTBitmap.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTCamera.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTCollisionInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTContainer.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTDrop.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEngine.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEvent.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTFile.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTFont.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTGroup.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WT.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTJoystick.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTKeyboardPollInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTLight.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTModel.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTMousePollInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTObject.java
+  #${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTOnLoadEvent.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTOrientation3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTPortal.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTShadow.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSpout.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTStage.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTString3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSurfaceShader.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSysInfo.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTVector3D.java
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTVisualizer.java
 
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTActor.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTAudioClip3D.java
@@ -265,7 +265,7 @@ add_jar(rt
 
 ############################
 
-set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_BINARY_DIR}/wildtangent.jar:${CMAKE_BINARY_DIR}/rt.jar)
+set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar)
 add_jar(WTPlayerMain WTPlayerMain.java)# ENTRY_POINT Main)
 add_dependencies(WTPlayerMain wildtangent rt)
 
