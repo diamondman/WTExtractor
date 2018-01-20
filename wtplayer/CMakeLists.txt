@@ -20,6 +20,8 @@ include(UseJava)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
+include_directories(${WLD3_SOURCE_DIR})
+
 ############################
 
 add_library( wtapi SHARED
@@ -56,9 +58,9 @@ add_library( wtapi SHARED
   src/WTSysInfo.cpp
   src/WTVector3D.cpp
   src/WTVisualizer.cpp
-
-  #///////src/WTOnLoadEvent.cpp
   )
+
+target_link_libraries(wtapi WLD3)
 
 ############################
 
@@ -66,10 +68,7 @@ set(CMAKE_SWIG_FLAGS -package wildtangent.webdriver.jni)
 set_property(SOURCE WTEngine.i PROPERTY CPLUSPLUS ON)
 set(CMAKE_SWIG_OUTDIR "${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni")
 set(SWIG_MODULE_NAME "wildtangent.webdriver.jni")
-#set_property(SOURCE WTEngine.i PROPERTY CMAKE_SWIG_OUTDIR "wildtangent/webdriver")
-#set_property(SOURCE WTEngine.i PROPERTY SWIG_MODULE_NAME "wildtangent.webdriver")
 swig_add_module( WTEngine JAVA WTEngine.i )
-#set_target_properties( WTEngine PROPERTIES CMAKE_SWIG_OUTDIR "wildtangent/webdriver")
 swig_link_libraries( WTEngine wtapi )
 
 function ( postprocess_swig TARGET_NAME INTERMEDIATE)
@@ -156,7 +155,6 @@ add_jar(wildtangent
   ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTModel.java
   ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTMousePollInfo.java
   ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTObject.java
-  #${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTOnLoadEvent.java
   ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTOrientation3D.java
   ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTPortal.java
   ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTShadow.java
@@ -225,7 +223,6 @@ add_jar(wildtangent
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTModel.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTMousePollInfo.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTObject.java
-  #${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTOnLoadEvent.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTOrientation3D.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTPortal.java
   ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTShadow.java

@@ -30,7 +30,14 @@
 #include <iostream>
 #include <unistd.h>
 
-WT::WT(){}
+WT::WT(char* localver_path){
+  if(localver_path)
+    this->working_directory = std::string(localver_path);
+  else
+    this->working_directory = "";
+
+  std::cout << "Working directory: " << this->working_directory << std::endl;
+}
 
 ///Creates a box model.
 WTModel* WT::createBox(float Width,
@@ -277,12 +284,6 @@ void WT::setFilesPath(char* Default_File_Path){
   APILOG;
 }
 
-///Gets the current working directory.
-char* WT::getFilesPath(){
-  APILOG;
-  return (char*)"/";
-}
-
 ///Forces a single render.
 void WT::exec(){
   APILOG;
@@ -318,7 +319,7 @@ WTFile* WT::readFile(char* File_Name,
                      int endian){
   APILOG;
   std::cout << "  (\"" << File_Name << "\", " << WTCache_Type << ", " << endian << ")" << std::endl;
-  return new WTFile();
+  return new WTFile(this, File_Name, WTCache_Type, endian);
 }
 
 ///Opens a debug window.

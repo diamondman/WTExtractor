@@ -3,6 +3,7 @@
 #include "basetypes.hpp"
 
 #include <thread>
+#include <string>
 
 class InternalCallbackWrapper;
 
@@ -34,13 +35,8 @@ class WTVisualizer;
 class WTObject;
 
 class WT {
-
-  //private:
-  //InternalCallbackWrapper *callbackTest;
-
 public:
-
-  WT();
+  WT(char* localver_path);
 
   /*void setCallbackTest(InternalCallbackWrapper *callback) {
     this->callbackTest = callback;
@@ -50,7 +46,7 @@ public:
     if(this->callbackTest != 0){
       this->callbackTest->run();
     }
-    }*/
+  }*/
 
   ///Creates a box model.
   WTModel* createBox(float Width,
@@ -275,7 +271,10 @@ public:
   void setFilesPath(char* Default_File_Path);
 
   ///Gets the current working directory.
-  char* getFilesPath();
+  const char* getFilesPath(){
+     APILOG;
+     return this->working_directory.c_str();
+  }
 
   ///Forces a single render.
   void exec();
@@ -490,4 +489,6 @@ private:
 
   int ErrorHandling = 1;
   int MaxFramesPerSecond = 25;
+
+  std::string working_directory;
 };

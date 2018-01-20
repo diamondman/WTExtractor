@@ -88,8 +88,9 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %include "WTCamera.hpp"
 %include "WTCollisionInfo.hpp"
 %include "WTDrop.hpp"
-//%include "WTEventCallback.hpp"
 %include "WTEvent.hpp"
+//Ignore an internal constructor
+%ignore WTFile::WTFile;
 %include "WTFile.hpp"
 %include "WTFont.hpp"
 %include "WT.hpp"
@@ -98,7 +99,6 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %include "WTLight.hpp"
 %include "WTModel.hpp"
 %include "WTMousePollInfo.hpp"
-//%include "WTOnLoadEvent.hpp"
 %include "WTOrientation3D.hpp"
 %include "WTPortal.hpp"
 %include "WTShadow.hpp"

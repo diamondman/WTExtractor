@@ -7,10 +7,6 @@ public class WTFile extends wildtangent.webdriver.jni.WTFile
         super(cPtr, cMemoryOwn);
     }
 
-    public WTFile() {
-        super();
-    }
-
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);
         //this.setOption_xfer(n, object);
@@ -42,12 +38,19 @@ public class WTFile extends wildtangent.webdriver.jni.WTFile
         this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
     };
 
-    public byte readByte() {
-        System.out.println("*************************************FUCK*************************");
+    /*public byte readByte() {
         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
             System.out.println(ste);
         }
         return super.readByte();
+    }*/
+
+    public void close() {
+        System.out.println("*************************************FILE CLOSING*************************");
+        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+            System.out.println("  "+ste);
+        }
+        super.close();
     }
 }
 

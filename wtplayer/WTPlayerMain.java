@@ -23,18 +23,19 @@ public class WTPlayerMain {
     private ArrayBlockingQueue<Message> q = new ArrayBlockingQueue<Message>(128);
     private boolean loop = true;
 
-    public WTPlayerMain(){
+    public WTPlayerMain(String localver_path){
         System.out.println("Current Class Loader : "
                            + WTPlayerMain.class.getClassLoader().getClass().getName());
 
         ClassLoader loader = ClassLoader.getSystemClassLoader();
 
+        System.out.println("Loader URLs:");
         URL[] urls = ((URLClassLoader)loader).getURLs();
         for(URL url: urls){
-            System.out.println(url.getFile());
+            System.out.println("  " + url.getFile());
         }
 
-        WT wt = new wildtangent.webdriver.impl.WT();
+        WT wt = new wildtangent.webdriver.impl.WT(localver_path);
 
         try{
             Class<?> gameMainClass = loader.loadClass("dark.Main");
@@ -51,7 +52,8 @@ public class WTPlayerMain {
                  InvocationTargetException e){
             e.printStackTrace();
         } catch (ClassCastException e) {
-            System.err.println("Error! Failed to load game: The game's main class must extend java.applet.Applet.");
+            System.err.println("Error! Failed to load game: The game's main "+
+                               "class must extend java.applet.Applet.");
             e.printStackTrace();
         }
 
@@ -63,32 +65,32 @@ public class WTPlayerMain {
             }
          });*/
 
-		/*try {
-			Thread.sleep(5000);
-			wt.stop();
-			Thread.sleep(5000);
-			wt.start();
-			Thread.sleep(5000);
-			wt.stop();
-			Thread.sleep(5000);
-			wt.start();
-		} catch (InterruptedException e) {
+        /*try {
+            Thread.sleep(5000);
+            wt.stop();
+            Thread.sleep(5000);
+            wt.start();
+            Thread.sleep(5000);
+            wt.stop();
+            Thread.sleep(5000);
+            wt.start();
+        } catch (InterruptedException e) {
 
         }*/
 
         while(loop) {
-			try {
-				Message val = q.take();
-				switch(val) {
-				case Quit:
-					System.out.println("QUIT MESSAGE");
-					loop = false;
-					break;
-				}
-			} catch (InterruptedException e) {
-				System.out.println("INTERRUPT " + e.toString());
-			}
-		}
+            try {
+                Message val = q.take();
+                switch(val) {
+                case Quit:
+                    System.out.println("QUIT MESSAGE");
+                    loop = false;
+                    break;
+                }
+            } catch (InterruptedException e) {
+                System.out.println("INTERRUPT " + e.toString());
+            }
+        }
 
         System.out.println("MAIN ENDING NORMALLY");
 
@@ -99,6 +101,9 @@ public class WTPlayerMain {
         for(String arg : args)
             System.out.println("ARG: " + arg);
 
-        new WTPlayerMain();
+        if(args.length < 1)
+            System.out.println("Please provide a path to a game's localver directory.");
+        else
+            new WTPlayerMain(args[0]);
     }
 }

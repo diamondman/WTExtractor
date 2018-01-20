@@ -13,5 +13,6 @@ set (WLD3_VERSION_MINOR 0)
 #  )
 
 # Add Targets
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library(WLD3 STATIC dataaccessors.c multifh.c wld3_extract.c pwt_decode.c)
 target_link_libraries(WLD3 uuid mspack magic m)

@@ -8,5 +8,11 @@ then
     VERBOSEFLAGS="-verbose:class"
 fi
 
-java ${VERBOSEFLAGS} -Djava.library.path=$DIR -cp $DIR/wildtangent.jar:$DIR/WTPlayerMain.jar:.:/home/diamondman/.wine/drive_c/Program\ Files\ \(x86\)/WildTangent/Apps/GameChannel/Games/02554DAA-470F-40BC-BF60-675C5BD9920F/localver/darkorbit \
-     -Xbootclasspath/p:$DIR/rt.jar WTPlayerMain "${@: -1}"
+LOCALVER_PATH="/home/diamondman/.wine/drive_c/Program Files (x86)/WildTangent/Apps/GameChannel/Games/02554DAA-470F-40BC-BF60-675C5BD9920F/localver"
+
+java \
+    ${VERBOSEFLAGS} \
+    -Djava.library.path=$DIR \
+    -cp $DIR/wildtangent.jar:$DIR/WTPlayerMain.jar:.:"${LOCALVER_PATH}/darkorbit" \
+    -Xbootclasspath/p:$DIR/rt.jar WTPlayerMain "${LOCALVER_PATH}"
+#"${@:2}"

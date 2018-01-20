@@ -2,6 +2,8 @@
 #include "WTEvent.hpp"
 #include "WTObject.hpp"
 
+#include <chrono>
+
 int WTEvent::getType(){
   APILOG;
   return _Type;
@@ -9,7 +11,11 @@ int WTEvent::getType(){
 
 int WTEvent::getTime(){
   APILOG;
-  return 0;
+  using namespace std::chrono;
+  int ms = (int)(duration_cast< milliseconds >
+                 (system_clock::now().time_since_epoch()).count());
+  std::cout << "  Ret " << ms << " ms;" << std::endl;
+  return ms;
 }
 
 int WTEvent::getInterval(){

@@ -2,10 +2,20 @@
 
 #include "WTObject.hpp"
 #include "basetypes.hpp"
+#include "wld3_extract.h"
+
+class WT;
 
 class WTFile : public WTObject {
 
 public:
+  WTFile(WT* wt,
+         char* File_Name,
+         int WTCache_Type,
+         int endian);
+
+  ~WTFile();
+
   VARIANT readAll();
 
   unsigned char readByte();
@@ -41,4 +51,11 @@ public:
   int setEndian(int endian);
 
   char* readString(int length = -1);
+
+private:
+  WT* _wt;
+  int cacheType;
+  int endian;
+  WLD3* wld3;
+  size_t wtbuff_offset = 0;
 };
