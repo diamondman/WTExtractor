@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
+
 ############################
 
 project(wtengine)
@@ -16,6 +18,12 @@ INCLUDE(${SWIG_USE_FILE})
 
 find_package(Java REQUIRED)
 include(UseJava)
+
+find_package(Cairo)
+include_directories(${Cairo_INCLUDE_DIRS})
+
+find_package(SDL2)
+include_directories(${SDL2_INCLUDE_DIR})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -60,7 +68,7 @@ add_library( wtapi SHARED
   src/WTVisualizer.cpp
   )
 
-target_link_libraries(wtapi WLD3)
+target_link_libraries(wtapi WLD3 ${Cairo_LIBRARIES} ${SDL2_LIBRARY})
 
 ############################
 

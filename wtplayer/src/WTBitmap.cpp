@@ -1,15 +1,56 @@
 #include "basetypes.hpp"
 #include "WTBitmap.hpp"
+#include "WT.hpp"
 
-WTBitmap::WTBitmap(){}
-
-WTBitmap::WTBitmap(int width, int height){
+WTBitmap::WTBitmap(WT* wt,
+                   int width,
+                   int height) :
+  _wt(wt){
   std::cout << "New WTBitmap(width=" << width << ", height=" << height << ");" << std::endl;
+
+  sdlsurf = SDL_CreateRGBSurface
+    (0, width, height, 32,
+     0x00FF0000,
+     0x0000FF00,
+     0x000000FF,
+     0xFF000000);
+
+  cairosurf = cairo_image_surface_create_for_data
+    ((unsigned char*)sdlsurf->pixels,
+     CAIRO_FORMAT_RGB24,
+     this->sdlsurf->w,
+     this->sdlsurf->h,
+     this->sdlsurf->pitch);
+
+  cr = cairo_create(cairosurf);
 }
 
 
-WTBitmap::WTBitmap(char* File_Name,
-                   int WTCache_Type){
+WTBitmap::WTBitmap(WT* wt,
+                   char* File_Name,
+                   int WTCache_Type) :
+  _wt(wt){
+  sdlsurf = SDL_CreateRGBSurface
+    (0, 640, 480, 32,
+     0x00FF0000,
+     0x0000FF00,
+     0x000000FF,
+     0xFF000000);
+
+  cairosurf = cairo_image_surface_create_for_data
+    ((unsigned char*)sdlsurf->pixels,
+     CAIRO_FORMAT_RGB24,
+     this->sdlsurf->w,
+     this->sdlsurf->h,
+     this->sdlsurf->pitch);
+
+  cr = cairo_create(cairosurf);
+}
+
+WTBitmap::~WTBitmap(){
+  cairo_destroy(this->cr);
+  cairo_surface_destroy(this->cairosurf);
+  SDL_FreeSurface(this->sdlsurf);
 }
 
 void WTBitmap::setColorKey(unsigned char Red,
@@ -24,12 +65,12 @@ void WTBitmap::unsetColorKey(){
 
 int WTBitmap::getWidth(){
   APILOG;
-  return 0;
+  return this->sdlsurf->w;
 }
 
 int WTBitmap::getHeight(){
   APILOG;
-  return 0;
+  return this->sdlsurf->h;
 }
 
 void WTBitmap::drawText(int x,
@@ -37,6 +78,8 @@ void WTBitmap::drawText(int x,
                         char* Text_To_Draw){
   APILOG;
   std::cout << "  (X: " << x << "; Y: " << y << "; STR: " << Text_To_Draw << ")" << std::endl;
+  cairo_move_to(this->cr, x, y);
+  cairo_show_text(this->cr, Text_To_Draw);
 }
 
 void WTBitmap::setTextBold(int Draw_Text_In_Bold){
@@ -45,6 +88,7 @@ void WTBitmap::setTextBold(int Draw_Text_In_Bold){
 
 void WTBitmap::setTextHeight(int Text_Height_In_Points){
   APILOG;
+  cairo_set_font_size(this->cr, Text_Height_In_Points);
 }
 
 void WTBitmap::setTextItalic(int Draw_Text_In_Italic){
@@ -74,6 +118,7 @@ void WTBitmap::setTextColor(unsigned char Red,
                             unsigned char Green,
                             unsigned char Blue){
   APILOG;
+  cairo_set_source_rgb(this->cr, Red, Green, Blue);
 }
 
 void WTBitmap::setTextBkColor(unsigned char Red,

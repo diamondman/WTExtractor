@@ -84,6 +84,7 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %include "WTActor.hpp"
 %include "WTAudioClip3D.hpp"
 %include "WTAudioClip.hpp"
+%ignore WTBitmap::WTBitmap;
 %include "WTBitmap.hpp"
 %include "WTCamera.hpp"
 %include "WTCollisionInfo.hpp"

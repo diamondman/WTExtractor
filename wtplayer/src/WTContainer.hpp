@@ -169,4 +169,11 @@ public:
   WTVector3D* getGeometryExtents(bool Max_Extents,
                                  bool With_Children = false);
 
+private:
+  float pos_x = 0;
+  float pos_y = 0;
+  float pos_z = 0;
+
+  bool is_highlighted = false;
+  bool is_visible = true;
 };

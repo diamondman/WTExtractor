@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <string>
+#include <SDL.h>
 
 class InternalCallbackWrapper;
 
@@ -37,6 +38,8 @@ class WTObject;
 class WT {
 public:
   WT(char* localver_path);
+
+  ~WT();
 
   /*void setCallbackTest(InternalCallbackWrapper *callback) {
     this->callbackTest = callback;
@@ -491,4 +494,7 @@ private:
   int MaxFramesPerSecond = 25;
 
   std::string working_directory;
+
+  SDL_Window* window = NULL;
+  SDL_Surface* sdlsurf = NULL;
 };

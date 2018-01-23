@@ -7,11 +7,6 @@ public class WTBitmap extends wildtangent.webdriver.jni.WTBitmap
         super(cPtr, cMemoryOwn);
     }
 
-    public WTBitmap() {
-        super();
-    }
-
-
     public void setTextColor(int n, int n2, int n3) {
         this.setTextColor((byte)n, (byte)n2, (byte)n3);
     }

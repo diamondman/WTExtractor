@@ -2,6 +2,8 @@
 
 #include "basetypes.hpp"
 
+#include <string>
+
 class InternalOnLoadCallbackWrapper;
 
 class WT;
@@ -18,9 +20,16 @@ public:
 
   WTObject* getOwner();
 
-  char* getName();
+  const char* getName(){
+    APILOG;
+    return this->name.c_str();
+  }
 
-  void setName(char* Name_Of_Object);
+  void setName(const char* Name_Of_Object){
+    APILOG;
+    std::cout << "  (Name_Of_Object = \"" << Name_Of_Object << "\")" << std::endl;
+    this->name = std::string(Name_Of_Object);
+  }
 
   bool getIsValid();
 
@@ -58,4 +67,5 @@ public:
 private:
   VARIANT userdata;
   InternalOnLoadCallbackWrapper *OnLoadCallback = 0;
+  std::string name = "";
 };

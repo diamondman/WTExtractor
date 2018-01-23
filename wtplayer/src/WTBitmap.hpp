@@ -3,16 +3,23 @@
 #include "WTObject.hpp"
 #include "basetypes.hpp"
 
+#include <SDL.h>
+#include <cairo.h>
+
+class WT;
+
 class WTBitmap : public WTObject {
 
 public:
-  WTBitmap();
-
-  WTBitmap(int width,
+  WTBitmap(WT* wt,
+           int width,
            int height);
 
-  WTBitmap(char* File_Name,
+  WTBitmap(WT* wt,
+           char* File_Name,
            int WTCache_Type);
+
+  ~WTBitmap();
 
   void setColorKey(unsigned char Red,
                    unsigned char Green,
@@ -136,4 +143,10 @@ public:
                         int Blue);
 
   void setTextUnderline(int Draw_Text_In_Underline);
+
+private:
+  WT* _wt;
+  SDL_Surface *sdlsurf;
+  cairo_surface_t *cairosurf;
+  cairo_t *cr;
 };

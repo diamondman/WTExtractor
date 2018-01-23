@@ -24,17 +24,6 @@ WTObject* WTObject::getOwner(){
   return 0;
 }
 
-char* WTObject::getName(){
-  APILOG;
-  std::cout << "Hello from cout in native." << std::endl;
-  return (char*)"TEST";
-}
-
-void WTObject::setName(char* Name_Of_Object){
-  APILOG;
-  std::cout << "  (Name_Of_Object = \"" << Name_Of_Object << "\")" << std::endl;
-}
-
 bool WTObject::getIsValid(){
   APILOG;
   return true;

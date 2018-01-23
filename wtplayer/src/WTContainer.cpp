@@ -7,11 +7,14 @@ void WTContainer::setPosition(float x,
                               float y,
                               float Z){
   APILOG;
+  this->pos_x = x;
+  this->pos_y = y;
+  this->pos_z = Z;
 }
 
 WTVector3D* WTContainer::getPosition(){
   APILOG;
-  return new WTVector3D();
+  return new WTVector3D(this->pos_x, this->pos_y, this->pos_z);
 }
 
 void WTContainer::setAbsolutePosition(float x,
@@ -29,6 +32,9 @@ void WTContainer::moveBy(float x,
                          float y,
                          float Z){
   APILOG;
+  this->pos_x += x;
+  this->pos_y += y;
+  this->pos_z += Z;
 }
 
 void WTContainer::setOrientation(float x,
@@ -153,20 +159,22 @@ int WTContainer::getPickPriority(){
 
 void WTContainer::highlight(bool Turn_On_Highlight){
   APILOG;
+  this->is_highlighted = Turn_On_Highlight;
 }
 
 bool WTContainer::isHighlighted(){
   APILOG;
-  return false;
+  return this->is_highlighted;
 }
 
 void WTContainer::setVisible(bool Turn_On_Visibility){
   APILOG;
+  this->is_visible = Turn_On_Visibility;
 }
 
 bool WTContainer::getVisible(){
   APILOG;
-  return true;
+  return this->is_visible;
 }
 
 char* WTContainer::getPositionAsString(){

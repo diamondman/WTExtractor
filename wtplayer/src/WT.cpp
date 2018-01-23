@@ -29,6 +29,11 @@
 
 #include <iostream>
 #include <unistd.h>
+#include <stdexcept>
+#include <cairo.h>
+
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
 WT::WT(char* localver_path){
   if(localver_path)
@@ -37,13 +42,36 @@ WT::WT(char* localver_path){
     this->working_directory = "";
 
   std::cout << "Working directory: " << this->working_directory << std::endl;
+
+  if( SDL_Init( SDL_INIT_VIDEO ) < 0 ){
+    printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+    throw std::runtime_error("SDL coult not initialize.");
+  }
+
+  this->window = SDL_CreateWindow( "WTPlayer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                   SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+  if(this->window == NULL) {
+    printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
+    throw std::runtime_error("Could not create SDL Window.");
+  }
+
+  this->sdlsurf = SDL_GetWindowSurface(window);
+}
+
+WT::~WT(){
+  //SDL_FreeSurface( gHelloWorld );
+
+  if(this->window)
+    SDL_DestroyWindow(this->window);
+
+  SDL_Quit();
 }
 
 ///Creates a box model.
 WTModel* WT::createBox(float Width,
-                   float Height,
-                   float Depth,
-                   int Number_Of_Tiles_Per_Edge){
+                       float Height,
+                       float Depth,
+                       int Number_Of_Tiles_Per_Edge){
   APILOG;
   return new WTModel();
 }
@@ -83,7 +111,7 @@ WTGroup* WT::createGroup(){
 WTBitmap* WT::createBlankBitmap(int Width,
                                 int Height){
   APILOG;
-  return new WTBitmap(Width, Height);
+  return new WTBitmap(this, Width, Height);
 }
 
 ///Creates a WTBitmap object from a media file.
@@ -91,7 +119,7 @@ WTBitmap* WT::createBitmap(char* File_Name,
                            int WTCache_Type){
   APILOG;
   std::cout << "  (\"" << File_Name << "\", " << WTCache_Type << ")" << std::endl;
-  return new WTBitmap(File_Name, WTCache_Type);
+  return new WTBitmap(this, File_Name, WTCache_Type);
 }
 
 ///Creates a WTAudioClip object from a media file.
@@ -607,8 +635,37 @@ void WT::thread_bootstrap(void* This){
 }
 
 void WT::wtMainThreadFunc(){
+  SDL_Event e;
+
+  cairo_surface_t *cairosurf = cairo_image_surface_create_for_data
+    (
+     (unsigned char*)sdlsurf->pixels,
+     CAIRO_FORMAT_RGB24,
+     sdlsurf->w,
+     sdlsurf->h,
+     sdlsurf->pitch
+    );
+
+  cairo_t *cr = cairo_create(cairosurf);
+
+  cairo_set_source_rgb(cr, 0, 0xFF, 0);
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+      CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 40.0);
+
+  cairo_move_to(cr, 10.0, 50.0);
+  cairo_show_text(cr, "WTPlayer");
+
+  SDL_UpdateWindowSurface(this->window);
+
   while(this->wtThreadRun){
     std::cout << std::endl << "HELLO FROM WT THREAD" << std::endl;
+    while( SDL_PollEvent(&e) ) {
+      if( e.type == SDL_QUIT ) {
+        this->wtThreadRun = false;
+      }
+    }
+
     if(this->RenderCallback != 0){
       WTEvent *event = new WTEvent();
       event->_Type = 8;
@@ -616,4 +673,7 @@ void WT::wtMainThreadFunc(){
     }
     usleep(0.01 * 1000 * 1000);
   }
+
+  cairo_destroy(cr);
+  cairo_surface_destroy(cairosurf);
 }

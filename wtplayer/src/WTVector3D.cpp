@@ -1,7 +1,14 @@
 #include "basetypes.hpp"
 #include "WTVector3D.hpp"
 
-WTVector3D::WTVector3D(){
+WTVector3D::WTVector3D() :
+  x(0), y(0), z(0) {
+}
+
+WTVector3D::WTVector3D(float x,
+                       float y,
+                       float z) :
+  x(x), y(y), z(z) {
 }
 
 float WTVector3D::getY(){
