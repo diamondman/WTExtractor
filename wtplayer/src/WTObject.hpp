@@ -1,6 +1,7 @@
 #pragma once
 
 #include "basetypes.hpp"
+#include "IUnknown.hpp"
 
 #include <string>
 
@@ -8,9 +9,11 @@ class InternalOnLoadCallbackWrapper;
 
 class WT;
 
-class WTObject {
+class WTObject : public IUnknown {
 
 public:
+  WTObject();
+
   virtual int getObjectType();
 
   //[id(0x000003ea), hidden]

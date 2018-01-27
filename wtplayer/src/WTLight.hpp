@@ -5,8 +5,6 @@
 class WTLight : public WTContainer {
 
 public:
-  WTLight();
-
   WTLight(int Type);
 
   void setColor(int Red,

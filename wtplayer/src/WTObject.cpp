@@ -3,6 +3,10 @@
 #include "InternalOnLoadCallbackWrapper.hpp"
 #include <iostream>
 
+WTObject::WTObject() :
+  IUnknown() {
+}
+
 int WTObject::getObjectType(){
   APILOG;
   return 14;

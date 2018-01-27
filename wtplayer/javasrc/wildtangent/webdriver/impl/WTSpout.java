@@ -7,10 +7,6 @@ public class WTSpout extends wildtangent.webdriver.jni.WTSpout
         super(cPtr, cMemoryOwn);
     }
 
-    public WTSpout() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

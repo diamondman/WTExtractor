@@ -10,6 +10,8 @@ class WTSurfaceShader;
 class WTContainer : public WTObject {
 
 public:
+  WTContainer();
+
   void setPosition(float x,
                    float y,
                    float Z);

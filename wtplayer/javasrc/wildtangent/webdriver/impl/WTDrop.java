@@ -7,10 +7,6 @@ public class WTDrop extends wildtangent.webdriver.jni.WTDrop
         super(cPtr, cMemoryOwn);
     }
 
-    public WTDrop() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

@@ -8,6 +8,8 @@ class WTContainer;
 class WTStage : public WTObject {
 
 public:
+  WTStage();
+
   void addObject(WTContainer* Object_To_Add);
 
   void removeObject(WTContainer* Object_To_Remove);

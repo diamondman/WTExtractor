@@ -5,8 +5,6 @@
 class WTAudioClip : public WTObject {
 
 public:
-  WTAudioClip();
-
   WTAudioClip(char* File_Name,
               int WTCache_Type);
 

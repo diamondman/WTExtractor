@@ -5,19 +5,11 @@ public class WTEvent extends wildtangent.webdriver.jni.WTEvent
 
     /*public WTEvent(long cPtr, boolean cMemoryOwn) {
         super(cPtr, cMemoryOwn);
-    }
-
-    public WTEvent() {
-        super();
     }*/
 
     public class WTEventSub extends wildtangent.webdriver.jni.WTEvent {
         public WTEventSub(long cPtr, boolean cMemoryOwn) {
             super(cPtr, cMemoryOwn);
-        }
-
-        public WTEventSub() {
-            super();
         }
     }
 

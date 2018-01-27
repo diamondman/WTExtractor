@@ -7,9 +7,5 @@ public class WTMousePollInfo extends wildtangent.webdriver.jni.WTMousePollInfo
         super(cPtr, cMemoryOwn);
     }
 
-    public WTMousePollInfo() {
-        super();
-    }
-
 }
 

@@ -10,6 +10,8 @@ class WTCollisionInfo;
 class WTCamera : public WTContainer {
 
 public:
+  WTCamera();
+
   //[id(0x00001771), hidden]
   void setZoom(int Zoom_Factor);
 

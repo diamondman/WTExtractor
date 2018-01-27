@@ -9,10 +9,6 @@ public class WTJoystick extends wildtangent.webdriver.jni.WTJoystick
         super(cPtr, cMemoryOwn);
     }
 
-    public WTJoystick() {
-        super();
-    }
-
 
     public void setOnEvent(WTEventJoystickCallback wTEventJoystickCallback) {
         /*if (this.rni_wt == null) {

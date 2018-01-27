@@ -3,6 +3,10 @@
 #include "WTCamera.hpp"
 #include "WTContainer.hpp"
 
+WTStage::WTStage() :
+  WTObject() {
+}
+
 void WTStage::addObject(WTContainer* Object_To_Add){
   APILOG;
 }

@@ -8,6 +8,8 @@ class WTSurfaceShader;
 class WTString3D : public WTGroup {
 
 public:
+  WTString3D();
+
   void setText(char* text);
 
   void setTextProperties(int drawTextInBold,

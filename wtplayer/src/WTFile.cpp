@@ -9,7 +9,7 @@ WTFile::WTFile(WT* wt,
                char* File_Name,
                int WTCache_Type,
                int endian) :
-  cacheType(WTCache_Type), endian(endian), wld3(0), _wt(wt) {
+  WTObject(), _wt(wt), wld3(0), cacheType(WTCache_Type), endian(endian) {
   APILOG;
 
   std::string full_fname = std::string(this->_wt->getFilesPath()) + "/" + File_Name;

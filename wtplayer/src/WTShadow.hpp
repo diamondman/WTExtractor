@@ -5,8 +5,6 @@
 class WTShadow : public WTGroup {
 
 public:
-  WTShadow();
-
   WTShadow(int Type,
            int Width,
            int Height);

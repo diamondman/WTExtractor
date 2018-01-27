@@ -7,9 +7,5 @@ public class WTVector3D extends wildtangent.webdriver.jni.WTVector3D
         super(cPtr, cMemoryOwn);
     }
 
-    public WTVector3D() {
-        super();
-    }
-
 }
 

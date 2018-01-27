@@ -7,9 +7,5 @@ public class WTVisualizer extends wildtangent.webdriver.jni.WTVisualizer
         super(cPtr, cMemoryOwn);
     }
 
-    public WTVisualizer() {
-        super();
-    }
-
 }
 

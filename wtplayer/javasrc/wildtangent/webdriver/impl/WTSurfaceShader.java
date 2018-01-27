@@ -7,10 +7,6 @@ public class WTSurfaceShader extends wildtangent.webdriver.jni.WTSurfaceShader
         super(cPtr, cMemoryOwn);
     }
 
-    public WTSurfaceShader() {
-        super();
-    }
-
 
     public void setGeometryAmbientColor(int n, int n2, int n3) {
         this.setGeometryAmbientColor((byte)n, (byte)n2, (byte)n3);

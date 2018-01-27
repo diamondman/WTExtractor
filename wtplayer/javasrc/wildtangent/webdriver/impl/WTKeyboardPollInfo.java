@@ -7,9 +7,5 @@ public class WTKeyboardPollInfo extends wildtangent.webdriver.jni.WTKeyboardPoll
         super(cPtr, cMemoryOwn);
     }
 
-    public WTKeyboardPollInfo() {
-        super();
-    }
-
 }
 

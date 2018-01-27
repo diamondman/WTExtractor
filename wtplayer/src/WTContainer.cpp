@@ -3,6 +3,10 @@
 #include "WTVector3D.hpp"
 #include "WTOrientation3D.hpp"
 
+WTContainer::WTContainer() :
+  WTObject() {
+}
+
 void WTContainer::setPosition(float x,
                               float y,
                               float Z){

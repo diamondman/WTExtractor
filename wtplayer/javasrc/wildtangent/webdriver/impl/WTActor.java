@@ -7,10 +7,6 @@ public class WTActor extends wildtangent.webdriver.jni.WTActor
         super(cPtr, cMemoryOwn);
     }
 
-    public WTActor() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

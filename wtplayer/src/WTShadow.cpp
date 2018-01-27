@@ -1,12 +1,10 @@
 #include "basetypes.hpp"
 #include "WTShadow.hpp"
 
-WTShadow::WTShadow(){
-}
-
 WTShadow::WTShadow(int Type,
                    int Width,
-                   int Height){
+                   int Height) :
+  WTGroup() {
 }
 
 int WTShadow::getType(){

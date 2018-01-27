@@ -8,6 +8,8 @@ class WTSurfaceShader;
 class WTSpout : public WTGroup {
 
 public:
+  WTSpout();
+
   void setTexture(WTBitmap* pBitmap);
 
   void setSurfaceShader(WTSurfaceShader* pISurfaceShader);

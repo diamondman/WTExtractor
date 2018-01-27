@@ -7,10 +7,6 @@ public class WTPortal extends wildtangent.webdriver.jni.WTPortal
         super(cPtr, cMemoryOwn);
     }
 
-    public WTPortal() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

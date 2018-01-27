@@ -8,8 +8,6 @@ class WTSurfaceShader;
 class WTActor : public WTGroup {
 
 public:
-  WTActor();
-
   WTActor(char* File_Name,
           int WTCache_Type);
 

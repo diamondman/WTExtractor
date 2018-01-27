@@ -7,10 +7,6 @@ public class WTAudioClip3D extends wildtangent.webdriver.jni.WTAudioClip3D
         super(cPtr, cMemoryOwn);
     }
 
-    public WTAudioClip3D() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

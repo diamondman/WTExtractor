@@ -7,9 +7,5 @@ public class WTOrientation3D extends wildtangent.webdriver.jni.WTOrientation3D
         super(cPtr, cMemoryOwn);
     }
 
-    public WTOrientation3D() {
-        super();
-    }
-
 }
 

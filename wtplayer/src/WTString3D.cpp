@@ -3,6 +3,10 @@
 #include "WTBitmap.hpp"
 #include "WTSurfaceShader.hpp"
 
+WTString3D::WTString3D() :
+  WTGroup() {
+}
+
 void WTString3D::setText(char* text){
   APILOG;
 }

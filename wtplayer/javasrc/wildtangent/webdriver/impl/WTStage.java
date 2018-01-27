@@ -7,10 +7,6 @@ public class WTStage extends wildtangent.webdriver.jni.WTStage
         super(cPtr, cMemoryOwn);
     }
 
-    public WTStage() {
-        super();
-    }
-
 
     public void setBGColor(int n, int n2, int n3) {
         this.setBGColor((byte)n, (byte)n2, (byte)n3);

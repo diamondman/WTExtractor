@@ -7,10 +7,6 @@ public class WTCamera extends wildtangent.webdriver.jni.WTCamera
         super(cPtr, cMemoryOwn);
     }
 
-    public WTCamera() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

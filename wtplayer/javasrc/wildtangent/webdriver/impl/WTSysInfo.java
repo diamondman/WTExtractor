@@ -7,9 +7,5 @@ public class WTSysInfo extends wildtangent.webdriver.jni.WTSysInfo
         super(cPtr, cMemoryOwn);
     }
 
-    public WTSysInfo() {
-        super();
-    }
-
 }
 

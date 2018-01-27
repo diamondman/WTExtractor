@@ -7,10 +7,6 @@ public class WTContainer extends wildtangent.webdriver.jni.WTContainer
         super(cPtr, cMemoryOwn);
     }
 
-    public WTContainer() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

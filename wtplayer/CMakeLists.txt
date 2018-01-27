@@ -36,6 +36,7 @@ add_library( wtapi SHARED
   src/basetypes.cpp
   src/InternalCallbackWrapper.hpp
   src/InternalOnLoadCallbackWrapper.hpp
+  src/IUnknown.cpp
 
   src/WTActor.cpp
   src/WTAudioClip3D.cpp

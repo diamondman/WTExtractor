@@ -1,11 +1,9 @@
 #include "basetypes.hpp"
 #include "WTAudioClip.hpp"
 
-WTAudioClip::WTAudioClip(){
-}
-
 WTAudioClip::WTAudioClip(char* File_Name,
-                         int WTCache_Type){
+                         int WTCache_Type) :
+  WTObject() {
 }
 
 void WTAudioClip::start(int Play_Sound_Forever,

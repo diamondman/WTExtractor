@@ -7,10 +7,6 @@ public class WTFont extends wildtangent.webdriver.jni.WTFont
         super(cPtr, cMemoryOwn);
     }
 
-    public WTFont() {
-        super();
-    }
-
 
     public void setTextColor(int n, int n2, int n3) {
         this.setTextColor((byte)n, (byte)n2, (byte)n3);

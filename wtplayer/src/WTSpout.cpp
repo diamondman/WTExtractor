@@ -3,6 +3,10 @@
 #include "WTBitmap.hpp"
 #include "WTSurfaceShader.hpp"
 
+WTSpout::WTSpout() :
+  WTGroup() {
+}
+
 void WTSpout::setTexture(WTBitmap* pBitmap){
   APILOG;
 }

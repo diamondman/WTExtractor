@@ -7,9 +7,6 @@ public class WTLight extends wildtangent.webdriver.jni.WTLight
         super(cPtr, cMemoryOwn);
     }
 
-    public WTLight() {
-        super();
-    }
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

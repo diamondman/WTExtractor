@@ -7,9 +7,5 @@ public class WTCollisionInfo extends wildtangent.webdriver.jni.WTCollisionInfo
         super(cPtr, cMemoryOwn);
     }
 
-    public WTCollisionInfo() {
-        super();
-    }
-
 }
 

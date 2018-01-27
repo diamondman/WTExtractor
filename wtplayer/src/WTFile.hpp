@@ -54,8 +54,8 @@ public:
 
 private:
   WT* _wt;
+  WLD3* wld3;
   int cacheType;
   int endian;
-  WLD3* wld3;
   size_t wtbuff_offset = 0;
 };

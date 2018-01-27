@@ -7,10 +7,6 @@ public class WTObject extends wildtangent.webdriver.jni.WTObject
         super(cPtr, cMemoryOwn);
     }
 
-    public WTObject() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

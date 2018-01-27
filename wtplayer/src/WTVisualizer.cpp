@@ -1,9 +1,6 @@
 #include "basetypes.hpp"
 #include "WTVisualizer.hpp"
 
-WTVisualizer::WTVisualizer(){
-}
-
 WTVisualizer::WTVisualizer(char* Visualizer_Type,
                            char* Get_Audio_From,
                            int Number_Of_Data_Bins){

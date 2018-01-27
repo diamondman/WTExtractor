@@ -78,35 +78,123 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %include "InternalCallbackWrapper.hpp"
 %include "InternalOnLoadCallbackWrapper.hpp"
 
+%ignore IUnknown::AddRef;
+%ignore IUnknown::Release;
+%feature("ref")   IUnknown "$this->AddRef();"
+%feature("unref") IUnknown "$this->Release();"
+%include "IUnknown.hpp"
+
+%ignore WTObject::WTObject;
 %include "WTObject.hpp"
+
+%ignore WTContainer::WTContainer;
 %include "WTContainer.hpp"
+
+%ignore WTGroup::WTGroup;
 %include "WTGroup.hpp"
+
+%ignore WTActor::WTActor;
 %include "WTActor.hpp"
+
+%ignore WTAudioClip3D::WTAudioClip3D;
 %include "WTAudioClip3D.hpp"
+
+%ignore WTAudioClip::WTAudioClip;
 %include "WTAudioClip.hpp"
+
 %ignore WTBitmap::WTBitmap;
 %include "WTBitmap.hpp"
+
+%ignore WTCamera::WTCamera;
 %include "WTCamera.hpp"
+
+%ignore WTCollisionInfo::WTCollisionInfo;
 %include "WTCollisionInfo.hpp"
+
+%ignore WTDrop::WTDrop;
 %include "WTDrop.hpp"
+
+//The WTEvent constructor is necessary, for now at least.
 %include "WTEvent.hpp"
-//Ignore an internal constructor
+
 %ignore WTFile::WTFile;
 %include "WTFile.hpp"
+
+%ignore WTFont::WTFont;
 %include "WTFont.hpp"
+
+%newobject createStage;
+%newobject createBox;
+%newobject createStage;
+%newobject createModel;
+%newobject createContainer;
+%newobject createLight;
+%newobject createGroup;
+%newobject createBlankBitmap;
+%newobject createBitmap;
+%newobject createAudioClip;
+%newobject createAudioVisualizer;
+%newobject createLine;
+%newobject createCone;
+%newobject createCylinder;
+%newobject createPlane;
+%newobject createPatch;
+%newobject createSphere;
+%newobject createJoystick;
+%newobject createGroupFromFile;
+%newobject createActor;
+%newobject createSurfaceShader;
+%newobject createFont;
+%newobject createAudioClip3D;
+%newobject createSpout;
+%newobject createPortal;
+%newobject createMesh;
+%newobject createBlankMesh;
+%newobject createString3D;
+%newobject createShadow;
 %include "WT.hpp"
+
+%ignore WTJoystick::WTJoystick;
 %include "WTJoystick.hpp"
+
+%ignore WTKeyboardPollInfo::WTKeyboardPollInfo;
 %include "WTKeyboardPollInfo.hpp"
+
+%ignore WTLight::WTLight;
 %include "WTLight.hpp"
+
+%ignore WTModel::WTModel;
 %include "WTModel.hpp"
+
+%ignore WTMousePollInfo::WTMousePollInfo;
 %include "WTMousePollInfo.hpp"
+
+%ignore WTOrientation3D::WTOrientation3D;
 %include "WTOrientation3D.hpp"
+
+%ignore WTPortal::WTPortal;
 %include "WTPortal.hpp"
+
+%ignore WTShadow::WTShadow;
 %include "WTShadow.hpp"
+
+%ignore WTSpout::WTSpout;
 %include "WTSpout.hpp"
+
+%ignore WTStage::WTStage;
 %include "WTStage.hpp"
+
+%ignore WTString3D::WTString3D;
 %include "WTString3D.hpp"
+
+%ignore WTSurfaceShader::WTSurfaceShader;
 %include "WTSurfaceShader.hpp"
+
+%ignore WTSysInfo::WTSysInfo;
 %include "WTSysInfo.hpp"
+
+%ignore WTVector3D::WTVector3D;
 %include "WTVector3D.hpp"
+
+%ignore WTVisualizer::WTVisualizer;
 %include "WTVisualizer.hpp"

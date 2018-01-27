@@ -7,10 +7,6 @@ public class WTShadow extends wildtangent.webdriver.jni.WTShadow
         super(cPtr, cMemoryOwn);
     }
 
-    public WTShadow() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

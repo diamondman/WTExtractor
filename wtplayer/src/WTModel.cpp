@@ -4,11 +4,13 @@
 #include "WTSurfaceShader.hpp"
 #include "WTVector3D.hpp"
 
-WTModel::WTModel(){
+WTModel::WTModel() :
+  WTObject() {
 }
 
 WTModel::WTModel(char* File_Name,
-                 int WTCache_Type){
+                 int WTCache_Type) :
+  WTObject() {
 }
 
 void setColor(int Red,

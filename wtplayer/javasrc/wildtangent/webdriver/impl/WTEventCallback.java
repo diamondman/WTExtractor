@@ -7,9 +7,5 @@ public class WTEventCallback extends wildtangent.webdriver.jni.WTEventCallback
         super(cPtr, cMemoryOwn);
     }
 
-    public WTEventCallback() {
-        super();
-    }
-
 }
 

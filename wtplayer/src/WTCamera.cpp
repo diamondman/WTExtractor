@@ -5,6 +5,10 @@
 #include "WTVector3D.hpp"
 #include "WTCollisionInfo.hpp"
 
+WTCamera::WTCamera() :
+  WTContainer() {
+}
+
 void WTCamera::setZoom(int Zoom_Factor){
   APILOG;
 }

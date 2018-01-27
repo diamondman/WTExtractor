@@ -7,10 +7,6 @@ public class WTModel extends wildtangent.webdriver.jni.WTModel
         super(cPtr, cMemoryOwn);
     }
 
-    public WTModel() {
-        super();
-    }
-
 
     public void setFaceColor(int n, int n2, int n3, int n4, int n5) {
         this.setFaceColor(n, (byte)n2, (byte)n3, (byte)n4, (byte)n5);

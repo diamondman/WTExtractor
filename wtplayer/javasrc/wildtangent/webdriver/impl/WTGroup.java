@@ -7,10 +7,6 @@ public class WTGroup extends wildtangent.webdriver.jni.WTGroup
         super(cPtr, cMemoryOwn);
     }
 
-    public WTGroup() {
-        super();
-    }
-
 
     public void setOption(int n, Object object) {
         //this.internal_setOption(n, object);

@@ -2,11 +2,13 @@
 #include "WTDrop.hpp"
 #include "WTBitmap.hpp"
 
-WTDrop::WTDrop(){
+WTDrop::WTDrop() :
+  WTObject() {
 }
 
 WTDrop::WTDrop(WTBitmap* Bitmap_To_Use_As_Drop,
-               int Z_Order){
+               int Z_Order) :
+  WTObject() {
 }
 
 int WTDrop::getWidth(){
