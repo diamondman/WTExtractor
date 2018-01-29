@@ -221,33 +221,33 @@ public:
 
   void setOnExceptionEvent(InternalCallbackWrapper *callback){
     APILOG;
-    callback->AddRef();
-    if(this->ExceptionCallback)
-      this->ExceptionCallback->Release();
+    //callback->AddRef();
+    //if(this->ExceptionCallback)
+    //  this->ExceptionCallback->Release();
     this->ExceptionCallback = callback;
   }
 
   void setOnKeyboardEvent(InternalCallbackWrapper *callback){
     APILOG;
-    callback->AddRef();
-    if(this->KeyboardCallback)
-      this->KeyboardCallback->Release();
+    //callback->AddRef();
+    //if(this->KeyboardCallback)
+    //  this->KeyboardCallback->Release();
     this->KeyboardCallback = callback;
   }
 
   void setOnMouseEvent(InternalCallbackWrapper *callback){
     APILOG;
-    callback->AddRef();
-    if(this->MouseCallback)
-      this->MouseCallback->Release();
+    //callback->AddRef();
+    //if(this->MouseCallback)
+    //  this->MouseCallback->Release();
     this->MouseCallback = callback;
   }
 
   void setOnRenderEvent(InternalCallbackWrapper *callback){
     APILOG;
-    callback->AddRef();
-    if(this->RenderCallback)
-      this->RenderCallback->Release();
+    //callback->AddRef();
+    //if(this->RenderCallback)
+    //  this->RenderCallback->Release();
     this->RenderCallback = callback;
   }
 

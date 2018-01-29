@@ -661,7 +661,8 @@ void WT::wtMainThreadFunc(){
   while(this->wtThreadRun){
     std::cout << std::endl << "HELLO FROM WT THREAD " <<
       std::hex << static_cast<void*>(this->RenderCallback) << " Refcnt " <<
-      std::dec << (this->RenderCallback == 0 ? 0 : this->RenderCallback->GetRefCount()) << std::endl;
+      //std::dec << (this->RenderCallback == 0 ? 0 : this->RenderCallback->GetRefCount()) <<
+      std::endl;
     while( SDL_PollEvent(&e) ) {
       if( e.type == SDL_QUIT ) {
         this->wtThreadRun = false;
