@@ -10,9 +10,10 @@ class WTVector3D;
 class WTModel : public WTObject {
 
 public:
-  WTModel();
+  WTModel(WT* wt_);
 
-  WTModel(char* File_Name,
+  WTModel(WT* wt_,
+          char* File_Name,
           int WTCache_Type);
 
   int getObjectType(){

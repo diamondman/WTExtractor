@@ -8,7 +8,7 @@ class WTSurfaceShader;
 class WTString3D : public WTGroup {
 
 public:
-  WTString3D();
+  WTString3D(WT* wt_);
 
   int getObjectType(){
     APILOG;

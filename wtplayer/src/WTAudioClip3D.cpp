@@ -2,9 +2,10 @@
 #include "WTAudioClip3D.hpp"
 #include "WTCamera.hpp"
 
-WTAudioClip3D::WTAudioClip3D(char* File_Name,
+WTAudioClip3D::WTAudioClip3D(WT* wt_,
+                             char* File_Name,
                              int WTCache_Type) :
-  WTGroup() {
+  WTGroup(wt_) {
 }
 
 void WTAudioClip3D::start(int loop,

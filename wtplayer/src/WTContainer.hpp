@@ -12,7 +12,7 @@ class WTSurfaceShader;
 class WTContainer : public WTObject {
 
 public:
-  WTContainer();
+  WTContainer(WT* wt_);
 
   int getObjectType(){
     APILOG;

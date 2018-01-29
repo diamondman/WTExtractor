@@ -59,7 +59,6 @@ public:
   char* readString(int length = -1);
 
 private:
-  WT* _wt;
   WLD3* wld3;
   int cacheType;
   int endian;

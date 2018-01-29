@@ -183,6 +183,10 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %ignore WTSpout::WTSpout;
 %include "WTSpout.hpp"
 
+%newobject WTStage::getObjectByName;
+%newobject WTStage::getChildByIndex;
+%newobject WTStage::createCamera;
+%newobject WTStage::createBitmapCamera;
 %ignore WTStage::WTStage;
 %include "WTStage.hpp"
 

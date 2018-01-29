@@ -3,8 +3,8 @@
 #include "WTBitmap.hpp"
 #include "WTSurfaceShader.hpp"
 
-WTString3D::WTString3D() :
-  WTGroup() {
+WTString3D::WTString3D(WT* wt_) :
+  WTGroup(wt_) {
 }
 
 void WTString3D::setText(char* text){

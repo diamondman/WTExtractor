@@ -1,9 +1,11 @@
 #include "basetypes.hpp"
 #include "WTVisualizer.hpp"
 
-WTVisualizer::WTVisualizer(char* Visualizer_Type,
-                           char* Get_Audio_From,
-                           int Number_Of_Data_Bins){
+WTVisualizer::WTVisualizer(WT* wt_,
+                           const char* Visualizer_Type,
+                           const char* Get_Audio_From,
+                           int Number_Of_Data_Bins) :
+  wt(wt_) {
 }
 
 float WTVisualizer::getBinData(int Bin_Number){

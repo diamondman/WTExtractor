@@ -5,7 +5,8 @@
 class WTLight : public WTContainer {
 
 public:
-  WTLight(int Type);
+  WTLight(WT* wt_,
+          int Type);
 
   int getObjectType(){
     APILOG;

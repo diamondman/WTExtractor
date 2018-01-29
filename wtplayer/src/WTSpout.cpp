@@ -3,8 +3,8 @@
 #include "WTBitmap.hpp"
 #include "WTSurfaceShader.hpp"
 
-WTSpout::WTSpout() :
-  WTGroup() {
+WTSpout::WTSpout(WT* wt_) :
+  WTGroup(wt_) {
 }
 
 void WTSpout::setTexture(WTBitmap* pBitmap){

@@ -10,7 +10,7 @@ class WTCollisionInfo;
 class WTCamera : public WTContainer {
 
 public:
-  WTCamera();
+  WTCamera(WT* wt_);
 
   int getObjectType(){
     APILOG;

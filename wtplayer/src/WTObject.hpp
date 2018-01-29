@@ -14,7 +14,7 @@ class WT;
 class WTObject : public IUnknown {
 
 public:
-  WTObject();
+  WTObject(WT* wt_);
 
   virtual int getObjectType(){
     APILOG;
@@ -72,8 +72,11 @@ public:
 
   VARIANT getOption(int Option_Number);
 
+protected:
+  WT *wt;
+  std::string name = "";
+
 private:
   VARIANT userdata;
   InternalOnLoadCallbackWrapper *OnLoadCallback = 0;
-  std::string name = "";
 };

@@ -2,10 +2,10 @@
 #include "WTBitmap.hpp"
 #include "WT.hpp"
 
-WTBitmap::WTBitmap(WT* wt,
+WTBitmap::WTBitmap(WT* wt_,
                    int width,
                    int height) :
-  WTObject(), _wt(wt){
+  WTObject(wt_){
   std::cout << "New WTBitmap(width=" << width << ", height=" << height << ");" << std::endl;
 
   sdlsurf = SDL_CreateRGBSurface
@@ -26,10 +26,10 @@ WTBitmap::WTBitmap(WT* wt,
 }
 
 
-WTBitmap::WTBitmap(WT* wt,
+WTBitmap::WTBitmap(WT* wt_,
                    char* File_Name,
                    int WTCache_Type) :
-  WTObject(), _wt(wt){
+  WTObject(wt_){
   sdlsurf = SDL_CreateRGBSurface
     (0, 640, 480, 32,
      0x00FF0000,

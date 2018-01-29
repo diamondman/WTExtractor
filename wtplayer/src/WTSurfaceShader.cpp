@@ -2,8 +2,8 @@
 #include "WTSurfaceShader.hpp"
 #include "WTBitmap.hpp"
 
-WTSurfaceShader::WTSurfaceShader() :
-  WTObject() {
+WTSurfaceShader::WTSurfaceShader(WT* wt_) :
+  WTObject(wt_) {
 }
 
 void WTSurfaceShader::setNumLayers(int num_layers){

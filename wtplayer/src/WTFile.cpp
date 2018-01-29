@@ -5,14 +5,14 @@
 #include "dataaccessors.h"
 #include <string>
 
-WTFile::WTFile(WT* wt,
+WTFile::WTFile(WT* wt_,
                char* File_Name,
                int WTCache_Type,
                int endian) :
-  WTObject(), _wt(wt), wld3(0), cacheType(WTCache_Type), endian(endian) {
+  WTObject(wt_), wld3(0), cacheType(WTCache_Type), endian(endian) {
   APILOG;
 
-  std::string full_fname = std::string(this->_wt->getFilesPath()) + "/" + File_Name;
+  std::string full_fname = std::string(this->wt->getFilesPath()) + "/" + File_Name;
   std::cout << "opening file: \"" << full_fname << "\"" << std::endl;
 
   DataAccessor* acc = openFileAccessor(full_fname.c_str());

@@ -1,8 +1,9 @@
 #include "basetypes.hpp"
 #include "WTLight.hpp"
 
-WTLight::WTLight(int Type) :
-  WTContainer() {
+WTLight::WTLight(WT* wt_,
+                 int Type) :
+  WTContainer(wt_) {
 }
 
 void WTLight::setColor(int Red,

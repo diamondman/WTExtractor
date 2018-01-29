@@ -5,7 +5,8 @@
 class WTAudioClip : public WTObject {
 
 public:
-  WTAudioClip(char* File_Name,
+  WTAudioClip(WT* wt_,
+              char* File_Name,
               int WTCache_Type);
 
   int getObjectType(){

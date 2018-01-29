@@ -7,9 +7,10 @@ class WTBitmap;
 class WTDrop : public WTObject {
 
 public:
-  WTDrop();
+  WTDrop(WT* wt_);
 
-  WTDrop(WTBitmap* Bitmap_To_Use_As_Drop,
+  WTDrop(WT* wt_,
+         WTBitmap* Bitmap_To_Use_As_Drop,
          int Z_Order);
 
   int getObjectType(){

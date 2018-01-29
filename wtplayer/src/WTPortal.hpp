@@ -9,7 +9,8 @@ class WTSurfaceShader;
 class WTPortal : public WTGroup {
 
 public:
-  WTPortal(float Width,
+  WTPortal(WT* wt_,
+           float Width,
            float Height,
            WTCamera* pCam,
            int mappingOption,

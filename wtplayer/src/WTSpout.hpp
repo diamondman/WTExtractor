@@ -8,7 +8,7 @@ class WTSurfaceShader;
 class WTSpout : public WTGroup {
 
 public:
-  WTSpout();
+  WTSpout(WT* wt_);
 
   int getObjectType(){
     APILOG;

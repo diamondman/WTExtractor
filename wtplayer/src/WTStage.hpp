@@ -2,13 +2,17 @@
 
 #include "WTObject.hpp"
 
+#include <vector>
+
 class WTCamera;
 class WTContainer;
 
 class WTStage : public WTObject {
 
 public:
-  WTStage();
+  WTStage(WT* wt_);
+
+  ~WTStage();
 
   int getObjectType(){
     APILOG;
@@ -20,7 +24,17 @@ public:
 
   void removeObject(WTContainer* Object_To_Remove);
 
+  WTObject* getObjectByName(char* Name_Of_Object,
+                            int Nth = 1);
+
+  int getChildCount();
+
+  WTObject* getChildByIndex(int Child_Number);
+
   WTCamera* createCamera();
+
+  WTCamera* createBitmapCamera(int iWidth,
+                               int iHeight);
 
   bool getFogEnabled();
 
@@ -46,13 +60,17 @@ public:
                   unsigned char Green,
                   unsigned char Blue);
 
-  WTObject* getObjectByName(char* Name_Of_Object,
-                            int Nth = 1);
+private:
+  std::vector<WTCamera*> cameras;
+  std::vector<WTCamera*> bitmapCameras;
 
-  int getChildCount();
+  std::vector<WTObject*> objects;
 
-  WTObject* getChildByIndex(int Child_Number);
+  bool fog_enabled = false;
+  float fog_start_distance = 0;
+  float fog_end_distance = 0;
+  float fog_density = 0;
+  uint32_t fog_color = 0;
 
-  WTCamera* createBitmapCamera(int iWidth,
-                               int iHeight);
+  uint32_t bg_color = 0;
 };

@@ -5,8 +5,8 @@
 #include "WTVector3D.hpp"
 #include "WTCollisionInfo.hpp"
 
-WTCamera::WTCamera() :
-  WTContainer() {
+WTCamera::WTCamera(WT* wt_) :
+  WTContainer(wt_) {
 }
 
 void WTCamera::setZoom(int Zoom_Factor){
@@ -23,7 +23,7 @@ void WTCamera::setViewRect(int x,
 WTDrop* WTCamera::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
                           bool Put_Drop_In_Front){
   APILOG;
-  return new WTDrop();
+  return new WTDrop(this->wt);
 }
 
 void WTCamera::removeDrop(WTDrop* Drop_To_Remove){

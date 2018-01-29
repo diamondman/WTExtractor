@@ -7,7 +7,12 @@ class WTObject;
 class WTGroup : public WTContainer {
 
 public:
-  WTGroup();
+  WTGroup(WT* wt_);
+
+  WTGroup(WT* wt_,
+          char* File_Name,
+          int WTCache_Type,
+          int Load_Order_Offset);
 
   virtual int getObjectType(){
     APILOG;
@@ -15,10 +20,6 @@ public:
       WT_3D |
       WTGROUP;
   }
-
-  WTGroup(char* File_Name,
-          int WTCache_Type,
-          int Load_Order_Offset);
 
   int addObject(WTContainer* Object_To_Add);
 

@@ -7,7 +7,7 @@ class WTBitmap;
 class WTSurfaceShader : public WTObject {
 
 public:
-  WTSurfaceShader();
+  WTSurfaceShader(WT* wt_);
 
   void setNumLayers(int num_layers);
 

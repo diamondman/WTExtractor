@@ -11,11 +11,11 @@ class WT;
 class WTBitmap : public WTObject {
 
 public:
-  WTBitmap(WT* wt,
+  WTBitmap(WT* wt_,
            int width,
            int height);
 
-  WTBitmap(WT* wt,
+  WTBitmap(WT* wt_,
            char* File_Name,
            int WTCache_Type);
 
@@ -151,7 +151,6 @@ public:
   void setTextUnderline(int Draw_Text_In_Underline);
 
 private:
-  WT* _wt;
   SDL_Surface *sdlsurf;
   cairo_surface_t *cairosurf;
   cairo_t *cr;

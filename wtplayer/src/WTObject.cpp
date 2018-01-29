@@ -3,8 +3,9 @@
 #include "InternalOnLoadCallbackWrapper.hpp"
 #include <iostream>
 
-WTObject::WTObject() :
-  IUnknown() {
+WTObject::WTObject(WT* wt_) :
+  IUnknown(),
+  wt(wt_){
 }
 
 //[id(0x000003ea), hidden]

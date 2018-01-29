@@ -59,6 +59,9 @@ WT::WT(char* localver_path){
 }
 
 WT::~WT(){
+  if(this->stage)
+    this->stage->Release();
+
   //SDL_FreeSurface( gHelloWorld );
 
   if(this->window)
@@ -73,38 +76,45 @@ WTModel* WT::createBox(float Width,
                        float Depth,
                        int Number_Of_Tiles_Per_Edge){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 ///Create the main stage for the scene.
 WTStage* WT::createStage(){
   APILOG;
-  return new WTStage();
+  if(this->stage)
+    return this->stage;
+  this->stage = new WTStage(this);
+  this->stage->AddRef();
+  return this->stage;
 }
 
 ///Create a model using data loaded from the specified .wt file.
 WTModel* WT::createModel(char* File_Name,
                          int WTCache_Type){
   APILOG;
-  return new WTModel(File_Name, WTCache_Type);
+  return new WTModel(this,
+                     File_Name,
+                     WTCache_Type);
 }
 
 ///Creates a container for a model or bitmap.
 WTContainer* WT::createContainer(){
   APILOG;
-  return new WTContainer();
+  return new WTContainer(this);
 }
 
 ///Creates a light.
 WTLight* WT::createLight(int Type){
   APILOG;
-  return new WTLight(Type);
+  return new WTLight(this,
+                     Type);
 }
 
 ///Creates a group to use for placement of child objects.
 WTGroup* WT::createGroup(){
   APILOG;
-  return new WTGroup();
+  return new WTGroup(this);
 }
 
 ///Creates an empty WTBitmap object.
@@ -126,7 +136,9 @@ WTBitmap* WT::createBitmap(char* File_Name,
 WTAudioClip* WT::createAudioClip(char* File_Name,
                                  int WTCache_Type){
   APILOG;
-  return new WTAudioClip(File_Name, WTCache_Type);
+  return new WTAudioClip(this,
+                         File_Name,
+                         WTCache_Type);
 }
 
 ///Creates a WTVisualizer object.
@@ -135,7 +147,8 @@ WTVisualizer* WT::createAudioVisualizer(char* Visualizer_Type,
                                         int Number_Of_Data_Bins,
                                         int Reserved){
   APILOG;
-  return new WTVisualizer(Visualizer_Type,
+  return new WTVisualizer(this,
+                          Visualizer_Type,
                           Get_Audio_From,
                           Number_Of_Data_Bins);
 }
@@ -179,7 +192,7 @@ WTModel* WT::createLine(float X1,
                         int Cap_Type,
                         int Line_Type){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 ///Creates a cone model.
@@ -188,7 +201,7 @@ WTModel* WT::createCone(float Height,
                         int Number_Of_Sides,
                         int Cap_Type){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 ///Creates a cylinder model.
@@ -197,7 +210,7 @@ WTModel* WT::createCylinder(float Height,
                             int Number_Of_Sides,
                             int Cap_Type){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 ///Creates a plane model.
@@ -208,7 +221,7 @@ WTModel* WT::createPlane(float Width,
                          float Y_Center,
                          int Number_Of_Tiles_Per_Edge){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 ///Creates a patch model.
@@ -220,7 +233,7 @@ WTModel* WT::createPatch(int Number_Of_S_Points,
                          float Z,
                          bool Make_Patch_With_Two_Sides){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 //[id(0x00000017), hidden]
@@ -393,7 +406,7 @@ void WT::sleep(int Number_Of_Milliseconds){
 WTModel* WT::createSphere(float Radius,
                           int Number_Of_Points_Around){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 //[id(0x0000003d), hidden]
@@ -413,7 +426,8 @@ WTGroup* WT::createGroupFromFile(char* File_Name,
                                  int Load_Order_Offset,
                                  int Reserved){
   APILOG;
-  return new WTGroup(File_Name,
+  return new WTGroup(this,
+                     File_Name,
                      WTCache_Type,
                      Load_Order_Offset);
 }
@@ -422,7 +436,8 @@ WTGroup* WT::createGroupFromFile(char* File_Name,
 WTActor* WT::createActor(char* File_Name,
                          int WTCache_Type){
   APILOG;
-  return new WTActor(File_Name,
+  return new WTActor(this,
+                     File_Name,
                      WTCache_Type);
 }
 
@@ -472,7 +487,7 @@ WTMousePollInfo* WT::pollMouse(){
 ///Creates a WTSurfaceShader object.
 WTSurfaceShader* WT::createSurfaceShader(){
   APILOG;
-  return new WTSurfaceShader();
+  return new WTSurfaceShader(this);
 }
 
 ///This method creates a WTFont object.
@@ -504,7 +519,8 @@ double WT::getInfo(int Info_Type,
 WTAudioClip3D* WT::createAudioClip3D(char* File_Name,
                                      int WTCache_Type){
   APILOG;
-  return new WTAudioClip3D(File_Name,
+  return new WTAudioClip3D(this,
+                           File_Name,
                            WTCache_Type);
 }
 
@@ -530,7 +546,7 @@ char* WT::getRegistryStringValue(char* Sub_Key,
 ///This method creates a WTSpout object.
 WTSpout* WT::createSpout(){
   APILOG;
-  return new WTSpout();
+  return new WTSpout(this);
 }
 
 ///Creates a WTPortal object.
@@ -541,7 +557,8 @@ WTPortal* WT::createPortal(float Width,
                            bool doubleSided,
                            bool renderOnlyChildren){
   APILOG;
-  return new WTPortal(Width,
+  return new WTPortal(this,
+                      Width,
                       Height,
                       pCam,
                       mappingOption,
@@ -577,13 +594,13 @@ WTModel* WT::createMesh(
   int Color_Lower_Bound
 ){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 ///Creates a blank Generic Mesh WTModel.
 WTModel* WT::createBlankMesh(){
   APILOG;
-  return new WTModel();
+  return new WTModel(this);
 }
 
 //[id(0x00000058), propget]
@@ -609,7 +626,7 @@ void WT::setRenderMode(int mode){
 ///Creates a new WTString3D object.
 WTString3D* WT::createString3D(){
   APILOG;
-  return new WTString3D();
+  return new WTString3D(this);
 }
 
 ///This method creates a WTShadow object.
@@ -617,7 +634,8 @@ WTShadow* WT::createShadow(int Type,
                            int Width,
                            int Height){
   APILOG;
-  return new WTShadow(Type,
+  return new WTShadow(this,
+                      Type,
                       Width,
                       Height);
 }

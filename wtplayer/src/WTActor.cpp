@@ -3,9 +3,10 @@
 #include "WTBitmap.hpp"
 #include "WTSurfaceShader.hpp"
 
-WTActor::WTActor(char* File_Name,
+WTActor::WTActor(WT* wt_,
+                 char* File_Name,
                  int WTCache_Type) :
-  WTGroup() {
+  WTGroup(wt_) {
 }
 
 int WTActor::getMaterialCount(){

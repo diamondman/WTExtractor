@@ -7,7 +7,8 @@ class WTCamera;
 class WTAudioClip3D : public WTGroup {
 
 public:
-  WTAudioClip3D(char* File_Name,
+  WTAudioClip3D(WT* wt_,
+                char* File_Name,
                 int WTCache_Type);
 
   int getObjectType(){

@@ -4,13 +4,14 @@
 #include "WTCamera.hpp"
 #include "WTSurfaceShader.hpp"
 
-WTPortal::WTPortal(float Width,
+WTPortal::WTPortal(WT* wt_,
+                   float Width,
                    float Height,
                    WTCamera* pCam,
                    int mappingOption,
                    bool doubleSided,
                    bool renderOnlyChildren) :
-  WTGroup() {
+  WTGroup(wt_) {
 }
 
 void WTPortal::setMappingOption(int mappingOption,

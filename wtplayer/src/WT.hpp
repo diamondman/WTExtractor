@@ -510,4 +510,6 @@ private:
 
   SDL_Window* window = NULL;
   SDL_Surface* sdlsurf = NULL;
+
+  WTStage* stage = NULL;
 };

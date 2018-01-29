@@ -1,10 +1,13 @@
 #pragma once
 
+#include "WT.hpp"
+
 class WTVisualizer {
 
 public:
-  WTVisualizer(char* Visualizer_Type,
-               char* Get_Audio_From,
+  WTVisualizer(WT* wt_,
+               const char* Visualizer_Type,
+               const char* Get_Audio_From,
                int Number_Of_Data_Bins);
 
   float getBinData(int Bin_Number);
@@ -37,4 +40,7 @@ public:
                        int ul1 = 0,
                        int ul2 = 0,
                        int ul3 = 0);
+
+protected:
+  WT* wt;
 };
