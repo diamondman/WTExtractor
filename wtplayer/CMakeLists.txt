@@ -34,7 +34,7 @@ include_directories(${WLD3_SOURCE_DIR})
 
 add_library( wtapi SHARED
   src/basetypes.cpp
-  src/InternalCallbackWrapper.hpp
+  src/InternalCallbackWrapper.cpp
   src/InternalOnLoadCallbackWrapper.hpp
   src/IUnknown.cpp
 

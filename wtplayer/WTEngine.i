@@ -75,14 +75,16 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %feature("director") InternalCallbackWrapper;
 %feature("director") InternalOnLoadCallbackWrapper;
 
-%include "InternalCallbackWrapper.hpp"
-%include "InternalOnLoadCallbackWrapper.hpp"
-
 %ignore IUnknown::AddRef;
 %ignore IUnknown::Release;
+%ignore IUnknown::GetRefCount;
 %feature("ref")   IUnknown "$this->AddRef();"
 %feature("unref") IUnknown "$this->Release();"
 %include "IUnknown.hpp"
+
+%newobject InternalCallbackWrapper;
+%include "InternalCallbackWrapper.hpp"
+%include "InternalOnLoadCallbackWrapper.hpp"
 
 %ignore WTObject::WTObject;
 %include "WTObject.hpp"

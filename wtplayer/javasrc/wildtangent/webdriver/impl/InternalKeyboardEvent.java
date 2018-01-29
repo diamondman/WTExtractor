@@ -6,6 +6,7 @@ public class InternalKeyboardEvent extends wildtangent.webdriver.jni.InternalCal
 
     public InternalKeyboardEvent(wildtangent.webdriver.WTEventCallback callback) {
         super();
+        System.out.println("**************Creating a InternalKeyboardEvent");
         this.callback = callback;
     }
 
@@ -13,5 +14,11 @@ public class InternalKeyboardEvent extends wildtangent.webdriver.jni.InternalCal
         System.out.println("**************InternalKeyboardEvent.run()");
         this.callback.onKeyboardEvent(event);
     }
+
+    protected void finalize() {
+        System.out.println("********* Java Finalizing an InternalKeyboardEvent!!");
+        super.finalize();
+    }
+
 }
 

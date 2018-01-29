@@ -10,6 +10,12 @@ public:
   WTAudioClip3D(char* File_Name,
                 int WTCache_Type);
 
+  int getObjectType(){
+    APILOG;
+    return this->WTGroup::getObjectType() |
+      WTAUDIOCLIP3D;
+  }
+
   void start(int loop = 0,
              int wait = 0);
 

@@ -21,6 +21,12 @@ public:
 
   ~WTBitmap();
 
+  int getObjectType(){
+    APILOG;
+    return this->WTObject::getObjectType() |
+      WTBITMAP;
+  }
+
   void setColorKey(unsigned char Red,
                    unsigned char Green,
                    unsigned char Blue);

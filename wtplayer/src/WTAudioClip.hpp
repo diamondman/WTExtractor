@@ -8,6 +8,12 @@ public:
   WTAudioClip(char* File_Name,
               int WTCache_Type);
 
+  int getObjectType(){
+    APILOG;
+    return this->WTObject::getObjectType() |
+      WTAUDIOCLIP;
+  }
+
   void start(int Play_Sound_Forever = 0,
              int Wait_Until_Loaded = 0);
 

@@ -7,6 +7,13 @@ class WTLight : public WTContainer {
 public:
   WTLight(int Type);
 
+  int getObjectType(){
+    APILOG;
+    return WTContainer::getObjectType() |
+      WT_3D |
+      WTLIGHT;
+  }
+
   void setColor(int Red,
                 int Green,
                 int Blue);

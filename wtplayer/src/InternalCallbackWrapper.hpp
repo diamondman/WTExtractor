@@ -1,18 +1,22 @@
 #pragma once
 
 #include <iostream>
+#include "IUnknown.hpp"
 
 class WTEvent;
 
-class InternalCallbackWrapper {
+class InternalCallbackWrapper : public IUnknown {
 
 public:
-  virtual ~InternalCallbackWrapper() {
-    std::cout << "****InternalCallbackWrapper::~InternalCallbackWrapper()" << std::endl;
-  }
+  InternalCallbackWrapper();
 
-  virtual void run(WTEvent *event) {
-    std::cout << "****InternalCallbackWrapper::run()" << std::endl;
-  }
+  virtual ~InternalCallbackWrapper();
 
+  virtual void run(WTEvent *event);
+
+  virtual unsigned long AddRef();
+  virtual unsigned long Release();
+
+  static int nextnum;
+  int num;
 };

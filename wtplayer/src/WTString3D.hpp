@@ -10,6 +10,12 @@ class WTString3D : public WTGroup {
 public:
   WTString3D();
 
+  int getObjectType(){
+    APILOG;
+    return this->WTGroup::getObjectType() |
+      WTSTRING3D;
+  }
+
   void setText(char* text);
 
   void setTextProperties(int drawTextInBold,

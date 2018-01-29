@@ -9,6 +9,12 @@ public:
            int Width,
            int Height);
 
+  int getObjectType(){
+    APILOG;
+    return this->WTGroup::getObjectType() |
+      WTSHADOW;
+  }
+
   int getType();
 
   void setEnable(bool enabled);

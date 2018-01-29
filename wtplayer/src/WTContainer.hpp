@@ -2,6 +2,8 @@
 
 #include "WTObject.hpp"
 
+#include "constants.hpp"
+
 class WTVector3D;
 class WTOrientation3D;
 class WTCollisionInfo;
@@ -11,6 +13,12 @@ class WTContainer : public WTObject {
 
 public:
   WTContainer();
+
+  int getObjectType(){
+    APILOG;
+    return WTObject::getObjectType() |
+      WTCONTAINER;
+  }
 
   void setPosition(float x,
                    float y,

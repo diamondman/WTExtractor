@@ -16,6 +16,12 @@ public:
 
   ~WTFile();
 
+  int getObjectType(){
+    APILOG;
+    return this->WTObject::getObjectType() |
+      WTFILE;
+  }
+
   VARIANT readAll();
 
   unsigned char readByte();

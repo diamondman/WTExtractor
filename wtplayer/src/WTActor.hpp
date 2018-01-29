@@ -11,6 +11,12 @@ public:
   WTActor(char* File_Name,
           int WTCache_Type);
 
+  int getObjectType(){
+    APILOG;
+    return this->WTGroup::getObjectType() |
+      WTACTOR;
+  }
+
   int getMaterialCount();
 
   char* getMaterialName(int Material_Number);

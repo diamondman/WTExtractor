@@ -17,12 +17,10 @@ public class WTEvent extends wildtangent.webdriver.jni.WTEvent
 
     public WTEvent(long cPtr, boolean cMemoryOwn) {
         this.event = new WTEventSub(cPtr, cMemoryOwn);
-        System.out.printf("=============GetInverval!!! : %d\n", this.event.getInterval());
     }
 
     public WTEvent(wildtangent.webdriver.jni.WTEvent event) {
         this.event = event;
-        System.out.printf("=============GetInverval!!! : %d\n", this.event.getInterval());
     }
 
 

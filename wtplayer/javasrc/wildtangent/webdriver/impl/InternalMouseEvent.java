@@ -6,6 +6,7 @@ public class InternalMouseEvent extends wildtangent.webdriver.jni.InternalCallba
 
     public InternalMouseEvent(wildtangent.webdriver.WTEventCallback callback) {
         super();
+        System.out.println("**************Creating a InternalMouseEvent");
         this.callback = callback;
     }
 
@@ -13,5 +14,11 @@ public class InternalMouseEvent extends wildtangent.webdriver.jni.InternalCallba
         System.out.println("**************InternalMouseEvent.run()");
         this.callback.onMouseEvent(event);
     }
+
+    protected void finalize() {
+        System.out.println("********* Java Finalizing an InternalMouseEvent!!");
+        super.finalize();
+    }
+
 }
 

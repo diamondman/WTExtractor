@@ -7,11 +7,6 @@ WTObject::WTObject() :
   IUnknown() {
 }
 
-int WTObject::getObjectType(){
-  APILOG;
-  return 14;
-}
-
 //[id(0x000003ea), hidden]
 WTObject* WTObject::duplicate(){
   APILOG;

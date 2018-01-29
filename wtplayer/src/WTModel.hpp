@@ -15,6 +15,12 @@ public:
   WTModel(char* File_Name,
           int WTCache_Type);
 
+  int getObjectType(){
+    APILOG;
+    return this->WTObject::getObjectType() |
+      WTMODEL;
+  }
+
   void setColor(int Red,
                 int Green,
                 int Blue,

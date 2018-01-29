@@ -12,6 +12,13 @@ class WTCamera : public WTContainer {
 public:
   WTCamera();
 
+  int getObjectType(){
+    APILOG;
+    return WTContainer::getObjectType() |
+      WT_3D |
+      WTCAMERA;
+  }
+
   //[id(0x00001771), hidden]
   void setZoom(int Zoom_Factor);
 

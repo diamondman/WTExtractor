@@ -3,6 +3,8 @@
 #include "basetypes.hpp"
 #include "IUnknown.hpp"
 
+#include "constants.hpp"
+
 #include <string>
 
 class InternalOnLoadCallbackWrapper;
@@ -14,7 +16,10 @@ class WTObject : public IUnknown {
 public:
   WTObject();
 
-  virtual int getObjectType();
+  virtual int getObjectType(){
+    APILOG;
+    return WTOBJECT;
+  }
 
   //[id(0x000003ea), hidden]
   WTObject* duplicate();

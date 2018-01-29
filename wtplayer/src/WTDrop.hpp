@@ -12,6 +12,13 @@ public:
   WTDrop(WTBitmap* Bitmap_To_Use_As_Drop,
          int Z_Order);
 
+  int getObjectType(){
+    APILOG;
+    return this->WTObject::getObjectType() |
+      WT_2D |
+      WTDROP;
+  }
+
   int getWidth();
 
   int getHeight();

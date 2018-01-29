@@ -6,6 +6,7 @@ public class InternalLoadEvent extends wildtangent.webdriver.jni.InternalOnLoadC
 
     public InternalLoadEvent(wildtangent.webdriver.WTOnLoadEvent callback) {
         super();
+        System.out.println("**************Creating a InternalLoadEvent");
         this.callback = callback;
     }
 

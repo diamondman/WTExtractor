@@ -14,7 +14,7 @@ int WTEvent::getTime(){
   using namespace std::chrono;
   int ms = (int)(duration_cast< milliseconds >
                  (system_clock::now().time_since_epoch()).count());
-  std::cout << "  Ret " << ms << " ms;" << std::endl;
+  std::cout << "  Ret " << std::dec << ms << " ms;" << std::endl;
   return ms;
 }
 

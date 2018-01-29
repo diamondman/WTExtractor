@@ -42,32 +42,39 @@ public class WT extends wildtangent.webdriver.jni.WT
     }
 
 
-    private InternalKeyboardEvent keyboardEvent;
+    /*private InternalKeyboardEvent keyboardEvent;
     private InternalRenderEvent renderEvent;
     private InternalMouseEvent mouseEvent;
-    private InternalExceptionEvent exceptionEvent;
+    private InternalExceptionEvent exceptionEvent;*/
 
     public void setOnKeyboardEvent(wildtangent.webdriver.WTEventCallback callback){
         System.out.println("calling JAVA WTAPI {void WT.setOnKeyboardEvent(WTEventCallback)}");
-        keyboardEvent = new InternalKeyboardEvent(callback);
+        InternalKeyboardEvent keyboardEvent = new InternalKeyboardEvent(callback);
+        //keyboardEvent = new InternalKeyboardEvent(callback);
         this.setOnKeyboardEvent(keyboardEvent);
     };
 
     public void setOnRenderEvent(wildtangent.webdriver.WTEventCallback callback){
         System.out.println("calling JAVA WTAPI {void WT.setOnRenderEvent(WTEventCallback)}");
-        renderEvent = new InternalRenderEvent(callback);
+        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+            System.out.println("    " + ste);
+        }
+        InternalRenderEvent renderEvent = new InternalRenderEvent(callback);
+        //renderEvent = new InternalRenderEvent(callback);
         this.setOnRenderEvent(renderEvent);
     };
 
     public void setOnMouseEvent(wildtangent.webdriver.WTEventCallback callback){
         System.out.println("calling JAVA WTAPI {void WT.setOnMouseEvent(WTEventCallback)}");
-        mouseEvent = new InternalMouseEvent(callback);
+        InternalMouseEvent mouseEvent = new InternalMouseEvent(callback);
+        //mouseEvent = new InternalMouseEvent(callback);
         this.setOnMouseEvent(mouseEvent);
     };
 
     public void setOnExceptionEvent(wildtangent.webdriver.WTEventCallback callback){
         System.out.println("calling JAVA WTAPI {void WT.setOnExceptionEvent(WTEventCallback)}");
-        exceptionEvent = new InternalExceptionEvent(callback);
+        InternalExceptionEvent exceptionEvent = new InternalExceptionEvent(callback);
+        //exceptionEvent = new InternalExceptionEvent(callback);
         this.setOnExceptionEvent(exceptionEvent);
     };
 

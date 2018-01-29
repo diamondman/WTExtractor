@@ -16,6 +16,12 @@ public:
            bool doubleSided,
            bool renderOnlyChildren);
 
+  int getObjectType(){
+    APILOG;
+    return this->WTGroup::getObjectType() |
+      WTPORTAL;
+  }
+
   void setMappingOption(int mappingOption,
                         float zScale = 100);
 

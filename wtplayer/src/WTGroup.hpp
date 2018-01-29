@@ -9,6 +9,13 @@ class WTGroup : public WTContainer {
 public:
   WTGroup();
 
+  virtual int getObjectType(){
+    APILOG;
+    return this->WTContainer::getObjectType() |
+      WT_3D |
+      WTGROUP;
+  }
+
   WTGroup(char* File_Name,
           int WTCache_Type,
           int Load_Order_Offset);

@@ -10,6 +10,12 @@ class WTStage : public WTObject {
 public:
   WTStage();
 
+  int getObjectType(){
+    APILOG;
+    return this->WTObject::getObjectType() |
+      WTSTAGE;
+  }
+
   void addObject(WTContainer* Object_To_Add);
 
   void removeObject(WTContainer* Object_To_Remove);

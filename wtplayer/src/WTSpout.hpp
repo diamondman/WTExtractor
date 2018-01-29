@@ -10,6 +10,12 @@ class WTSpout : public WTGroup {
 public:
   WTSpout();
 
+  int getObjectType(){
+    APILOG;
+    return this->WTGroup::getObjectType() |
+      WTSPOUT;
+  }
+
   void setTexture(WTBitmap* pBitmap);
 
   void setSurfaceShader(WTSurfaceShader* pISurfaceShader);
