@@ -10,6 +10,8 @@ class WTSpout : public WTGroup {
 public:
   WTSpout(WT* wt_);
 
+  ~WTSpout();
+
   int getObjectType(){
     APILOG;
     return this->WTGroup::getObjectType() |
@@ -48,4 +50,8 @@ public:
                            float maxValue);
 
   void setMode(int mode);
+
+private:
+  WTBitmap* texture = NULL;
+  WTSurfaceShader* shader = NULL;
 };

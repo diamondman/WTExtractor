@@ -7,7 +7,7 @@ public interface WTDrop
 extends WTObject {
     public WTDrop getDrop(int var1);
 
-    public void stubFunction(int var1);
+    //public void stubFunction(int var1);
 
     public int getX();
 

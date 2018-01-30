@@ -8,6 +8,12 @@ WTAudioClip3D::WTAudioClip3D(WT* wt_,
   WTGroup(wt_) {
 }
 
+WTAudioClip3D::~WTAudioClip3D() {
+  if(this->camera)
+    this->camera->Release();
+  this->camera = NULL;
+}
+
 void WTAudioClip3D::start(int loop,
                           int wait){
   APILOG;
@@ -79,13 +85,21 @@ int WTAudioClip3D::getPlaybackPosition(){
 
 WTCamera* WTAudioClip3D::getCamera(){
   APILOG;
-  return 0;
+  return this->camera;
 }
 
 void WTAudioClip3D::setCamera(WTCamera* camera){
   APILOG;
+  if(this->camera)
+    this->camera->Release();
+  this->camera = camera;
+  this->camera->AddRef();
 }
 
 void WTAudioClip3D::removeCamera(){
   APILOG;
+  if(this->camera) {
+    this->camera->Release();
+    this->camera = NULL;
+  }
 }

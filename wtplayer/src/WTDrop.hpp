@@ -2,16 +2,17 @@
 
 #include "WTObject.hpp"
 
+#include <vector>
+
 class WTBitmap;
 
 class WTDrop : public WTObject {
 
 public:
-  WTDrop(WT* wt_);
-
   WTDrop(WT* wt_,
-         WTBitmap* Bitmap_To_Use_As_Drop,
-         int Z_Order);
+         WTBitmap* Bitmap_To_Use_As_Drop);
+
+  virtual ~WTDrop();
 
   int getObjectType(){
     APILOG;
@@ -20,13 +21,25 @@ public:
       WTDROP;
   }
 
-  int getWidth();
+  int getWidth(){
+    APILOG;
+    return this->width;
+  }
 
-  int getHeight();
+  int getHeight(){
+    APILOG;
+    return this->height;
+  }
 
-  int getX();
+  int getX(){
+    APILOG;
+    return this->pos_x;
+  }
 
-  int getY();
+  int getY(){
+    APILOG;
+    return this->pos_y;
+  }
 
   int getBitmapWidth();
 
@@ -37,7 +50,10 @@ public:
 
   void removeDrop(WTDrop* Drop_To_Remove);
 
-  int getDropCount();
+  int getDropCount(){
+    APILOG;
+    return this->drops.size();
+  }
 
   WTDrop* getDrop(int Drop_Number);
 
@@ -46,9 +62,6 @@ public:
 
   void setPosition(int x,
                    int y);
-
-  //[id(0x00001f4d), hidden]
-  void stubFunction(int Angle);
 
   void bringToFront();
 
@@ -60,18 +73,45 @@ public:
 
   void detach();
 
-  WTBitmap* getBitmap();
+  WTBitmap* getBitmap(){
+    APILOG;
+    return this->bitmap;
+  }
 
-  void setVisible(bool Make_It_Visible);
+  void setVisible(bool b){
+    APILOG;
+    this->visible = b;
+  }
 
   void make3d(bool Make_It_ThreeD = true);
 
-  void setFiltering(bool Make_It_Filter = true);
+  void setFiltering(bool b = true){
+    APILOG;
+    this->filter = b;
+  }
 
   void setTextureRect(float u0,
                       float v0,
                       float U1,
                       float V1);
 
-  void setOpacity(int Opacity);
+  void setOpacity(int Opacity){
+    APILOG;
+    this->opacity = Opacity;
+  }
+
+private:
+  WTBitmap* bitmap = NULL;
+  std::vector<WTDrop*> drops;
+
+  unsigned int pos_x = 0;
+  unsigned int pos_y = 0;
+
+  unsigned int width = 0;
+  unsigned int height = 0;
+
+  uint8_t opacity = 0xFF;
+
+  bool visible = true;
+  bool filter = false;
 };

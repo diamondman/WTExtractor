@@ -10,11 +10,11 @@ class WTFile : public WTObject {
 
 public:
   WTFile(WT* wt,
-         char* File_Name,
+         const char* File_Name,
          int WTCache_Type,
          int endian);
 
-  ~WTFile();
+  virtual ~WTFile();
 
   int getObjectType(){
     APILOG;
@@ -34,7 +34,7 @@ public:
 
   double readDouble();
 
-  char* readLine();
+  const char* readLine();
 
   //[id(0x00002b00), hidden]
   void close();
@@ -56,7 +56,7 @@ public:
 
   int setEndian(int endian);
 
-  char* readString(int length = -1);
+  const char* readString(int length = -1);
 
 private:
   WLD3* wld3;

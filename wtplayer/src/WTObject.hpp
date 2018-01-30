@@ -21,12 +21,12 @@ public:
     return WTOBJECT;
   }
 
-  //[id(0x000003ea), hidden]
-  WTObject* duplicate();
+  WT* getCreator(){
+    APILOG;
+    return this->wt;
+  }
 
-  WT* getCreator();
-
-  WTObject* getOwner();
+  virtual WTObject* getOwner();
 
   const char* getName(){
     APILOG;

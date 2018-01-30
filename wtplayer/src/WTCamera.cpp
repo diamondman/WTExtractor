@@ -9,6 +9,22 @@ WTCamera::WTCamera(WT* wt_) :
   WTContainer(wt_) {
 }
 
+WTCamera::WTCamera(WT* wt_,
+                   WTBitmap* bitmap) :
+  WTContainer(wt_), render_bitmap(bitmap) {
+  this->render_bitmap->AddRef();
+}
+
+WTCamera::~WTCamera() {
+  if(this->render_bitmap) {
+    this->render_bitmap->Release();
+    this->render_bitmap = NULL;
+  }
+
+  for(auto o : this->drops)
+    o->Release();
+}
+
 void WTCamera::setZoom(int Zoom_Factor){
   APILOG;
 }
@@ -23,21 +39,30 @@ void WTCamera::setViewRect(int x,
 WTDrop* WTCamera::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
                           bool Put_Drop_In_Front){
   APILOG;
-  return new WTDrop(this->wt);
+  WTDrop* drop = new WTDrop(this->wt,
+                            Bitmap_To_Use_As_Drop);
+  drop->AddRef();
+  this->drops.push_back(drop);
+  return drop;
 }
 
-void WTCamera::removeDrop(WTDrop* Drop_To_Remove){
+void WTCamera::removeDrop(WTDrop* o){
   APILOG;
+  for(int i = 0; i < this->drops.size(); i++) {
+    if(this->drops[i] == o){
+      o->Release();
+      this->drops.erase(this->drops.begin() + i);
+      return;
+    }
+  }
+  std::cout << "ERROR! Tried to remove an drop that was not here! Prob our fault!\n";
 }
 
 WTDrop* WTCamera::getDrop(int Drop_Number){
   APILOG;
-  return 0;
-}
-
-int WTCamera::getDropCount(bool Count_Front_Drops){
-  APILOG;
-  return 0;
+  if(Drop_Number >= this->drops.size())
+    return NULL;
+  return this->drops[Drop_Number];
 }
 
 void WTCamera::setViewHWND(int hWnd){
@@ -85,24 +110,5 @@ WTCollisionInfo* WTCamera::pick(int x,
 
 WTBitmap* WTCamera::getRenderBitmap(){
   APILOG;
-  return 0;
-}
-
-void WTCamera::setRenderPriority(int Priority){
-  APILOG;
-}
-
-int WTCamera::getRenderPriority(){
-  APILOG;
-  return 0;
-}
-
-void WTCamera::setBitmapClearColor(int iRed,
-                                   int iGreen,
-                                   int iBlue){
-  APILOG;
-}
-
-void WTCamera::setUpdateFrequency(int iFrequency){
-  APILOG;
+  return this->render_bitmap;
 }

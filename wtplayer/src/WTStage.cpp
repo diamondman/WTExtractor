@@ -1,5 +1,6 @@
 #include "basetypes.hpp"
 #include "WTStage.hpp"
+#include "WTBitmap.hpp"
 #include "WTCamera.hpp"
 #include "WTContainer.hpp"
 
@@ -46,17 +47,14 @@ WTObject* WTStage::getObjectByName(char* Name_Of_Object,
 
   for(int i = 0; i < this->objects.size(); i++) {
     if(strcmp(this->objects[i]->getName(), Name_Of_Object) == 0){
-      return this->objects[i];
+      if(Nth == 0)
+        return this->objects[i];
+      Nth--;
     }
   }
 
   std::cout << "Error? getObjectByName returning null" << std::endl;
   return NULL;
-}
-
-int WTStage::getChildCount(){
-  APILOG;
-  return this->objects.size();
 }
 
 WTObject* WTStage::getChildByIndex(int Child_Number){
@@ -74,18 +72,14 @@ WTCamera* WTStage::createCamera(){
   return camera;
 }
 
-WTCamera* WTStage::createBitmapCamera(int iWidth,
-                                      int iHeight){
+WTCamera* WTStage::createBitmapCamera(int width,
+                                      int height){
   APILOG;
-  WTCamera* camera = new WTCamera(this->wt);
+  WTBitmap* bitmap = new WTBitmap(this->wt, width, height);
+  WTCamera* camera = new WTCamera(this->wt, bitmap);
   camera->AddRef();
   this->bitmapCameras.push_back(camera);
   return camera;
-}
-
-bool WTStage::getFogEnabled(){
-  APILOG;
-  return this->fog_enabled;
 }
 
 void WTStage::setFogEnabled(bool Turn_On_Fog){
@@ -93,29 +87,14 @@ void WTStage::setFogEnabled(bool Turn_On_Fog){
   this->fog_enabled = Turn_On_Fog;
 }
 
-float WTStage::getFogStartDistance(){
-  APILOG;
-  return this->fog_start_distance;
-}
-
 void WTStage::setFogStartDistance(float Distance){
   APILOG;
   this->fog_start_distance = Distance;
 }
 
-float WTStage::getFogEndDistance(){
-  APILOG;
-  return this->fog_end_distance;
-}
-
 void WTStage::setFogEndDistance(float Distance){
   APILOG;
   this->fog_end_distance = Distance;
-}
-
-float WTStage::getFogDensity(){
-  APILOG;
-  return this->fog_density;
 }
 
 void WTStage::setFogDensity(float Density){

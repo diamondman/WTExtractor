@@ -8,17 +8,6 @@ WTObject::WTObject(WT* wt_) :
   wt(wt_){
 }
 
-//[id(0x000003ea), hidden]
-WTObject* WTObject::duplicate(){
-  APILOG;
-  return 0;
-}
-
-WT* WTObject::getCreator(){
-  APILOG;
-  return 0;
-}
-
 WTObject* WTObject::getOwner(){
   APILOG;
   return 0;

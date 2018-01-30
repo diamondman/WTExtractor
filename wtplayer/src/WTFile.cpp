@@ -6,7 +6,7 @@
 #include <string>
 
 WTFile::WTFile(WT* wt_,
-               char* File_Name,
+               const char* File_Name,
                int WTCache_Type,
                int endian) :
   WTObject(wt_), wld3(0), cacheType(WTCache_Type), endian(endian) {
@@ -72,7 +72,7 @@ double WTFile::readDouble(){
   return 0;
 }
 
-char* WTFile::readLine(){
+const char* WTFile::readLine(){
   APILOG;
   return 0;
 }
@@ -144,7 +144,7 @@ int WTFile::setEndian(int endian){
   return prev;
 }
 
-char* WTFile::readString(int length){
+const char* WTFile::readString(int length){
   APILOG;
   return (char*)"";
 }

@@ -17,6 +17,8 @@ public:
            bool doubleSided,
            bool renderOnlyChildren);
 
+  virtual ~WTPortal();
+
   int getObjectType(){
     APILOG;
     return this->WTGroup::getObjectType() |
@@ -40,8 +42,15 @@ public:
 
   void setRenderOnlyChildren(bool renderOnlyChildren);
 
-  WTCamera* getCamera();
+  WTCamera* getCamera() {
+    return this->camera;
+  }
 
   void setSurfaceShader(WTSurfaceShader* pShader,
                         int newAlpha = 255);
+
+private:
+  WTCamera* camera = NULL;
+  WTBitmap* texture = NULL;
+  WTSurfaceShader* shader = NULL;
 };

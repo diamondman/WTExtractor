@@ -87,17 +87,23 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %include "InternalOnLoadCallbackWrapper.hpp"
 
 %ignore WTObject::WTObject;
+%newobject WTObject::getOwner;
 %include "WTObject.hpp"
 
+%newobject WTContainer::getLookAt;
+%newobject WTContainer::getAttached;
 %ignore WTContainer::WTContainer;
 %include "WTContainer.hpp"
 
+%newobject WTGroup::getObjectByName;
+%newobject WTGroup::getChildByIndex;
 %ignore WTGroup::WTGroup;
 %include "WTGroup.hpp"
 
 %ignore WTActor::WTActor;
 %include "WTActor.hpp"
 
+%newobject WTAudioClip3D::getCamera;
 %ignore WTAudioClip3D::WTAudioClip3D;
 %include "WTAudioClip3D.hpp"
 
@@ -107,16 +113,25 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %ignore WTBitmap::WTBitmap;
 %include "WTBitmap.hpp"
 
+%newobject WTCamera::addDrop;
+%newobject WTCamera::getDrop;
+%newobject WTCamera::getRenderBitmap;
 %ignore WTCamera::WTCamera;
 %include "WTCamera.hpp"
 
 %ignore WTCollisionInfo::WTCollisionInfo;
 %include "WTCollisionInfo.hpp"
 
+%newobject WTDrop::addDrop;
+%newobject WTDrop::getDrop;
+%newobject WTDrop::getBitmap;
 %ignore WTDrop::WTDrop;
 %include "WTDrop.hpp"
 
 //The WTEvent constructor is necessary, for now at least.
+%newobject WTEvent::getStage;
+%newobject WTEvent::getCamera;
+%newobject WTEvent::getObject;
 %include "WTEvent.hpp"
 
 %ignore WTFile::WTFile;
@@ -174,6 +189,7 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %ignore WTOrientation3D::WTOrientation3D;
 %include "WTOrientation3D.hpp"
 
+%newobject WTPortal::getCamera;
 %ignore WTPortal::WTPortal;
 %include "WTPortal.hpp"
 

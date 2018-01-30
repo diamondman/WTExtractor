@@ -11,6 +11,8 @@ public:
                 char* File_Name,
                 int WTCache_Type);
 
+  virtual ~WTAudioClip3D();
+
   int getObjectType(){
     APILOG;
     return this->WTGroup::getObjectType() |
@@ -53,4 +55,7 @@ public:
   void setCamera(WTCamera* camera = 0);
 
   void removeCamera();
+
+private:
+  WTCamera* camera = NULL;
 };

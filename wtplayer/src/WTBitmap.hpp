@@ -19,12 +19,17 @@ public:
            char* File_Name,
            int WTCache_Type);
 
-  ~WTBitmap();
+  virtual ~WTBitmap();
 
   int getObjectType(){
     APILOG;
     return this->WTObject::getObjectType() |
       WTBITMAP;
+  }
+
+  virtual WTObject* getOwner(){
+    APILOG;
+    return NULL;
   }
 
   void setColorKey(unsigned char Red,

@@ -2,6 +2,8 @@
 
 #include "WTContainer.hpp"
 
+#include <vector>
+
 class WTBitmap;
 class WTDrop;
 class WTVector3D;
@@ -11,6 +13,11 @@ class WTCamera : public WTContainer {
 
 public:
   WTCamera(WT* wt_);
+
+  WTCamera(WT* wt_,
+           WTBitmap* bitmap);
+
+  virtual ~WTCamera();
 
   int getObjectType(){
     APILOG;
@@ -34,7 +41,10 @@ public:
 
   WTDrop* getDrop(int Drop_Number);
 
-  int getDropCount(bool Count_Front_Drops = false);
+  int getDropCount(bool Count_Front_Drops = false){
+    APILOG;
+    return this->drops.size();
+  }
 
   void setViewHWND(int hWnd);
 
@@ -60,13 +70,36 @@ public:
 
   WTBitmap* getRenderBitmap();
 
-  void setRenderPriority(int Priority);
+  void setRenderPriority(int Priority) {
+    APILOG;
+    this->render_priority = Priority;
+  }
 
-  int getRenderPriority();
+  int getRenderPriority() {
+    APILOG;
+    return render_priority;
+  }
 
-  void setBitmapClearColor(int iRed,
-                           int iGreen,
-                           int iBlue);
+  void setBitmapClearColor(int Red,
+                           int Green,
+                           int Blue) {
+    APILOG;
+    this->bitmap_clear_color =
+      (((uint8_t)Red)   << 16) |
+      (((uint8_t)Green) << 8 ) |
+      ((uint8_t)Blue);
+  }
 
-  void setUpdateFrequency(int iFrequency);
+  void setUpdateFrequency(int Frequency) {
+    APILOG;
+    this->update_frequency = Frequency;
+  }
+
+private:
+  std::vector<WTDrop*> drops;
+  WTBitmap* render_bitmap = NULL;
+
+  int render_priority = 0;
+  uint32_t bitmap_clear_color = 0;
+  int update_frequency = 0;
 };

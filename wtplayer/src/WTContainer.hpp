@@ -14,6 +14,8 @@ class WTContainer : public WTObject {
 public:
   WTContainer(WT* wt_);
 
+  virtual ~WTContainer();
+
   int getObjectType(){
     APILOG;
     return WTObject::getObjectType() |
@@ -45,14 +47,14 @@ public:
 
   WTVector3D* getOrientationVector();
 
-  WTVector3D* getOrientationUp();
-
   void setOrientationVector(float X_Forward,
                             float Y_Forward,
                             float Z_Forward,
                             float X_Up,
                             float Y_Up,
                             float Z_Up);
+
+  WTVector3D* getOrientationUp();
 
   void setConstantRotation(float x,
                            float y,
@@ -155,9 +157,15 @@ public:
                        int Reserved = 0);
 
   void setCollisionMask(int Mask,
-                        int Reserved = 0);
+                        int Reserved = 0){
+    APILOG;
+    this->collision_mask = Mask;
+  }
 
-  int getCollisionMask();
+  int getCollisionMask(){
+    APILOG;
+    return this->collision_mask;
+  }
 
   void makeCollisionBox(int Box_Type = 3,
                         int Box_Flags = 0,
@@ -180,10 +188,23 @@ public:
                                  bool With_Children = false);
 
 private:
+  WTObject* attached_object = NULL;
+  WTContainer* container_lookat = NULL;
+
   float pos_x = 0;
   float pos_y = 0;
   float pos_z = 0;
 
+  float scale_x = 0;
+  float scale_y = 0;
+  float scale_z = 0;
+
+  uint8_t opacity = 0xFF;
+
   bool is_highlighted = false;
   bool is_visible = true;
+
+  int collision_mask = 0;
+
+  int pick_priority = 0;
 };

@@ -12,12 +12,17 @@ class WTStage : public WTObject {
 public:
   WTStage(WT* wt_);
 
-  ~WTStage();
+  virtual ~WTStage();
 
   int getObjectType(){
     APILOG;
     return this->WTObject::getObjectType() |
       WTSTAGE;
+  }
+
+  virtual WTObject* getOwner(){
+    APILOG;
+    return NULL;
   }
 
   void addObject(WTContainer* Object_To_Add);
@@ -27,7 +32,10 @@ public:
   WTObject* getObjectByName(char* Name_Of_Object,
                             int Nth = 1);
 
-  int getChildCount();
+  int getChildCount(){
+    APILOG;
+    return this->objects.size();
+  }
 
   WTObject* getChildByIndex(int Child_Number);
 
@@ -36,19 +44,31 @@ public:
   WTCamera* createBitmapCamera(int iWidth,
                                int iHeight);
 
-  bool getFogEnabled();
+  bool getFogEnabled(){
+    APILOG;
+    return this->fog_enabled;
+  }
 
   void setFogEnabled(bool Turn_On_Fog);
 
-  float getFogStartDistance();
+  float getFogStartDistance() {
+    APILOG;
+    return this->fog_start_distance;
+  }
 
   void setFogStartDistance(float Distance);
 
-  float getFogEndDistance();
+  float getFogEndDistance() {
+    APILOG;
+    return this->fog_end_distance;
+  }
 
   void setFogEndDistance(float Distance);
 
-  float getFogDensity();
+  float getFogDensity() {
+    APILOG;
+    return this->fog_density;
+  }
 
   void setFogDensity(float Density);
 

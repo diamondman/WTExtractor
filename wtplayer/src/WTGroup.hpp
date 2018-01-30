@@ -2,6 +2,8 @@
 
 #include "WTContainer.hpp"
 
+#include <vector>
+
 class WTObject;
 
 class WTGroup : public WTContainer {
@@ -10,9 +12,11 @@ public:
   WTGroup(WT* wt_);
 
   WTGroup(WT* wt_,
-          char* File_Name,
+          const char* File_Name,
           int WTCache_Type,
           int Load_Order_Offset);
+
+  virtual ~WTGroup();
 
   virtual int getObjectType(){
     APILOG;
@@ -28,9 +32,15 @@ public:
   WTObject* getObjectByName(char* Name_Of_Object,
                             int Nth = 1);
 
-  int getChildCount();
+  int getChildCount() {
+    APILOG;
+    return this->objects.size();
+  }
 
   WTObject* getChildByIndex(int Child_Number);
 
   bool getLightingStatus();
+
+private:
+  std::vector<WTObject*> objects;
 };

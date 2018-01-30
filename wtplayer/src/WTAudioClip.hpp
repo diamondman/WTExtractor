@@ -15,6 +15,11 @@ public:
       WTAUDIOCLIP;
   }
 
+  virtual WTObject* getOwner(){
+    APILOG;
+    return NULL;
+  }
+
   void start(int Play_Sound_Forever = 0,
              int Wait_Until_Loaded = 0);
 

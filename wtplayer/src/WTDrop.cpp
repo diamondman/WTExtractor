@@ -2,81 +2,74 @@
 #include "WTDrop.hpp"
 #include "WTBitmap.hpp"
 
-WTDrop::WTDrop(WT* wt_) :
-  WTObject(wt_) {
-}
-
 WTDrop::WTDrop(WT* wt_,
-               WTBitmap* Bitmap_To_Use_As_Drop,
-               int Z_Order) :
-  WTObject(wt_) {
+               WTBitmap* bitmap) :
+  WTObject(wt_), bitmap(bitmap) {
+  this->bitmap->AddRef();
 }
 
-int WTDrop::getWidth(){
-  APILOG;
-  return 0;
-}
+WTDrop::~WTDrop() {
+  this->detach();
 
-int WTDrop::getHeight(){
-  APILOG;
-  return 0;
-}
-
-int WTDrop::getX(){
-  APILOG;
-  return 0;
-}
-
-int WTDrop::getY(){
-  APILOG;
-  return 0;
+  for(auto o : this->drops)
+    o->Release();
 }
 
 int WTDrop::getBitmapWidth(){
   APILOG;
+  if(this->bitmap)
+    return this->bitmap->getWidth();
   return 0;
 }
 
 int WTDrop::getBitmapHeight(){
   APILOG;
+  if(this->bitmap)
+    return this->bitmap->getHeight();
   return 0;
 }
 
 WTDrop* WTDrop::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
                         int Z_Order){
   APILOG;
-  return new WTDrop(this->wt,
-                    Bitmap_To_Use_As_Drop,
-                    Z_Order);
+  WTDrop* drop = new WTDrop(this->wt,
+                            Bitmap_To_Use_As_Drop);
+  drop->AddRef();
+  this->drops.push_back(drop);
+  return drop;
 }
 
-void WTDrop::removeDrop(WTDrop* Drop_To_Remove){
+void WTDrop::removeDrop(WTDrop* o){
   APILOG;
-}
-
-int WTDrop::getDropCount(){
-  APILOG;
-  return 0;
+  for(int i = 0; i < this->drops.size(); i++) {
+    if(this->drops[i] == o){
+      o->Release();
+      this->drops.erase(this->drops.begin() + i);
+      return;
+    }
+  }
+  std::cout << "ERROR! Tried to remove an drop that was not here! Prob our fault!\n";
 }
 
 WTDrop* WTDrop::getDrop(int Drop_Number){
   APILOG;
-  return 0;
+  if(Drop_Number >= this->drops.size())
+    return NULL;
+  return this->drops[Drop_Number];
 }
 
 void WTDrop::setSize(int Width,
                      int Height){
   APILOG;
+  this->width = Width;
+  this->height = Height;
 }
 
 void WTDrop::setPosition(int x,
                          int y){
   APILOG;
-}
-
-//[id(0x00001f4d), hidden]
-void WTDrop::stubFunction(int Angle){
-  APILOG;
+  this->pos_x = x;
+  this->pos_y = y;
 }
 
 void WTDrop::bringToFront(){
@@ -91,28 +84,22 @@ void WTDrop::setZOrder(int New_Z_Order){
   APILOG;
 }
 
-void WTDrop::attach(WTBitmap* Bitmap_To_Attach){
+void WTDrop::attach(WTBitmap* bitmap){
   APILOG;
+  this->detach();
+  this->bitmap = bitmap;
+  this->bitmap->AddRef();
 }
 
 void WTDrop::detach(){
   APILOG;
+  if(this->bitmap) {
+    this->bitmap->Release();
+    this->bitmap = NULL;
+  }
 }
 
-WTBitmap* WTDrop::getBitmap(){
-  APILOG;
-  return 0;
-}
-
-void WTDrop::setVisible(bool Make_It_Visible){
-  APILOG;
-}
-
-void WTDrop::make3d(bool Make_It_ThreeD){
-  APILOG;
-}
-
-void WTDrop::setFiltering(bool Make_It_Filter){
+void WTDrop::make3d(bool b){
   APILOG;
 }
 
@@ -120,9 +107,5 @@ void WTDrop::setTextureRect(float u0,
                             float v0,
                             float U1,
                             float V1){
-  APILOG;
-}
-
-void WTDrop::setOpacity(int Opacity){
   APILOG;
 }

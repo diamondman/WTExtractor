@@ -7,6 +7,11 @@ WTContainer::WTContainer(WT* wt_) :
   WTObject(wt_) {
 }
 
+WTContainer::~WTContainer() {
+  this->detach();
+  this->unsetLookAt();
+}
+
 void WTContainer::setPosition(float x,
                               float y,
                               float Z){
@@ -58,11 +63,6 @@ WTVector3D* WTContainer::getOrientationVector(){
   return new WTVector3D();
 }
 
-WTVector3D* WTContainer::getOrientationUp(){
-  APILOG;
-  return new WTVector3D();
-}
-
 void WTContainer::setOrientationVector(float X_Forward,
                                        float Y_Forward,
                                        float Z_Forward,
@@ -70,6 +70,11 @@ void WTContainer::setOrientationVector(float X_Forward,
                                        float Y_Up,
                                        float Z_Up){
   APILOG;
+}
+
+WTVector3D* WTContainer::getOrientationUp(){
+  APILOG;
+  return new WTVector3D();
 }
 
 void WTContainer::setConstantRotation(float x,
@@ -92,39 +97,57 @@ void WTContainer::setRotation(float x,
   APILOG;
 }
 
-void WTContainer::setLookAt(WTContainer* Container_To_Look_At,
+void WTContainer::setLookAt(WTContainer* container,
                             int Look_Type){
   APILOG;
+  this->unsetLookAt();
+  this->container_lookat = container;
+  this->container_lookat->AddRef();
+
 }
 
 void WTContainer::unsetLookAt(){
   APILOG;
+  if(this->container_lookat) {
+    this->container_lookat->Release();
+    this->container_lookat = NULL;
+  }
 }
 
 WTContainer* WTContainer::getLookAt(){
   APILOG;
-  return 0;
+  return this->container_lookat;
 }
 
 void WTContainer::attach(WTObject* Object_To_Attach){
   APILOG;
+  this->detach();
+  this->attached_object = Object_To_Attach;
+  this->attached_object->AddRef();
 }
 
-void WTContainer::attachBitmap(WTObject* Bitmap_To_Add,
+void WTContainer::attachBitmap(WTObject* o,
                                float Scale_Width,
                                float Scale_Height,
                                int X_Center,
                                int Y_Center){
   APILOG;
+  this->detach();
+  this->attached_object = o;
+  this->attached_object->AddRef();
 }
 
 void WTContainer::detach(){
   APILOG;
+  if(this->attached_object) {
+    this->attached_object->Release();
+    this->attached_object = NULL;
+  }
 }
 
 WTObject* WTContainer::getAttached(){
   APILOG;
-  return 0;
+  return this->attached_object;
 }
 
 void WTContainer::setBitmapSize(float Scale_Width,
@@ -134,12 +157,16 @@ void WTContainer::setBitmapSize(float Scale_Width,
 
 void WTContainer::setBitmapOpacity(int Opacity){
   APILOG;
+  this->opacity = Opacity;
 }
 
 void WTContainer::setScale(float x,
                            float y,
                            float Z){
   APILOG;
+  this->scale_x = x;
+  this->scale_y = y;
+  this->scale_z = Z;
 }
 
 void WTContainer::setAbsoluteScale(float x,
@@ -154,11 +181,12 @@ void WTContainer::setScaleTare(){
 
 void WTContainer::setPickPriority(int Pick_Priority){
   APILOG;
+  this->pick_priority = Pick_Priority;
 }
 
 int WTContainer::getPickPriority(){
   APILOG;
-  return 0;
+  return this->pick_priority;
 }
 
 void WTContainer::highlight(bool Turn_On_Highlight){
@@ -247,16 +275,6 @@ void WTContainer::setCollisionBox(float X1,
                                   float Z2,
                                   int Reserved){
   APILOG;
-}
-
-void WTContainer::setCollisionMask(int Mask,
-                                   int Reserved){
-  APILOG;
-}
-
-int WTContainer::getCollisionMask(){
-  APILOG;
-  return 0;
 }
 
 void WTContainer::makeCollisionBox(int Box_Type,

@@ -25,7 +25,7 @@ public interface WTObject {
 
     public void setOption(int var1, int var2);
 
-    public WTObject duplicate();
+    //public WTObject duplicate();
 
     public boolean isLoaded();
 

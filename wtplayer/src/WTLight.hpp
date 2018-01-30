@@ -43,12 +43,6 @@ public:
 
   void setUmbra(float Degrees);
 
-  //[id(0x00001b66)]
-  //void zzstub1();
-
-  //[id(0x00001b67)]
-  //void zzstub2();
-
   bool isStatic();
 
   void setLightMask(int LightMask);
