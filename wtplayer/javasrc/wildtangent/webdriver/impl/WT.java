@@ -7,8 +7,8 @@ public class WT extends wildtangent.webdriver.jni.WT
         super(cPtr, cMemoryOwn);
     }
 
-    public WT(String localver_path) {
-        super(localver_path);
+    public WT(String localver_path, int width, int height) {
+        super(localver_path, width, height);
     }
 
 

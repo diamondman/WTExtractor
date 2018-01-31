@@ -30,12 +30,13 @@
 #include <iostream>
 #include <unistd.h>
 #include <stdexcept>
-#include <cairo.h>
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+WT::WT(char* localver_path,
+       int width,
+       int height){
+  this->width = std::max(1, width);
+  this->height = std::max(1, height);
 
-WT::WT(char* localver_path){
   if(localver_path)
     this->working_directory = std::string(localver_path);
   else
@@ -49,16 +50,41 @@ WT::WT(char* localver_path){
   }
 
   this->window = SDL_CreateWindow( "WTPlayer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                   SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+                                   width, height, SDL_WINDOW_SHOWN ); //
   if(this->window == NULL) {
     printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
     throw std::runtime_error("Could not create SDL Window.");
   }
 
   this->sdlsurf = SDL_GetWindowSurface(window);
+
+  this->cairosurf = cairo_image_surface_create_for_data
+    (
+     (unsigned char*)this->sdlsurf->pixels,
+     CAIRO_FORMAT_RGB24,
+     this->sdlsurf->w,
+     this->sdlsurf->h,
+     this->sdlsurf->pitch
+    );
+  if(this->cairosurf == NULL) {
+    printf( "Cairo Surface could not be created!\n" );
+    throw std::runtime_error("Could not create Cairo Surface.");
+  }
+
+  this->cr = cairo_create(this->cairosurf);
+  if(this->cr == NULL) {
+    printf( "Cairo Context could not be created!\n" );
+    throw std::runtime_error("Could not create Cairo Context.");
+  }
 }
 
 WT::~WT(){
+  if(this->cr)
+    cairo_destroy(this->cr);
+
+  if(this->cairosurf)
+    cairo_surface_destroy(this->cairosurf);
+
   if(this->stage)
     this->stage->Release();
 
@@ -379,18 +405,6 @@ void WT::setLeftHanded(bool newVal){
   APILOG;
 }
 
-///Returns the height of the driver window.
-int WT::getHeight(){
-  APILOG;
-  return 0;
-}
-
-///Gets the width of the driver window.
-int WT::getWidth(){
-  APILOG;
-  return 0;
-}
-
 ///Returns system performance information.
 WTSysInfo* WT::getPerformanceInfo(){
   APILOG;
@@ -655,26 +669,6 @@ void WT::thread_bootstrap(void* This){
 void WT::wtMainThreadFunc(){
   SDL_Event e;
 
-  cairo_surface_t *cairosurf = cairo_image_surface_create_for_data
-    (
-     (unsigned char*)sdlsurf->pixels,
-     CAIRO_FORMAT_RGB24,
-     sdlsurf->w,
-     sdlsurf->h,
-     sdlsurf->pitch
-    );
-
-  cairo_t *cr = cairo_create(cairosurf);
-
-  cairo_set_source_rgb(cr, 0, 0xFF, 0);
-  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
-      CAIRO_FONT_WEIGHT_NORMAL);
-  cairo_set_font_size(cr, 40.0);
-
-  cairo_move_to(cr, 10.0, 50.0);
-  cairo_show_text(cr, "WTPlayer");
-
-  SDL_UpdateWindowSurface(this->window);
 
   while(this->wtThreadRun){
     std::cout << std::endl << "HELLO FROM WT THREAD " <<
@@ -692,9 +686,14 @@ void WT::wtMainThreadFunc(){
       event->_Type = 8;
       this->RenderCallback->run(event);
     }
+
+    SDL_FillRect(this->sdlsurf, NULL, 0x000000);
+
+    if(this->stage)
+      this->stage->_render(this->cr);
+
+    SDL_UpdateWindowSurface(this->window);
+
     usleep(0.01 * 1000 * 1000);
   }
-
-  cairo_destroy(cr);
-  cairo_surface_destroy(cairosurf);
 }

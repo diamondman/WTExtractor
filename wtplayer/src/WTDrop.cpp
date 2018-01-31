@@ -15,6 +15,18 @@ WTDrop::~WTDrop() {
     o->Release();
 }
 
+void WTDrop::_render(cairo_t* cr) {
+  cairo_set_source_rgb(cr, 1.0, 0, 0);
+  cairo_set_line_width(cr, 4.0);
+  cairo_rectangle(cr,
+                  this->pos_x, this->pos_y,
+                  this->width, this->height);
+  cairo_stroke(cr);
+
+  for(WTDrop* drop : this->drops)
+    drop->_render(cr);
+}
+
 int WTDrop::getBitmapWidth(){
   APILOG;
   if(this->bitmap)

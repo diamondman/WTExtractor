@@ -3,6 +3,7 @@
 #include "WTBitmap.hpp"
 #include "WTCamera.hpp"
 #include "WTContainer.hpp"
+#include "WT.hpp"
 
 #include <string.h>
 
@@ -19,6 +20,12 @@ WTStage::~WTStage() {
 
   for(auto c : this->bitmapCameras)
     c->Release();
+}
+
+void WTStage::_render(cairo_t *cr){
+  for(WTCamera* camera : this->cameras){
+    camera->_render(cr);
+  }
 }
 
 void WTStage::addObject(WTContainer* o){
@@ -68,6 +75,9 @@ WTCamera* WTStage::createCamera(){
   APILOG;
   WTCamera* camera = new WTCamera(this->wt);
   camera->AddRef();
+  camera->setViewRect(0, 0,
+                      this->wt->getWidth(),
+                      this->wt->getHeight());
   this->cameras.push_back(camera);
   return camera;
 }

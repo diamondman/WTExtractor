@@ -25,6 +25,24 @@ WTCamera::~WTCamera() {
     o->Release();
 }
 
+void WTCamera::_render(cairo_t* cr) {
+  cairo_set_source_rgb(cr, 1.0, 0, 0);
+  cairo_set_line_width(cr, 4.0);
+  cairo_rectangle(cr, this->x, this->y, this->width, this->height);
+  cairo_stroke(cr);
+
+  for(WTDrop* drop : this->drops)
+    drop->_render(cr);
+
+  cairo_set_source_rgb(cr, 0, 1.0, 0);
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+      CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 40.0);
+
+  cairo_move_to(cr, 10.0, 50.0);
+  cairo_show_text(cr, "WTPlayer");
+}
+
 void WTCamera::setZoom(int Zoom_Factor){
   APILOG;
 }
@@ -34,6 +52,10 @@ void WTCamera::setViewRect(int x,
                            int Width,
                            int Height){
   APILOG;
+  this->x = x;
+  this->y = y;
+  this->width = Width;
+  this->height = Height;
 }
 
 WTDrop* WTCamera::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,

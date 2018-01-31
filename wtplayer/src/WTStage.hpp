@@ -3,6 +3,7 @@
 #include "WTObject.hpp"
 
 #include <vector>
+#include <cairo.h>
 
 class WTCamera;
 class WTContainer;
@@ -24,6 +25,8 @@ public:
     APILOG;
     return NULL;
   }
+
+  void _render(cairo_t *cr);
 
   void addObject(WTContainer* Object_To_Add);
 

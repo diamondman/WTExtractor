@@ -35,7 +35,7 @@ public class WTPlayerMain {
             System.out.println("  " + url.getFile());
         }
 
-        WT wt = new wildtangent.webdriver.impl.WT(localver_path);
+        WT wt = new wildtangent.webdriver.impl.WT(localver_path, 800, 600);
 
         try{
             Class<?> gameMainClass = loader.loadClass("dark.Main");

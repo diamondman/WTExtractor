@@ -3,6 +3,7 @@
 #include "WTObject.hpp"
 
 #include <vector>
+#include <cairo.h>
 
 class WTBitmap;
 
@@ -13,6 +14,8 @@ public:
          WTBitmap* Bitmap_To_Use_As_Drop);
 
   virtual ~WTDrop();
+
+  void _render(cairo_t* cr);
 
   int getObjectType(){
     APILOG;

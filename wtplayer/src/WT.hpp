@@ -5,7 +5,9 @@
 
 #include <thread>
 #include <string>
+#include <algorithm>
 #include <SDL.h>
+#include <cairo.h>
 
 class InternalCallbackWrapper;
 
@@ -38,7 +40,9 @@ class WTObject;
 
 class WT {
 public:
-  WT(char* localver_path);
+  WT(char* localver_path,
+     int width,
+     int height);
 
   ~WT();
 
@@ -339,10 +343,16 @@ public:
   void setLeftHanded(bool newVal);
 
   ///Returns the height of the driver window.
-  int getHeight();
+  int getHeight(){
+    APILOG;
+    return this->height;
+  }
 
   ///Gets the width of the driver window.
-  int getWidth();
+  int getWidth() {
+    APILOG;
+    return this->width;
+  }
 
   ///Returns system performance information.
   WTSysInfo* getPerformanceInfo();
@@ -489,6 +499,9 @@ private:
   static void thread_bootstrap(void*);
   void wtMainThreadFunc();
 
+  cairo_surface_t *cairosurf = NULL;
+  cairo_t *cr = NULL;
+
   std::thread wtMainThread;
   bool wtThreadRun = true;
   bool wtThreadActive = false;
@@ -512,4 +525,7 @@ private:
   SDL_Surface* sdlsurf = NULL;
 
   WTStage* stage = NULL;
+
+  int width;
+  int height;
 };

@@ -3,6 +3,7 @@
 #include "WTContainer.hpp"
 
 #include <vector>
+#include <cairo.h>
 
 class WTBitmap;
 class WTDrop;
@@ -18,6 +19,8 @@ public:
            WTBitmap* bitmap);
 
   virtual ~WTCamera();
+
+  void _render(cairo_t* cr);
 
   int getObjectType(){
     APILOG;
@@ -98,6 +101,11 @@ public:
 private:
   std::vector<WTDrop*> drops;
   WTBitmap* render_bitmap = NULL;
+
+  int x = 0;
+  int y = 0;
+  int width = 0;
+  int height = 0;
 
   int render_priority = 0;
   uint32_t bitmap_clear_color = 0;
