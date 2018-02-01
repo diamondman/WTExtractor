@@ -15,7 +15,7 @@ public:
 
   virtual ~WTDrop();
 
-  void _render(cairo_t* cr);
+  void _render(cairo_t* cr, int x, int y);
 
   int getObjectType(){
     APILOG;

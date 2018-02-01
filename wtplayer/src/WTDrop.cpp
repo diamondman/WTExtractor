@@ -2,6 +2,8 @@
 #include "WTDrop.hpp"
 #include "WTBitmap.hpp"
 
+#include <cairo.h>
+
 WTDrop::WTDrop(WT* wt_,
                WTBitmap* bitmap) :
   WTObject(wt_), bitmap(bitmap) {
@@ -15,16 +17,22 @@ WTDrop::~WTDrop() {
     o->Release();
 }
 
-void WTDrop::_render(cairo_t* cr) {
+void WTDrop::_render(cairo_t* cr, int x, int y) {
+  if(this->bitmap) {
+    cairo_set_source_surface(cr, this->bitmap->cairosurf,
+                             x + this->pos_x, y + this->pos_y);
+    cairo_paint(cr);
+  }
+
   cairo_set_source_rgb(cr, 1.0, 0, 0);
-  cairo_set_line_width(cr, 4.0);
+  cairo_set_line_width(cr, 1.0);
   cairo_rectangle(cr,
                   this->pos_x, this->pos_y,
                   this->width, this->height);
   cairo_stroke(cr);
 
   for(WTDrop* drop : this->drops)
-    drop->_render(cr);
+    drop->_render(cr, x + this->pos_x, y + this->pos_y);
 }
 
 int WTDrop::getBitmapWidth(){
@@ -73,6 +81,7 @@ WTDrop* WTDrop::getDrop(int Drop_Number){
 void WTDrop::setSize(int Width,
                      int Height){
   APILOG;
+  std::cout << "  (" << Width << ", " << Height << ")" << std::endl;
   this->width = Width;
   this->height = Height;
 }
@@ -80,6 +89,7 @@ void WTDrop::setSize(int Width,
 void WTDrop::setPosition(int x,
                          int y){
   APILOG;
+  std::cout << "  (" << x << ", " << y << ")" << std::endl;
   this->pos_x = x;
   this->pos_y = y;
 }

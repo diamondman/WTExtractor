@@ -10,6 +10,8 @@ class WT;
 
 class WTBitmap : public WTObject {
 
+  friend class WTDrop;
+
 public:
   WTBitmap(WT* wt_,
            int width,
@@ -159,4 +161,10 @@ private:
   SDL_Surface *sdlsurf;
   cairo_surface_t *cairosurf;
   cairo_t *cr;
+
+  int text_height = 10;
+
+  float text_r = 0;
+  float text_g = 0;
+  float text_b = 0;
 };

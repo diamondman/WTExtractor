@@ -45,6 +45,10 @@ WTBitmap::WTBitmap(WT* wt_,
      this->sdlsurf->pitch);
 
   cr = cairo_create(cairosurf);
+
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, this->text_height);
 }
 
 WTBitmap::~WTBitmap(){
@@ -57,6 +61,10 @@ void WTBitmap::setColorKey(unsigned char Red,
                            unsigned char Green,
                            unsigned char Blue){
   APILOG;
+  std::cout << std::hex <<
+    "  (0x" << (int)Red <<
+    ", 0x" << (int)Green <<
+    ", 0x" << (int)Blue << ")" << std::endl;
 }
 
 void WTBitmap::unsetColorKey(){
@@ -78,7 +86,8 @@ void WTBitmap::drawText(int x,
                         char* Text_To_Draw){
   APILOG;
   std::cout << "  (X: " << x << "; Y: " << y << "; STR: " << Text_To_Draw << ")" << std::endl;
-  cairo_move_to(this->cr, x, y);
+  cairo_move_to(this->cr, x, y + this->text_height);
+  cairo_set_source_rgb(cr, this->text_r, this->text_g, this->text_b);
   cairo_show_text(this->cr, Text_To_Draw);
 }
 
@@ -88,7 +97,10 @@ void WTBitmap::setTextBold(int Draw_Text_In_Bold){
 
 void WTBitmap::setTextHeight(int Text_Height_In_Points){
   APILOG;
-  cairo_set_font_size(this->cr, Text_Height_In_Points);
+  int pixelheight = round(((float)Text_Height_In_Points * 2)/1.5);
+  std::cout << "  (" << Text_Height_In_Points << " [" << pixelheight << "px])" << std::endl;
+  this->text_height = pixelheight;
+  cairo_set_font_size(this->cr, pixelheight);
 }
 
 void WTBitmap::setTextItalic(int Draw_Text_In_Italic){
@@ -112,25 +124,50 @@ void WTBitmap::setTextFamily(int nPitch,
 
 void WTBitmap::setTextFace(char* Font_Name_List){
   APILOG;
+  std::cout << "  (" << Font_Name_List << ")" << std::endl;
 }
 
 void WTBitmap::setTextColor(unsigned char Red,
                             unsigned char Green,
                             unsigned char Blue){
   APILOG;
-  cairo_set_source_rgb(this->cr, Red, Green, Blue);
+  std::cout << std::hex <<
+    "  (0x" << (int)Red <<
+    ", 0x" << (int)Green <<
+    ", 0x" << (int)Blue << ")" << std::endl;
+  this->text_r = ((float)Red)/255;
+  this->text_g = ((float)Green)/255;
+  this->text_b = ((float)Blue)/255;
 }
 
 void WTBitmap::setTextBkColor(unsigned char Red,
                               unsigned char Green,
                               unsigned char Blue){
   APILOG;
+  std::cout << std::hex <<
+    "  (0x" << (int)Red <<
+    ", 0x" << (int)Green <<
+    ", 0x" << (int)Blue << ")" << std::endl;
 }
 
 void WTBitmap::setColor(unsigned char Red,
                         unsigned char Green,
                         unsigned char Blue){
   APILOG;
+  std::cout << std::hex <<
+    "  (0x" << (int)Red <<
+    ", 0x" << (int)Green <<
+    ", 0x" << (int)Blue << ")" << std::endl;
+  //std::cout << std::dec <<
+  //  "  (" << (((float)Red)/255) <<
+  //  ", " << (((float)Green)/255) <<
+  //  ", " << (((float)Blue)/255) << ")" << std::endl;
+  cairo_set_source_rgb(cr, ((float)Red)/255, ((float)Green)/255, ((float)Blue)/255);
+  cairo_new_path (cr);  /* current path is not
+                         consumed by cairo_clip() */
+  cairo_rectangle (cr, 0, 0, this->sdlsurf->w, this->sdlsurf->h);
+  cairo_fill (cr);
+
 }
 
 void WTBitmap::drawLine(int X1,
@@ -144,6 +181,10 @@ void WTBitmap::setDrawColor(unsigned char Red,
                             unsigned char Green,
                             unsigned char Blue){
   APILOG;
+  std::cout << std::hex <<
+    "  (0x" << (int)Red <<
+    ", 0x" << (int)Green <<
+    ", 0x" << (int)Blue << ")" << std::endl;
 }
 
 void WTBitmap::drawPixel(int x,
