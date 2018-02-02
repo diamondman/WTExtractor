@@ -117,6 +117,7 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %newobject WTCamera::getDrop;
 %newobject WTCamera::getRenderBitmap;
 %ignore WTCamera::WTCamera;
+%ignore WTCamera::_render;
 %include "WTCamera.hpp"
 
 %ignore WTCollisionInfo::WTCollisionInfo;
@@ -126,6 +127,7 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %newobject WTDrop::getDrop;
 %newobject WTDrop::getBitmap;
 %ignore WTDrop::WTDrop;
+%ignore WTDrop::_render;
 %include "WTDrop.hpp"
 
 //The WTEvent constructor is necessary, for now at least.
@@ -205,6 +207,7 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %newobject WTStage::createCamera;
 %newobject WTStage::createBitmapCamera;
 %ignore WTStage::WTStage;
+%ignore WTStage::_render;
 %include "WTStage.hpp"
 
 %ignore WTString3D::WTString3D;

@@ -16,17 +16,18 @@ CPTR_Wrap = """\
     return getCPtr(({0})objimpl);
   }}\n\n"""
 
-def process_normal(filename, verbose=False):
-    with open(filename) as f:
+def process_normal(filename_in, filename_out, verbose=False):
+    with open(filename_in) as f:
         lines = f.readlines()
 
-    with open(filename, 'w') as fout:
+    with open(filename_out, 'w') as fout:
         for i, line in enumerate(lines):
             if("protected static long getCPtr" in line):
-                pass
-                clsname = renamer_cpt.search(line).group(1)
-                if clsname not in ("WTEvent"):
-                    fout.write(CPTR_Wrap.format(clsname))
+                clsname_match = renamer_cpt.search(line)
+                if(clsname_match):
+                    clsname = clsname_match.group(1)
+                    if clsname not in ("WTEvent"):
+                        fout.write(CPTR_Wrap.format(clsname))
             else:
                 line = renamer_new.sub(r'new wildtangent.webdriver.impl.\1', line)
                 line = renamer_ret.sub(r'\1wildtangent.webdriver.\2 ', line)
@@ -39,13 +40,13 @@ def process_normal(filename, verbose=False):
                 print(line[:-1])
             fout.write(line)
 
-def process_intermediary(filename, verbose=False):
-    with open(filename) as f:
+def process_intermediary(filename_in, filename_out, verbose=False):
+    with open(filename_in) as f:
         lines = f.readlines()
 
     renamer_dir = re.compile(r"jself.run((event == 0) ? null : new wildtangent.webdriver.impl.WTEvent(event, false));")
 
-    with open(filename, 'w') as fout:
+    with open(filename_out, 'w') as fout:
         for i, line in enumerate(lines):
             if line == "    jself.run((event == 0) ? null : new WTEvent(event, false));\n":
                 line = "    jself.run((event == 0) ? null : new wildtangent.webdriver.impl.WTEvent(event, false));\n"
@@ -61,6 +62,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("infile")
+    parser.add_argument("outfile")
     parser.add_argument('--verbose', dest='verbose', action='store_true')
     parser.add_argument('--swigintermediary', dest='func', action='store_const',
                         default=process_normal, const=process_intermediary)
@@ -68,4 +70,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     #if(args.verbose):
     print("Processing: " + args.infile)
-    args.func(args.infile, args.verbose)
+    args.func(args.infile, args.outfile, args.verbose)
