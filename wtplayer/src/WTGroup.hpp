@@ -1,8 +1,8 @@
 #pragma once
 
-#include "WTContainer.hpp"
-
 #include <vector>
+
+#include "WTContainer.hpp"
 
 class WTObject;
 

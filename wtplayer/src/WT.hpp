@@ -1,13 +1,10 @@
 #pragma once
 
-#include "basetypes.hpp"
-#include "InternalCallbackWrapper.hpp"
-
 #include <thread>
 #include <string>
-#include <algorithm>
-#include <SDL.h>
-#include <cairo.h>
+
+#include "basetypes.hpp"
+#include "InternalCallbackWrapper.hpp"
 
 class InternalCallbackWrapper;
 
@@ -499,7 +496,9 @@ private:
   static void thread_bootstrap(void*);
   void wtMainThreadFunc();
 
+  typedef struct _cairo_surface cairo_surface_t;
   cairo_surface_t *cairosurf = NULL;
+  typedef struct _cairo cairo_t;
   cairo_t *cr = NULL;
 
   std::thread wtMainThread;
@@ -521,7 +520,9 @@ private:
 
   std::string working_directory;
 
+  typedef struct SDL_Window SDL_Window;
   SDL_Window* window = NULL;
+  typedef struct SDL_Surface SDL_Surface;
   SDL_Surface* sdlsurf = NULL;
 
   WTStage* stage = NULL;

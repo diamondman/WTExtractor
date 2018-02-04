@@ -1,5 +1,6 @@
-#include "IUnknown.hpp"
 #include <iostream>
+
+#include "IUnknown.hpp"
 
 IUnknown::IUnknown() :
   refcount(0) {

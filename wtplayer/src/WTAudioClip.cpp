@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTAudioClip.hpp"
 
 WTAudioClip::WTAudioClip(WT* wt_,

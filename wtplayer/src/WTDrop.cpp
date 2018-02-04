@@ -1,8 +1,9 @@
+#include <cairo.h>
+
 #include "basetypes.hpp"
+
 #include "WTDrop.hpp"
 #include "WTBitmap.hpp"
-
-#include <cairo.h>
 
 WTDrop::WTDrop(WT* wt_,
                WTBitmap* bitmap) :
@@ -61,10 +62,12 @@ WTDrop* WTDrop::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
 
 void WTDrop::removeDrop(WTDrop* o){
   APILOG;
-  for(int i = 0; i < this->drops.size(); i++) {
-    if(this->drops[i] == o){
-      o->Release();
-      this->drops.erase(this->drops.begin() + i);
+  //for(int i = 0; i < this->drops.size(); i++) {
+  for(auto it = this->drops.begin(); it != this->drops.end(); ++it) {
+    //if(this->drops[i] == o){
+    if(*it == o){
+      (*it)->Release();
+      this->drops.erase(it);
       return;
     }
   }
@@ -73,9 +76,12 @@ void WTDrop::removeDrop(WTDrop* o){
 
 WTDrop* WTDrop::getDrop(int Drop_Number){
   APILOG;
-  if(Drop_Number >= this->drops.size())
-    return NULL;
-  return this->drops[Drop_Number];
+  if (this->drops.size() > Drop_Number) {
+    auto it = this->drops.begin();
+    std::advance(it, Drop_Number);
+    return (*it);
+  }
+  return NULL;
 }
 
 void WTDrop::setSize(int Width,

@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTSysInfo.hpp"
 
 char* WTSysInfo::getOS() {

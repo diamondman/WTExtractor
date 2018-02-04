@@ -1,7 +1,8 @@
 #pragma once
 
-#include "WTObject.hpp"
 #include "basetypes.hpp"
+
+#include "WTObject.hpp"
 
 class WTBitmap;
 class WTSurfaceShader;

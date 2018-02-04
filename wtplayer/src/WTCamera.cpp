@@ -1,4 +1,7 @@
+#include <cairo.h>
+
 #include "basetypes.hpp"
+
 #include "WTCamera.hpp"
 #include "WTBitmap.hpp"
 #include "WTDrop.hpp"

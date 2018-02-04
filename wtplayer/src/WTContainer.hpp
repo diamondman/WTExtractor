@@ -1,8 +1,8 @@
 #pragma once
 
-#include "WTObject.hpp"
-
 #include "constants.hpp"
+
+#include "WTObject.hpp"
 
 class WTVector3D;
 class WTOrientation3D;

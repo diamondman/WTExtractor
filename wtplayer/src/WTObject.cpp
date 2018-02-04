@@ -1,7 +1,7 @@
 #include "basetypes.hpp"
-#include "WTObject.hpp"
 #include "InternalOnLoadCallbackWrapper.hpp"
-#include <iostream>
+
+#include "WTObject.hpp"
 
 WTObject::WTObject(WT* wt_) :
   IUnknown(),

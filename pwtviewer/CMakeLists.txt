@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.2)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,7 +27,6 @@ endfunction()
 #OGRE
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
 find_package(OGRE REQUIRED)
-include_directories( ${OGRE_INCLUDE_DIRS} )
 
 #QT5
 find_package(Qt5Widgets)
@@ -36,10 +35,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-#libwld3
-#include_directories(${WLD3_INCLUDE_DIRS})
-include_directories(${WLD3_SOURCE_DIR})
 
 #DEBUG STUFF
 MESSAGE( STATUS "CMAKE_MODULE_PATH:                   " ${CMAKE_MODULE_PATH} )
@@ -56,8 +51,22 @@ MESSAGE( STATUS "OPENGL PLUGIN:                       " ${OGRE_RenderSystem_GL3P
 add_executable(pwtviewer
   main.cpp MainWindow.cpp
   PWTModelFrame.cpp FrameTreeItem.cpp FrameTreeModel.cpp ModelFrameTreeView.cpp
-  resource.qrc)
-target_link_libraries(pwtviewer Qt5::Widgets WLD3 ${OGRE_LIBRARIES} OgreHlmsPbs OgreHlmsUnlit)
+  resource.qrc
+  )
+
+target_include_directories(pwtviewer
+  PRIVATE
+    ${OGRE_INCLUDE_DIRS}
+  )
+
+target_link_libraries(pwtviewer
+  PRIVATE
+    Qt5::Widgets
+    WLD3
+    ${OGRE_LIBRARIES}
+    OgreHlmsPbs
+    OgreHlmsUnlit
+  )
 
 #copyWithSymLink(${OGRE_RenderSystem_GL3Plus_LIBRARY_DBG} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 #${CMAKE_CURRENT_BINARY_DIR}/bin)

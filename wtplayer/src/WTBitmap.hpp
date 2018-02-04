@@ -1,10 +1,6 @@
 #pragma once
 
 #include "WTObject.hpp"
-#include "basetypes.hpp"
-
-#include <SDL.h>
-#include <cairo.h>
 
 class WT;
 
@@ -158,8 +154,11 @@ public:
   void setTextUnderline(int Draw_Text_In_Underline);
 
 private:
+  typedef struct SDL_Surface SDL_Surface;
   SDL_Surface *sdlsurf;
+  typedef struct _cairo_surface cairo_surface_t;
   cairo_surface_t *cairosurf;
+  typedef struct _cairo cairo_t;
   cairo_t *cr;
 
   int text_height = 10;

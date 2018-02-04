@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.8)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,28 +11,22 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
 project(wtengine)
 
 find_package(JNI REQUIRED)
-include_directories(${JNI_INCLUDE_DIRS})
 
 find_package(SWIG REQUIRED)
-INCLUDE(${SWIG_USE_FILE})
+include(${SWIG_USE_FILE})
 
 find_package(Java REQUIRED)
 include(UseJava)
 
 find_package(Cairo)
-include_directories(${Cairo_INCLUDE_DIRS})
 
-find_package(SDL2)
-include_directories(${SDL2_INCLUDE_DIR})
+find_package(SDL2 REQUIRED)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-
-include_directories(${WLD3_SOURCE_DIR})
+find_package(PNG REQUIRED)
 
 ############################
 
-add_library( wtapi SHARED
+add_library(wtapi SHARED
   src/basetypes.cpp
   src/InternalCallbackWrapper.cpp
   src/InternalOnLoadCallbackWrapper.hpp
@@ -69,60 +63,115 @@ add_library( wtapi SHARED
   src/WTVisualizer.cpp
   )
 
-target_link_libraries(wtapi WLD3 ${Cairo_LIBRARIES} ${SDL2_LIBRARY})
+target_include_directories(wtapi
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+  PRIVATE
+    ${JNI_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIR}
+    ${PNG_INCLUDE_DIRS}
+    ${Cairo_INCLUDE_DIRS}
+  )
+
+target_link_libraries(wtapi
+  PRIVATE
+    WLD3
+    ${Cairo_LIBRARIES}
+    ${SDL2_LIBRARY}
+    ${PNG_LIBRARIES}
+  )
 
 ############################
 
-set(RAW_SWIG_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/wildtangent_preprocess/webdriver/jni/")
-set(PP_SWIG_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/")
+set(RAW_SWIG_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/swig_generated_raw")
+set(PP_SWIG_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni")
 
-set(CMAKE_SWIG_FLAGS -package wildtangent.webdriver.jni)
-set_property(SOURCE WTEngine.i PROPERTY CPLUSPLUS ON)
-set(CMAKE_SWIG_OUTDIR "${RAW_SWIG_GEN_DIR}")
 set(SWIG_MODULE_NAME "wildtangent.webdriver.jni")
-swig_add_module( WTEngine JAVA WTEngine.i )
-swig_link_libraries( WTEngine wtapi )
+set(CMAKE_SWIG_FLAGS -package ${SWIG_MODULE_NAME})
+set(CMAKE_SWIG_OUTDIR "${RAW_SWIG_GEN_DIR}")
+
+set_property(SOURCE WTEngine.i PROPERTY CPLUSPLUS ON)
+
+swig_add_library(WTEngine
+  TYPE SHARED
+  LANGUAGE JAVA
+  SOURCES WTEngine.i
+  )
+
+target_include_directories(WTEngine
+  PRIVATE
+    ${JNI_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
+
+swig_link_libraries( WTEngine PRIVATE wtapi )
+
+    SWIG_GET_EXTRA_OUTPUT_FILES(JAVA
+      swig_extra_generated_files_123
+      "${RAW_SWIG_GEN_DIR}"
+      "WTEngine.i")
+
+    message(STATUS "GENERATED FILES: ${swig_extra_generated_files_123}")
 
 function ( POSTPROCESS_SWIG )
-  set(options OPTIONAL FAST)
+  set(options ) #Clear
   set(oneValueArgs TARGET INPREFIX OUTPREFIX INTERMEDIATE)
   set(multiValueArgs POSTPROCESS NOPROCESS)
-  cmake_parse_arguments(PP_SWIG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-
-  #add_custom_target(build-time-make-directory ALL
-  add_custom_command(
-    TARGET ${PP_SWIG_TARGET} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PP_SWIG_OUTPREFIX})
-
-  add_custom_command(
-    TARGET ${PP_SWIG_TARGET} POST_BUILD
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/greatreplacer.py
-            --swigintermediary
-            "${PP_SWIG_INPREFIX}${PP_SWIG_INTERMEDIATE}"
-            "${PP_SWIG_OUTPREFIX}${PP_SWIG_INTERMEDIATE}"
+  cmake_parse_arguments(POSTPROCESS_SWIG
+    "${options}" "${oneValueArgs}" "${multiValueArgs}"
+    ${ARGN}
     )
 
-  foreach ( PP_FILE ${PP_SWIG_POSTPROCESS} )
-    add_custom_command(
-      TARGET ${PP_SWIG_TARGET} POST_BUILD
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/greatreplacer.py
-              "${PP_SWIG_INPREFIX}${PP_FILE}"
-              "${PP_SWIG_OUTPREFIX}${PP_FILE}"
-      )
-  endforeach( PP_FILE ${PP_SWIG_POSTPROCESS} )
+  add_custom_command(
+    TARGET ${POSTPROCESS_SWIG_TARGET} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${POSTPROCESS_SWIG_OUTPREFIX}
+    )
 
-  foreach ( PP_FILE ${PP_SWIG_NOPROCESS} )
+  ###
+  add_custom_command(
+    TARGET ${POSTPROCESS_SWIG_TARGET} POST_BUILD
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/greatreplacer.py
+            --swigintermediary
+            "${POSTPROCESS_SWIG_INPREFIX}${POSTPROCESS_SWIG_INTERMEDIATE}"
+            "${POSTPROCESS_SWIG_OUTPREFIX}${POSTPROCESS_SWIG_INTERMEDIATE}"
+    COMMENT "PostProcessing Swig Generated File ${POSTPROCESS_SWIG_INTERMEDIATE}"
+    )
+  get_source_file_property(swig_source_file_generated
+    "${POSTPROCESS_SWIG_INPREFIX}${POSTPROCESS_SWIG_INTERMEDIATE}" GENERATED)
+  message(STATUS "Generated Status of INFILE ${POSTPROCESS_SWIG_INTERMEDIATE} = "
+    "${swig_source_file_generated}")
+
+  set_property(SOURCE "${POSTPROCESS_SWIG_OUTPREFIX}${POSTPROCESS_SWIG_INTERMEDIATE}"
+    PROPERTY GENERATED 1)
+
+  ###
+  foreach ( PP_FILE ${POSTPROCESS_SWIG_POSTPROCESS} )
     add_custom_command(
-      TARGET ${PP_SWIG_TARGET} POST_BUILD
+      TARGET ${POSTPROCESS_SWIG_TARGET} POST_BUILD
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/greatreplacer.py
+              "${POSTPROCESS_SWIG_INPREFIX}${PP_FILE}"
+              "${POSTPROCESS_SWIG_OUTPREFIX}${PP_FILE}"
+      )
+    set_property(SOURCE ${POSTPROCESS_SWIG_OUTPREFIX}/${PP_FILE}
+      PROPERTY GENERATED 1)
+  endforeach( PP_FILE ${POSTPROCESS_SWIG_POSTPROCESS} )
+
+  ###
+  foreach ( PP_FILE ${POSTPROCESS_SWIG_NOPROCESS} )
+    add_custom_command(
+      TARGET ${POSTPROCESS_SWIG_TARGET} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy
-              "${PP_SWIG_INPREFIX}${PP_FILE}"
-              "${PP_SWIG_OUTPREFIX}${PP_FILE}")
-  endforeach( PP_FILE ${PP_SWIG_POSTPROCESS} )
+              "${POSTPROCESS_SWIG_INPREFIX}/${PP_FILE}"
+              "${POSTPROCESS_SWIG_OUTPREFIX}/${PP_FILE}"
+      )
+    set_property(SOURCE ${POSTPROCESS_SWIG_OUTPREFIX}/${PP_FILE}
+      PROPERTY GENERATED 1)
+  endforeach( PP_FILE ${POSTPROCESS_SWIG_POSTPROCESS} )
 endfunction( POSTPROCESS_SWIG )
 
 postprocess_swig(TARGET WTEngine
-  INPREFIX "${RAW_SWIG_GEN_DIR}"
-  OUTPREFIX "${PP_SWIG_GEN_DIR}"
+  INPREFIX "${RAW_SWIG_GEN_DIR}/"
+  OUTPREFIX "${PP_SWIG_GEN_DIR}/"
   INTERMEDIATE WTEngineJNI.java
   NOPROCESS
     InternalCallbackWrapper.java
@@ -163,118 +212,120 @@ postprocess_swig(TARGET WTEngine
 
 ############################
 
+set(JAVASRC "${CMAKE_CURRENT_SOURCE_DIR}/javasrc")
+
 add_jar(wildtangent
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/InternalCallbackWrapper.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/InternalOnLoadCallbackWrapper.java
+  ${PP_SWIG_GEN_DIR}/InternalCallbackWrapper.java
+  ${PP_SWIG_GEN_DIR}/InternalOnLoadCallbackWrapper.java
 
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTActor.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip3D.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTAudioClip.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTBitmap.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTCamera.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTCollisionInfo.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTContainer.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTDrop.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEngine.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEngineJNI.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTEvent.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTFile.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTFont.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTGroup.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WT.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTJoystick.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTKeyboardPollInfo.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTLight.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTModel.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTMousePollInfo.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTObject.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTOrientation3D.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTPortal.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTShadow.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSpout.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTStage.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTString3D.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSurfaceShader.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTSysInfo.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTVector3D.java
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent/webdriver/jni/WTVisualizer.java
+  ${PP_SWIG_GEN_DIR}/WTActor.java
+  ${PP_SWIG_GEN_DIR}/WTAudioClip3D.java
+  ${PP_SWIG_GEN_DIR}/WTAudioClip.java
+  ${PP_SWIG_GEN_DIR}/WTBitmap.java
+  ${PP_SWIG_GEN_DIR}/WTCamera.java
+  ${PP_SWIG_GEN_DIR}/WTCollisionInfo.java
+  ${PP_SWIG_GEN_DIR}/WTContainer.java
+  ${PP_SWIG_GEN_DIR}/WTDrop.java
+  ${PP_SWIG_GEN_DIR}/WTEngine.java
+  ${PP_SWIG_GEN_DIR}/WTEngineJNI.java
+  ${PP_SWIG_GEN_DIR}/WTEvent.java
+  ${PP_SWIG_GEN_DIR}/WTFile.java
+  ${PP_SWIG_GEN_DIR}/WTFont.java
+  ${PP_SWIG_GEN_DIR}/WTGroup.java
+  ${PP_SWIG_GEN_DIR}/WT.java
+  ${PP_SWIG_GEN_DIR}/WTJoystick.java
+  ${PP_SWIG_GEN_DIR}/WTKeyboardPollInfo.java
+  ${PP_SWIG_GEN_DIR}/WTLight.java
+  ${PP_SWIG_GEN_DIR}/WTModel.java
+  ${PP_SWIG_GEN_DIR}/WTMousePollInfo.java
+  ${PP_SWIG_GEN_DIR}/WTObject.java
+  ${PP_SWIG_GEN_DIR}/WTOrientation3D.java
+  ${PP_SWIG_GEN_DIR}/WTPortal.java
+  ${PP_SWIG_GEN_DIR}/WTShadow.java
+  ${PP_SWIG_GEN_DIR}/WTSpout.java
+  ${PP_SWIG_GEN_DIR}/WTStage.java
+  ${PP_SWIG_GEN_DIR}/WTString3D.java
+  ${PP_SWIG_GEN_DIR}/WTSurfaceShader.java
+  ${PP_SWIG_GEN_DIR}/WTSysInfo.java
+  ${PP_SWIG_GEN_DIR}/WTVector3D.java
+  ${PP_SWIG_GEN_DIR}/WTVisualizer.java
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTActor.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTAudioClip3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTAudioClip.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTBitmap.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTCamera.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTCollisionInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTContainer.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTDrop.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTEventCallback.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTEventJoystickCallback.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTFile.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTFont.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTGroup.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WT.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTJoystick.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTKeyboardPollInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTLight.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTModel.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTMousePollInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTObject.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTOnLoadEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTOrientation3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTPortal.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTShadow.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTSpout.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTStage.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTString3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTSurfaceShader.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTSysInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTVector3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTVisualizer.java
+  ${JAVASRC}/wildtangent/webdriver/WTActor.java
+  ${JAVASRC}/wildtangent/webdriver/WTAudioClip3D.java
+  ${JAVASRC}/wildtangent/webdriver/WTAudioClip.java
+  ${JAVASRC}/wildtangent/webdriver/WTBitmap.java
+  ${JAVASRC}/wildtangent/webdriver/WTCamera.java
+  ${JAVASRC}/wildtangent/webdriver/WTCollisionInfo.java
+  ${JAVASRC}/wildtangent/webdriver/WTContainer.java
+  ${JAVASRC}/wildtangent/webdriver/WTDrop.java
+  ${JAVASRC}/wildtangent/webdriver/WTEventCallback.java
+  ${JAVASRC}/wildtangent/webdriver/WTEventJoystickCallback.java
+  ${JAVASRC}/wildtangent/webdriver/WTEvent.java
+  ${JAVASRC}/wildtangent/webdriver/WTFile.java
+  ${JAVASRC}/wildtangent/webdriver/WTFont.java
+  ${JAVASRC}/wildtangent/webdriver/WTGroup.java
+  ${JAVASRC}/wildtangent/webdriver/WT.java
+  ${JAVASRC}/wildtangent/webdriver/WTJoystick.java
+  ${JAVASRC}/wildtangent/webdriver/WTKeyboardPollInfo.java
+  ${JAVASRC}/wildtangent/webdriver/WTLight.java
+  ${JAVASRC}/wildtangent/webdriver/WTModel.java
+  ${JAVASRC}/wildtangent/webdriver/WTMousePollInfo.java
+  ${JAVASRC}/wildtangent/webdriver/WTObject.java
+  ${JAVASRC}/wildtangent/webdriver/WTOnLoadEvent.java
+  ${JAVASRC}/wildtangent/webdriver/WTOrientation3D.java
+  ${JAVASRC}/wildtangent/webdriver/WTPortal.java
+  ${JAVASRC}/wildtangent/webdriver/WTShadow.java
+  ${JAVASRC}/wildtangent/webdriver/WTSpout.java
+  ${JAVASRC}/wildtangent/webdriver/WTStage.java
+  ${JAVASRC}/wildtangent/webdriver/WTString3D.java
+  ${JAVASRC}/wildtangent/webdriver/WTSurfaceShader.java
+  ${JAVASRC}/wildtangent/webdriver/WTSysInfo.java
+  ${JAVASRC}/wildtangent/webdriver/WTVector3D.java
+  ${JAVASRC}/wildtangent/webdriver/WTVisualizer.java
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalExceptionEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalKeyboardEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalMouseEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalRenderEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/InternalLoadEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTActor.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTAudioClip3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTAudioClip.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTBitmap.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTCamera.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTCollisionInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTContainer.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTDrop.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTEvent.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTFile.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTFont.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTGroup.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WT.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTJoystick.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTKeyboardPollInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTLight.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTModel.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTMousePollInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTObject.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTOrientation3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTPortal.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTShadow.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTSpout.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTStage.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTString3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTSurfaceShader.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTSysInfo.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTVector3D.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/impl/WTVisualizer.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalExceptionEvent.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalKeyboardEvent.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalMouseEvent.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalRenderEvent.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalLoadEvent.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTActor.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTAudioClip3D.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTAudioClip.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTBitmap.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTCamera.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTCollisionInfo.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTContainer.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTDrop.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTEvent.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTFile.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTFont.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTGroup.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WT.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTJoystick.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTKeyboardPollInfo.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTLight.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTModel.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTMousePollInfo.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTObject.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTOrientation3D.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTPortal.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTShadow.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTSpout.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTStage.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTString3D.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTSurfaceShader.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTSysInfo.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTVector3D.java
+  ${JAVASRC}/wildtangent/webdriver/impl/WTVisualizer.java
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/WTConstants.java
-  ${CMAKE_CURRENT_SOURCE_DIR}/javasrc/wildtangent/webdriver/wt3dLib.java
+  ${JAVASRC}/wildtangent/webdriver/WTConstants.java
+  ${JAVASRC}/wildtangent/webdriver/wt3dLib.java
   )
 add_dependencies( wildtangent WTEngine )
 
 ############################
 
-set(RTSRC ${CMAKE_CURRENT_SOURCE_DIR}/javasrc)
+set(RTSRC ${JAVASRC})
 add_jar(rt
   ${RTSRC}/com/ms/com/_Guid.java ${RTSRC}/com/ms/com/IUnknown.java
   ${RTSRC}/com/ms/com/NoAutoScripting.java
@@ -295,7 +346,8 @@ add_jar(rt
 
 ############################
 
-set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar)
+set(CMAKE_JAVA_INCLUDE_PATH
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar)
 add_jar(WTPlayerMain WTPlayerMain.java)# ENTRY_POINT Main)
 add_dependencies(WTPlayerMain wildtangent rt)
 
@@ -304,4 +356,5 @@ add_dependencies(WTPlayerMain wildtangent rt)
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/templates/run.sh.template
   ${CMAKE_CURRENT_BINARY_DIR}/run.sh
-  COPYONLY)
+  COPYONLY
+  )

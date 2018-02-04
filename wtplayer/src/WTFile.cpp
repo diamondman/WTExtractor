@@ -1,9 +1,9 @@
-#include "basetypes.hpp"
+#include <string>
+#include <dataaccessors.h>
+#include <wld3_extract.h>
+
 #include "WTFile.hpp"
 #include "WT.hpp"
-
-#include "dataaccessors.h"
-#include <string>
 
 WTFile::WTFile(WT* wt_,
                const char* File_Name,
@@ -130,11 +130,6 @@ int WTFile::status(){
   //return -11; //Not Opened. (File is loading or something)
   std::cout << "  STATUS = ALL OK!" << std::endl;
   return 0; //No Errors
-}
-
-int WTFile::getEndian(){
-  APILOG;
-  return this->endian;
 }
 
 int WTFile::setEndian(int endian){

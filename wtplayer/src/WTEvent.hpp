@@ -7,43 +7,91 @@ class WTObject;
 class WTEvent {
 
 public:
-  int getType();
+  int getType(){
+    APILOG;
+    return _Type;
+  }
 
   int getTime();
 
   int getInterval();
 
   //[id(0x0000138b), hidden]
-  int getId();
+  int getId(){
+    APILOG;
+    return 0;
+  }
 
-  int getWTX();
+  int getWTX(){
+    APILOG;
+    return _WTX;
+  }
 
-  int getWTY();
+  int getWTY(){
+    APILOG;
+    return _WTY;
+  }
 
-  int getX();
+  int getX(){
+    APILOG;
+    return _X;
+  }
 
-  int getY();
+  int getY(){
+    APILOG;
+    return _Y;
+  }
 
-  VARIANT getData();
+  VARIANT getData(){
+    APILOG;
+    return nullptr;
+  }
 
-  WTObject* getStage();
+  WTObject* getStage(){
+    APILOG;
+    return _Stage;
+  }
 
-  WTObject* getCamera();
+  WTObject* getCamera(){
+    APILOG;
+    return _Camera;
+  }
 
-  WTObject* getObject();
+  WTObject* getObject(){
+    APILOG;
+    return _Object;
+  }
 
-  int getButtonState();
+  int getButtonState(){
+    APILOG;
+    return _ButtonState;
+  }
 
-  int getExceptionType();
+  int getExceptionType(){
+    APILOG;
+    return _ExceptionType;
+  }
 
-  int getExceptionData();
+  int getExceptionData(){
+    APILOG;
+    return _ExceptionData;
+  }
 
-  int getKey();
+  int getKey(){
+    APILOG;
+    return _Key;
+  }
 
-  int getKeyState();
+  int getKeyState(){
+    APILOG;
+    return _KeyState;
+  }
 
   //[id(0x00001398), hidden]
-  void eventDone();
+  void eventDone(){
+    APILOG;
+  }
+
 
   //private:
   int _Type;

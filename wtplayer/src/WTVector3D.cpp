@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTVector3D.hpp"
 
 WTVector3D::WTVector3D() :

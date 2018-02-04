@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTShadow.hpp"
 
 WTShadow::WTShadow(WT* wt_,

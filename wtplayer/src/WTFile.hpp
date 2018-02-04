@@ -1,10 +1,11 @@
 #pragma once
 
-#include "WTObject.hpp"
 #include "basetypes.hpp"
-#include "wld3_extract.h"
+
+#include "WTObject.hpp"
 
 class WT;
+typedef struct WLD3 WLD3;
 
 class WTFile : public WTObject {
 
@@ -52,7 +53,10 @@ public:
 
   int status();
 
-  int getEndian();
+  int getEndian(){
+    APILOG;
+    return this->endian;
+  }
 
   int setEndian(int endian);
 

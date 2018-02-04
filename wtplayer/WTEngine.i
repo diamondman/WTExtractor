@@ -80,67 +80,67 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %ignore IUnknown::GetRefCount;
 %feature("ref")   IUnknown "$this->AddRef();"
 %feature("unref") IUnknown "$this->Release();"
-%include "IUnknown.hpp"
+%include "src/IUnknown.hpp"
 
 %newobject InternalCallbackWrapper;
-%include "InternalCallbackWrapper.hpp"
-%include "InternalOnLoadCallbackWrapper.hpp"
+%include "src/InternalCallbackWrapper.hpp"
+%include "src/InternalOnLoadCallbackWrapper.hpp"
 
 %ignore WTObject::WTObject;
 %newobject WTObject::getOwner;
-%include "WTObject.hpp"
+%include "src/WTObject.hpp"
 
 %newobject WTContainer::getLookAt;
 %newobject WTContainer::getAttached;
 %ignore WTContainer::WTContainer;
-%include "WTContainer.hpp"
+%include "src/WTContainer.hpp"
 
 %newobject WTGroup::getObjectByName;
 %newobject WTGroup::getChildByIndex;
 %ignore WTGroup::WTGroup;
-%include "WTGroup.hpp"
+%include "src/WTGroup.hpp"
 
 %ignore WTActor::WTActor;
-%include "WTActor.hpp"
+%include "src/WTActor.hpp"
 
 %newobject WTAudioClip3D::getCamera;
 %ignore WTAudioClip3D::WTAudioClip3D;
-%include "WTAudioClip3D.hpp"
+%include "src/WTAudioClip3D.hpp"
 
 %ignore WTAudioClip::WTAudioClip;
-%include "WTAudioClip.hpp"
+%include "src/WTAudioClip.hpp"
 
 %ignore WTBitmap::WTBitmap;
-%include "WTBitmap.hpp"
+%include "src/WTBitmap.hpp"
 
 %newobject WTCamera::addDrop;
 %newobject WTCamera::getDrop;
 %newobject WTCamera::getRenderBitmap;
 %ignore WTCamera::WTCamera;
 %ignore WTCamera::_render;
-%include "WTCamera.hpp"
+%include "src/WTCamera.hpp"
 
 %ignore WTCollisionInfo::WTCollisionInfo;
-%include "WTCollisionInfo.hpp"
+%include "src/WTCollisionInfo.hpp"
 
 %newobject WTDrop::addDrop;
 %newobject WTDrop::getDrop;
 %newobject WTDrop::getBitmap;
 %ignore WTDrop::WTDrop;
 %ignore WTDrop::_render;
-%include "WTDrop.hpp"
+%include "src/WTDrop.hpp"
 
 //The WTEvent constructor is necessary, for now at least.
 %newobject WTEvent::getStage;
 %newobject WTEvent::getCamera;
 %newobject WTEvent::getObject;
-%include "WTEvent.hpp"
+%include "src/WTEvent.hpp"
 
 %ignore WTFile::WTFile;
-%include "WTFile.hpp"
+%include "src/WTFile.hpp"
 
 %ignore WTFont::WTFont;
-%include "WTFont.hpp"
+%include "src/WTFont.hpp"
 
 %newobject WT::createStage;
 %newobject WT::createBox;
@@ -172,35 +172,35 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %newobject WT::createString3D;
 %newobject WT::createShadow;
 %newobject WT::readFile;
-%include "WT.hpp"
+%include "src/WT.hpp"
 
 %ignore WTJoystick::WTJoystick;
-%include "WTJoystick.hpp"
+%include "src/WTJoystick.hpp"
 
 %ignore WTKeyboardPollInfo::WTKeyboardPollInfo;
-%include "WTKeyboardPollInfo.hpp"
+%include "src/WTKeyboardPollInfo.hpp"
 
 %ignore WTLight::WTLight;
-%include "WTLight.hpp"
+%include "src/WTLight.hpp"
 
 %ignore WTModel::WTModel;
-%include "WTModel.hpp"
+%include "src/WTModel.hpp"
 
 %ignore WTMousePollInfo::WTMousePollInfo;
-%include "WTMousePollInfo.hpp"
+%include "src/WTMousePollInfo.hpp"
 
 %ignore WTOrientation3D::WTOrientation3D;
-%include "WTOrientation3D.hpp"
+%include "src/WTOrientation3D.hpp"
 
 %newobject WTPortal::getCamera;
 %ignore WTPortal::WTPortal;
-%include "WTPortal.hpp"
+%include "src/WTPortal.hpp"
 
 %ignore WTShadow::WTShadow;
-%include "WTShadow.hpp"
+%include "src/WTShadow.hpp"
 
 %ignore WTSpout::WTSpout;
-%include "WTSpout.hpp"
+%include "src/WTSpout.hpp"
 
 %newobject WTStage::getObjectByName;
 %newobject WTStage::getChildByIndex;
@@ -208,19 +208,19 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %newobject WTStage::createBitmapCamera;
 %ignore WTStage::WTStage;
 %ignore WTStage::_render;
-%include "WTStage.hpp"
+%include "src/WTStage.hpp"
 
 %ignore WTString3D::WTString3D;
-%include "WTString3D.hpp"
+%include "src/WTString3D.hpp"
 
 %ignore WTSurfaceShader::WTSurfaceShader;
-%include "WTSurfaceShader.hpp"
+%include "src/WTSurfaceShader.hpp"
 
 %ignore WTSysInfo::WTSysInfo;
-%include "WTSysInfo.hpp"
+%include "src/WTSysInfo.hpp"
 
 %ignore WTVector3D::WTVector3D;
-%include "WTVector3D.hpp"
+%include "src/WTVector3D.hpp"
 
 %ignore WTVisualizer::WTVisualizer;
-%include "WTVisualizer.hpp"
+%include "src/WTVisualizer.hpp"

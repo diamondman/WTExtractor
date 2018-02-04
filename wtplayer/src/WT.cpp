@@ -1,7 +1,14 @@
-#include "WT.hpp"
+#include <iostream>
+#include <algorithm>
+#include <unistd.h>
+#include <stdexcept>
+#include <SDL.h>
+#include <cairo.h>
+
 #include "basetypes.hpp"
 #include "InternalCallbackWrapper.hpp"
 
+#include "WT.hpp"
 #include "WTActor.hpp"
 #include "WTAudioClip.hpp"
 #include "WTAudioClip3D.hpp"
@@ -26,10 +33,6 @@
 #include "WTSysInfo.hpp"
 #include "WTVisualizer.hpp"
 #include "WTObject.hpp"
-
-#include <iostream>
-#include <unistd.h>
-#include <stdexcept>
 
 WT::WT(char* localver_path,
        int width,
@@ -694,6 +697,6 @@ void WT::wtMainThreadFunc(){
 
     SDL_UpdateWindowSurface(this->window);
 
-    usleep(0.01 * 1000 * 1000);
+    usleep(0.3 * 1000 * 1000);
   }
 }

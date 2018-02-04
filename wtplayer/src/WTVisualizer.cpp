@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTVisualizer.hpp"
 
 WTVisualizer::WTVisualizer(WT* wt_,

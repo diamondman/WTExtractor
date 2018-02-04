@@ -1,18 +1,23 @@
-cmake_minimum_required (VERSION 3.1)
-project (WLD3)
+cmake_minimum_required (VERSION 3.7)
 
-# The version number.
-set (WLD3_VERSION_MAJOR 0)
-set (WLD3_VERSION_MINOR 0)
+project (WLD3
+  VERSION 0.0
+  )
 
-# configure a header file to pass some of the CMake settings
-# to the source code
-#configure_file (
-#  "${PROJECT_SOURCE_DIR}/WLD3Config.h.in"
-#  "${PROJECT_BINARY_DIR}/WLD3Config.h"
-#  )
-
-# Add Targets
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_library(WLD3 STATIC dataaccessors.c multifh.c wld3_extract.c pwt_decode.c)
-target_link_libraries(WLD3 uuid mspack magic m)
+set (CMAKE_POSITION_INDEPENDENT_CODE ON)
+add_library(WLD3 STATIC
+  src/dataaccessors.c
+  src/multifh.c
+  src/wld3_extract.c
+  src/pwt_decode.c
+  )
+target_include_directories (WLD3
+  PUBLIC include
+  PRIVATE src
+  )
+target_link_libraries (WLD3
+  uuid
+  mspack
+  magic
+  m
+  )

@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTKeyboardPollInfo.hpp"
 
 int WTKeyboardPollInfo::getNextKeyDown() {

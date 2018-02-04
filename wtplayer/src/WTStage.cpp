@@ -1,11 +1,13 @@
+#include <string.h>
+#include <cairo.h>
+
 #include "basetypes.hpp"
+
 #include "WTStage.hpp"
 #include "WTBitmap.hpp"
 #include "WTCamera.hpp"
 #include "WTContainer.hpp"
 #include "WT.hpp"
-
-#include <string.h>
 
 WTStage::WTStage(WT* wt_) :
   WTObject(wt_) {

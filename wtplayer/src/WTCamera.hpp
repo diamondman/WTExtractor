@@ -1,9 +1,8 @@
 #pragma once
 
-#include "WTContainer.hpp"
-
 #include <vector>
-#include <cairo.h>
+
+#include "WTContainer.hpp"
 
 class WTBitmap;
 class WTDrop;
@@ -13,6 +12,8 @@ class WTCollisionInfo;
 class WTCamera : public WTContainer {
 
 public:
+  friend class WTDrop;
+
   WTCamera(WT* wt_);
 
   WTCamera(WT* wt_,
@@ -20,6 +21,7 @@ public:
 
   virtual ~WTCamera();
 
+  typedef struct _cairo cairo_t;
   void _render(cairo_t* cr);
 
   int getObjectType(){

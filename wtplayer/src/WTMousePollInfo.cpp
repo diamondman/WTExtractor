@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTMousePollInfo.hpp"
 
 int WTMousePollInfo::getMickeyX() {

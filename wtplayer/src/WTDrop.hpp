@@ -1,9 +1,8 @@
 #pragma once
 
-#include "WTObject.hpp"
+#include <list>
 
-#include <vector>
-#include <cairo.h>
+#include "WTObject.hpp"
 
 class WTBitmap;
 
@@ -15,6 +14,7 @@ public:
 
   virtual ~WTDrop();
 
+  typedef struct _cairo cairo_t;
   void _render(cairo_t* cr, int x, int y);
 
   int getObjectType(){
@@ -105,7 +105,7 @@ public:
 
 private:
   WTBitmap* bitmap = NULL;
-  std::vector<WTDrop*> drops;
+  std::list<WTDrop*> drops;
 
   unsigned int pos_x = 0;
   unsigned int pos_y = 0;

@@ -1,4 +1,5 @@
 #include "basetypes.hpp"
+
 #include "WTLight.hpp"
 
 WTLight::WTLight(WT* wt_,

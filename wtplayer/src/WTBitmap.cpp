@@ -1,4 +1,10 @@
+#include <cairo.h>
+#include <SDL.h>
+#include <dataaccessors.h>
+#include <wld3_extract.h>
+
 #include "basetypes.hpp"
+
 #include "WTBitmap.hpp"
 #include "WT.hpp"
 
@@ -30,6 +36,30 @@ WTBitmap::WTBitmap(WT* wt_,
                    char* File_Name,
                    int WTCache_Type) :
   WTObject(wt_){
+  std::string full_fname = std::string(this->wt->getFilesPath()) + "/" + File_Name;
+  std::cout << "opening file: \"" << full_fname << "\"" << std::endl;
+
+  DataAccessor* acc = openFileAccessor(full_fname.c_str());
+  if(!acc){
+    printf("Failed to create accessor for WTBitmap!\n\n");
+    throw std::runtime_error("Could not create Accessor for WTBitmap.");
+  }
+  WLD3* wld3 = wld3_extract(acc);
+
+  if(!wld3) {
+    printf( "Cairo Surface could not be created!\n" );
+    throw std::runtime_error("Could not create Cairo Surface.");
+  }
+
+  wld3_print(wld3);
+  wld3_free(wld3);
+  //wld3->payload_len
+  //wld3->payload_data
+  freeFileAccessor(acc);
+
+
+
+
   sdlsurf = SDL_CreateRGBSurface
     (0, 640, 480, 32,
      0x00FF0000,

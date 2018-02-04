@@ -1,9 +1,8 @@
 #pragma once
 
-#include "WTObject.hpp"
-
 #include <vector>
-#include <cairo.h>
+
+#include "WTObject.hpp"
 
 class WTCamera;
 class WTContainer;
@@ -26,6 +25,7 @@ public:
     return NULL;
   }
 
+  typedef struct _cairo cairo_t;
   void _render(cairo_t *cr);
 
   void addObject(WTContainer* Object_To_Add);
