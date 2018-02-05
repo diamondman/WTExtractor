@@ -68,6 +68,6 @@ if __name__ == "__main__":
                         default=process_normal, const=process_intermediary)
     parser.set_defaults(verbose=False)
     args = parser.parse_args()
-    #if(args.verbose):
-    print("Processing: " + args.infile)
+    if(args.verbose):
+        print("Processing: " + args.infile)
     args.func(args.infile, args.outfile, args.verbose)
