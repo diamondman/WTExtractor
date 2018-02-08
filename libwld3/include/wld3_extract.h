@@ -21,6 +21,15 @@ enum resource_class{
 #define MAX_EXT_LEN 3
 #define EXT_BUFF_LEN (MAX_EXT_LEN+1)
 
+typedef struct WLD3 WLD3;
+
+WLD3* wld3_extract(DataAccessor*);
+
+void wld3_print(WLD3* wt);
+
+void wld3_free(WLD3* wt);
+
+
 typedef struct ExtraStringLL {
   uint8_t type;
   uint32_t len;
@@ -51,13 +60,15 @@ typedef struct WLD3{
   //Payload
   size_t payload_len;
   uint8_t* payload_data;
+
+  #ifdef __cplusplus
+  void print(){
+    wld3_print(this);
+  }
+  #endif
+
 } WLD3;
 
-WLD3* wld3_extract(DataAccessor*);
-
-void wld3_print(WLD3* wt);
-
-void wld3_free(WLD3* wt);
 #endif
 
 #ifdef __cplusplus

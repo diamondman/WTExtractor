@@ -36,9 +36,15 @@ public:
 
   void unsetColorKey();
 
-  int getWidth();
+  int getWidth(){
+    APILOG;
+    return this->width;
+  }
 
-  int getHeight();
+  int getHeight(){
+    APILOG;
+    return this->height;
+  }
 
   void drawText(int x,
                 int y,
@@ -155,7 +161,7 @@ public:
 
 private:
   typedef struct SDL_Surface SDL_Surface;
-  SDL_Surface *sdlsurf;
+  SDL_Surface *sdlsurf = NULL;
   typedef struct _cairo_surface cairo_surface_t;
   cairo_surface_t *cairosurf;
   typedef struct _cairo cairo_t;
@@ -166,4 +172,9 @@ private:
   float text_r = 0;
   float text_g = 0;
   float text_b = 0;
+
+  unsigned int width = 0;
+  unsigned int height = 0;
+
+  unsigned char *data = 0;
 };

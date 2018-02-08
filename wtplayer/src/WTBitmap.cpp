@@ -1,32 +1,66 @@
+#include <algorithm>
 #include <cairo.h>
 #include <SDL.h>
+#include <png.h>
 #include <dataaccessors.h>
 #include <wld3_extract.h>
+#include <fstream>
+#include <iostream>
+#include <istream>
+#include <streambuf>
 
 #include "basetypes.hpp"
 
 #include "WTBitmap.hpp"
 #include "WT.hpp"
 
+struct membuf : std::streambuf
+{
+    membuf(char* begin, char* end) {
+        this->setg(begin, begin, end);
+    }
+};
+
+void ReadDataFromWLD3Buf(png_structp png_ptr,
+                         png_bytep outBytes,
+                         png_size_t byteCountToRead) {
+
+   png_voidp io_ptr = png_get_io_ptr(png_ptr);
+   if(io_ptr == NULL)
+      return;   // add custom error handling here
+
+   std::istream& inputStream = *(std::istream*)io_ptr;
+   inputStream.read(
+      (char*)outBytes,
+      (size_t)byteCountToRead);
+
+   if((png_size_t)inputStream.gcount() != byteCountToRead)
+      return;   // add custom error handling here
+}
+
+
+
 WTBitmap::WTBitmap(WT* wt_,
                    int width,
                    int height) :
-  WTObject(wt_){
+  WTObject(wt_),
+  width(width), height(height){
   std::cout << "New WTBitmap(width=" << width << ", height=" << height << ");" << std::endl;
 
-  sdlsurf = SDL_CreateRGBSurface
-    (0, width, height, 32,
-     0x00FF0000,
-     0x0000FF00,
-     0x000000FF,
-     0xFF000000);
+  int stride = cairo_format_stride_for_width (CAIRO_FORMAT_RGB24, width);
+  data = (unsigned char*)malloc (stride * this->height);
+  memset(data, 0, stride * this->height);
+
+  for(int i = 0; i < this->width * this->height; i++){
+    ((unsigned int*)this->data)[i] = 0x00FF0000;
+  }
 
   cairosurf = cairo_image_surface_create_for_data
-    ((unsigned char*)sdlsurf->pixels,
+    ((unsigned char*)this->data,
      CAIRO_FORMAT_RGB24,
-     this->sdlsurf->w,
-     this->sdlsurf->h,
-     this->sdlsurf->pitch);
+     this->width,
+     this->height,
+     stride);
 
   cr = cairo_create(cairosurf);
 }
@@ -35,44 +69,128 @@ WTBitmap::WTBitmap(WT* wt_,
 WTBitmap::WTBitmap(WT* wt_,
                    char* File_Name,
                    int WTCache_Type) :
-  WTObject(wt_){
+  WTObject(wt_),
+  width(100), height(100){
+
   std::string full_fname = std::string(this->wt->getFilesPath()) + "/" + File_Name;
   std::cout << "opening file: \"" << full_fname << "\"" << std::endl;
 
-  DataAccessor* acc = openFileAccessor(full_fname.c_str());
-  if(!acc){
-    printf("Failed to create accessor for WTBitmap!\n\n");
+  std::shared_ptr<DataAccessor> acc = std::shared_ptr<DataAccessor>
+    (openFileAccessor(full_fname.c_str()),
+     freeFileAccessor);
+  if(acc == nullptr){
+    printf("Failed to create accessor for WTBitmap (%s)!\n\n", full_fname.c_str());
     throw std::runtime_error("Could not create Accessor for WTBitmap.");
   }
-  WLD3* wld3 = wld3_extract(acc);
+  printf("Acc made\n");
 
-  if(!wld3) {
+  std::shared_ptr<WLD3> wld3 = std::shared_ptr<WLD3>(wld3_extract(acc.get()),
+                                                     wld3_free);
+  if(wld3 == nullptr) {
     printf( "Cairo Surface could not be created!\n" );
     throw std::runtime_error("Could not create Cairo Surface.");
   }
+  wld3->print();
 
-  wld3_print(wld3);
-  wld3_free(wld3);
-  //wld3->payload_len
-  //wld3->payload_data
-  freeFileAccessor(acc);
+  membuf sbuf((char*)wld3->payload_data,
+              (char*)wld3->payload_data + wld3->payload_len);
+  std::istream wld3buf(&sbuf);
+
+  std::string outext = std::string((char*)wld3->outext);
+  printf("Image type is %s\n\n", outext.c_str());
+
+  if(outext == "jpg"){
+    printf("IT IS A JPG! SKIP DOING THINGS\n\n");
+    int stride = cairo_format_stride_for_width (CAIRO_FORMAT_RGB24, width);
+    data = (unsigned char*)malloc (stride * this->height);
+    memset(data, 0, stride * this->height);
+    cairosurf = cairo_image_surface_create_for_data
+      (this->data,//(unsigned char*)sdlsurf->pixels,
+       CAIRO_FORMAT_RGB24,
+       this->width,
+       this->height,
+       stride);//this->sdlsurf->pitch);
+
+    for(int i = 0; i < this->width * this->height; i++){
+      ((unsigned int*)this->data)[i] = 0x00FFFF00;
+    }
+  }else if(outext == "png"){
+    if(png_sig_cmp(wld3->payload_data, 0, std::min((size_t)8, wld3->payload_len)) != 0){
+      printf("WTBitmap: Png has incorrect signature!\n\n");
+      throw std::runtime_error("WTBitmap: Png has incorrect signature.");
+    }
+
+    png_structp png_ptr = NULL;
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+
+    if(png_ptr == NULL){
+      printf("WTBitmap: libpng failed to create png_struct.\n\n");
+      throw std::runtime_error("WTBitmap: libpng failed to create png_struct.");
+    }
 
 
+    png_infop info_ptr = png_create_info_struct(png_ptr);
+
+    if(info_ptr == NULL){
+      png_destroy_read_struct(&png_ptr, NULL, NULL);
+      printf("WTBitmap: libpng failed to create png_info.\n\n");
+      throw std::runtime_error("WTBitmap: libpng failed to create png_info.");
+    }
+
+    png_set_read_fn(png_ptr, &wld3buf, ReadDataFromWLD3Buf);
 
 
-  sdlsurf = SDL_CreateRGBSurface
-    (0, 640, 480, 32,
-     0x00FF0000,
-     0x0000FF00,
-     0x000000FF,
-     0xFF000000);
+    png_read_info(png_ptr, info_ptr);
 
-  cairosurf = cairo_image_surface_create_for_data
-    ((unsigned char*)sdlsurf->pixels,
-     CAIRO_FORMAT_RGB24,
-     this->sdlsurf->w,
-     this->sdlsurf->h,
-     this->sdlsurf->pitch);
+    width          = png_get_image_width(png_ptr, info_ptr);
+    height         = png_get_image_height(png_ptr, info_ptr);
+    int color_type = png_get_color_type(png_ptr, info_ptr);
+    int bit_depth  = png_get_bit_depth(png_ptr, info_ptr);
+
+    if(bit_depth == 16)
+      png_set_strip_16(png_ptr);
+
+    if(color_type == PNG_COLOR_TYPE_PALETTE)
+      png_set_palette_to_rgb(png_ptr);
+
+    // PNG_COLOR_TYPE_GRAY_ALPHA is always 8 or 16bit depth.
+    if(color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
+      png_set_expand_gray_1_2_4_to_8(png_ptr);
+
+    if(png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
+      png_set_tRNS_to_alpha(png_ptr);
+
+    // These color_type don't have an alpha channel then fill it with 0xff.
+    if(color_type == PNG_COLOR_TYPE_RGB ||
+       color_type == PNG_COLOR_TYPE_GRAY ||
+       color_type == PNG_COLOR_TYPE_PALETTE)
+      png_set_filler(png_ptr, 0xFF, PNG_FILLER_AFTER);
+
+    if(color_type == PNG_COLOR_TYPE_GRAY ||
+       color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      png_set_gray_to_rgb(png_ptr);
+
+    png_read_update_info(png_ptr, info_ptr);
+
+    data = new unsigned char[this->width * this->height * 4];
+
+    char* rowData = new char[png_get_rowbytes(png_ptr, info_ptr)];
+    for(int y = 0; y < height; y++) {
+      png_read_row(png_ptr, (png_bytep)&data[png_get_rowbytes(png_ptr, info_ptr) * y], NULL);
+    }
+    delete[] rowData;
+
+    cairosurf = cairo_image_surface_create_for_data
+      (this->data,
+       CAIRO_FORMAT_RGB24,
+       this->width,
+       this->height,
+       png_get_rowbytes(png_ptr, info_ptr));
+
+  }else{
+    printf("WTBitmap: Unknown image type %s!\n\n", outext.c_str());
+    throw std::runtime_error("WTBitmap: Unknown image type.");
+  }
 
   cr = cairo_create(cairosurf);
 
@@ -84,7 +202,10 @@ WTBitmap::WTBitmap(WT* wt_,
 WTBitmap::~WTBitmap(){
   cairo_destroy(this->cr);
   cairo_surface_destroy(this->cairosurf);
-  SDL_FreeSurface(this->sdlsurf);
+  if(this->sdlsurf)
+    SDL_FreeSurface(this->sdlsurf);
+  if(this->data)
+    delete [] this->data;
 }
 
 void WTBitmap::setColorKey(unsigned char Red,
@@ -99,16 +220,6 @@ void WTBitmap::setColorKey(unsigned char Red,
 
 void WTBitmap::unsetColorKey(){
   APILOG;
-}
-
-int WTBitmap::getWidth(){
-  APILOG;
-  return this->sdlsurf->w;
-}
-
-int WTBitmap::getHeight(){
-  APILOG;
-  return this->sdlsurf->h;
 }
 
 void WTBitmap::drawText(int x,
@@ -195,7 +306,7 @@ void WTBitmap::setColor(unsigned char Red,
   cairo_set_source_rgb(cr, ((float)Red)/255, ((float)Green)/255, ((float)Blue)/255);
   cairo_new_path (cr);  /* current path is not
                          consumed by cairo_clip() */
-  cairo_rectangle (cr, 0, 0, this->sdlsurf->w, this->sdlsurf->h);
+  cairo_rectangle (cr, 0, 0, this->width, this->height);
   cairo_fill (cr);
 
 }
