@@ -8,6 +8,7 @@
 #include <iostream>
 #include <istream>
 #include <streambuf>
+#include <jpeglib.h>
 
 #include "basetypes.hpp"
 
@@ -48,7 +49,7 @@ WTBitmap::WTBitmap(WT* wt_,
   std::cout << "New WTBitmap(width=" << width << ", height=" << height << ");" << std::endl;
 
   int stride = cairo_format_stride_for_width (CAIRO_FORMAT_RGB24, width);
-  data = (unsigned char*)malloc (stride * this->height);
+  data = new unsigned char[stride * this->height];
   memset(data, 0, stride * this->height);
 
   for(int i = 0; i < this->width * this->height; i++){
@@ -92,29 +93,55 @@ WTBitmap::WTBitmap(WT* wt_,
   }
   wld3->print();
 
-  membuf sbuf((char*)wld3->payload_data,
-              (char*)wld3->payload_data + wld3->payload_len);
-  std::istream wld3buf(&sbuf);
-
   std::string outext = std::string((char*)wld3->outext);
   printf("Image type is %s\n\n", outext.c_str());
 
   if(outext == "jpg"){
-    printf("IT IS A JPG! SKIP DOING THINGS\n\n");
-    int stride = cairo_format_stride_for_width (CAIRO_FORMAT_RGB24, width);
-    data = (unsigned char*)malloc (stride * this->height);
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+
+    cinfo.err = jpeg_std_error(&jerr);
+    cinfo.out_color_space = JCS_EXT_ARGB;
+    #ifndef JCS_EXTENSIONS
+        #error "JSC Colorspace Excensions required"
+    #endif
+
+    jpeg_create_decompress(&cinfo);
+    jpeg_mem_src(&cinfo, wld3->payload_data, wld3->payload_len);
+    jpeg_read_header(&cinfo, TRUE);
+    cinfo.out_color_space = JCS_EXT_BGRA; //TODO Figure out why reversed.
+    jpeg_start_decompress(&cinfo);
+
+    width = cinfo.output_width;
+    height = cinfo.output_height;
+    printf("DECOMPRESS STARTED. W: %d, H: %d; pixel_size: %d\n",
+           width, height, cinfo.output_components);
+
+    int stride = cairo_format_stride_for_width(CAIRO_FORMAT_RGB24, width);
+    data = new unsigned char[stride * this->height];
     memset(data, 0, stride * this->height);
+
+    while (cinfo.output_scanline < cinfo.output_height) {
+      unsigned char *buffer_array[1];
+      buffer_array[0] = this->data + (cinfo.output_scanline * stride);
+      jpeg_read_scanlines(&cinfo, buffer_array, 1);
+    }
+
+    jpeg_finish_decompress(&cinfo);
+    jpeg_destroy_decompress(&cinfo);
+
     cairosurf = cairo_image_surface_create_for_data
-      (this->data,//(unsigned char*)sdlsurf->pixels,
+      (this->data,
        CAIRO_FORMAT_RGB24,
        this->width,
        this->height,
-       stride);//this->sdlsurf->pitch);
+       stride);
 
-    for(int i = 0; i < this->width * this->height; i++){
-      ((unsigned int*)this->data)[i] = 0x00FFFF00;
-    }
   }else if(outext == "png"){
+    membuf sbuf((char*)wld3->payload_data,
+                (char*)wld3->payload_data + wld3->payload_len);
+    std::istream wld3buf(&sbuf);
+
     if(png_sig_cmp(wld3->payload_data, 0, std::min((size_t)8, wld3->payload_len)) != 0){
       printf("WTBitmap: Png has incorrect signature!\n\n");
       throw std::runtime_error("WTBitmap: Png has incorrect signature.");
