@@ -24,6 +24,10 @@ find_package(SDL2 REQUIRED)
 
 find_package(PNG REQUIRED)
 
+find_package(JPEG REQUIRED)
+
+#find_package(LibJpegTurbo REQUIRED)
+
 ############################
 
 add_library(wtapi SHARED
@@ -67,18 +71,22 @@ target_include_directories(wtapi
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
   PRIVATE
-    ${JNI_INCLUDE_DIRS}
-    ${SDL2_INCLUDE_DIR}
-    ${PNG_INCLUDE_DIRS}
     ${Cairo_INCLUDE_DIRS}
+    ${JNI_INCLUDE_DIRS}
+    ${JPEG_INCLUDE_DIR}
+    ${LibJpegTurbo_INCLUDE_DIRS}
+    ${PNG_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIR}
   )
 
 target_link_libraries(wtapi
   PRIVATE
-    WLD3
     ${Cairo_LIBRARIES}
-    ${SDL2_LIBRARY}
+    ${JPEG_LIBRARIES}
+    ${LibJpegTurbo_LIBRARIES}
     ${PNG_LIBRARIES}
+    ${SDL2_LIBRARY}
+    WLD3
   )
 
 ############################

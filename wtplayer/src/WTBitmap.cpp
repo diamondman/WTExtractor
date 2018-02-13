@@ -9,6 +9,8 @@
 #include <istream>
 #include <streambuf>
 #include <jpeglib.h>
+#include <math.h>
+//#include <byteswap.h>
 
 #include "basetypes.hpp"
 
@@ -46,7 +48,8 @@ WTBitmap::WTBitmap(WT* wt_,
                    int height) :
   WTObject(wt_),
   width(width), height(height){
-  std::cout << "New WTBitmap(width=" << width << ", height=" << height << ");" << std::endl;
+  std::cout << std::dec << "New WTBitmap(width=" << width <<
+    ", height=" << height << ");" << std::endl;
 
   int stride = cairo_format_stride_for_width (CAIRO_FORMAT_RGB24, width);
   data = new unsigned char[stride * this->height];
@@ -204,6 +207,17 @@ WTBitmap::WTBitmap(WT* wt_,
     char* rowData = new char[png_get_rowbytes(png_ptr, info_ptr)];
     for(int y = 0; y < height; y++) {
       png_read_row(png_ptr, (png_bytep)&data[png_get_rowbytes(png_ptr, info_ptr) * y], NULL);
+      unsigned int *tmp = (unsigned int*)&data[png_get_rowbytes(png_ptr, info_ptr) * y];
+      //The RGB is backwards, but the A is in the 'correct' spot. If the Alpha is filled in
+      //BEFORE, then each pixel is perfectly backwards, like for JPEG, TODO find out why
+      //these pixels have their color information backwards.
+      for(int x = 0; x < width; x++){
+        unsigned int c = tmp[x];
+        tmp[x] = ((c & 0xFF000000) >> 0) |
+                 ((c & 0x00FF0000) >> 16) |
+                 ((c & 0x0000FF00) << 0) |
+                 ((c & 0x000000FF) << 16);
+      }
     }
     delete[] rowData;
 
@@ -243,10 +257,15 @@ void WTBitmap::setColorKey(unsigned char Red,
     "  (0x" << (int)Red <<
     ", 0x" << (int)Green <<
     ", 0x" << (int)Blue << ")" << std::endl;
+  this->colorkey_r = ((float)Red)/255;
+  this->colorkey_g = ((float)Green)/255;
+  this->colorkey_b = ((float)Blue)/255;
+  this->using_colorkey = true;
 }
 
 void WTBitmap::unsetColorKey(){
   APILOG;
+  this->using_colorkey = false;
 }
 
 void WTBitmap::drawText(int x,
@@ -316,6 +335,9 @@ void WTBitmap::setTextBkColor(unsigned char Red,
     "  (0x" << (int)Red <<
     ", 0x" << (int)Green <<
     ", 0x" << (int)Blue << ")" << std::endl;
+  this->text_bg_r = ((float)Red)/255;
+  this->text_bg_g = ((float)Green)/255;
+  this->text_bg_b = ((float)Blue)/255;
 }
 
 void WTBitmap::setColor(unsigned char Red,
@@ -326,16 +348,8 @@ void WTBitmap::setColor(unsigned char Red,
     "  (0x" << (int)Red <<
     ", 0x" << (int)Green <<
     ", 0x" << (int)Blue << ")" << std::endl;
-  //std::cout << std::dec <<
-  //  "  (" << (((float)Red)/255) <<
-  //  ", " << (((float)Green)/255) <<
-  //  ", " << (((float)Blue)/255) << ")" << std::endl;
-  cairo_set_source_rgb(cr, ((float)Red)/255, ((float)Green)/255, ((float)Blue)/255);
-  cairo_new_path (cr);  /* current path is not
-                         consumed by cairo_clip() */
-  cairo_rectangle (cr, 0, 0, this->width, this->height);
-  cairo_fill (cr);
-
+  cairo_set_source_rgb(this->cr, ((float)Red)/255, ((float)Green)/255, ((float)Blue)/255);
+  cairo_paint(this->cr);
 }
 
 void WTBitmap::drawLine(int X1,
@@ -353,6 +367,9 @@ void WTBitmap::setDrawColor(unsigned char Red,
     "  (0x" << (int)Red <<
     ", 0x" << (int)Green <<
     ", 0x" << (int)Blue << ")" << std::endl;
+  this->draw_r = ((float)Red)/255;
+  this->draw_g = ((float)Green)/255;
+  this->draw_b = ((float)Blue)/255;
 }
 
 void WTBitmap::drawPixel(int x,
@@ -369,9 +386,19 @@ void WTBitmap::drawFillRect(int x,
                             int Width,
                             int Height){
   APILOG;
+  std::cout << std::dec <<
+    "  (" << x <<
+    ", " << y <<
+    ", " << Width <<
+    ", " << Height << ")" << std::endl;
+  cairo_set_source_rgb(cr, draw_r, draw_g, draw_b);
+  cairo_new_path (cr);
+  cairo_rectangle (cr, x, y, Width, Height);
+  cairo_fill (cr);
+
 }
 
-void WTBitmap::copyRect(WTBitmap* Source_Bitmap_To_Copy_From,
+void WTBitmap::copyRect(WTBitmap* bmp,
                         int Type,
                         int Source_X,
                         int Source_Y,
@@ -382,6 +409,80 @@ void WTBitmap::copyRect(WTBitmap* Source_Bitmap_To_Copy_From,
                         int Destination_Width,
                         int Destination_Height){
   APILOG;
+  std::cout << std::dec <<
+    "  (Type:" << Type <<
+    ", Source_X:" << Source_X <<
+    ", Source_Y:" << Source_Y <<
+    ", Source_W:" << Source_Width <<
+    ", Source_H:" << Source_Height <<
+    ", Dest_X:" << Destination_X <<
+    ", Dest_Y:" << Destination_Y <<
+    ", Dest_W:" << Destination_Width <<
+    ", Dest_H:" << Destination_Height << ")" << std::endl;
+
+  if(Source_X < 0) Source_X = 0;
+  if(Source_Y < 0) Source_Y = 0;
+  if(Source_Width < 0) Source_Width = this->width;
+  if(Source_Height < 0) Source_Height = this->height;
+
+  if(Destination_X < 0) Destination_X = 0;
+  if(Destination_Y < 0) Destination_Y = 0;
+  if(Destination_Width < 0) Destination_Width = bmp->width;
+  if(Destination_Height < 0) Destination_Height = bmp->height;
+
+  std::cout << std::dec <<
+    "  (Type:" << Type <<
+    ", Source_X:" << Source_X <<
+    ", Source_Y:" << Source_Y <<
+    ", Source_W:" << Source_Width <<
+    ", Source_H:" << Source_Height <<
+    ", Dest_X:" << Destination_X <<
+    ", Dest_Y:" << Destination_Y <<
+    ", Dest_W:" << Destination_Width <<
+    ", Dest_H:" << Destination_Height << ")" << std::endl;
+
+  cairo_surface_t *tmpsurface = cairo_image_surface_create
+    (CAIRO_FORMAT_RGB24, Source_Width, Source_Height);
+  cairo_t *tmpcairo = cairo_create(tmpsurface);
+
+  cairo_set_source_surface(tmpcairo, bmp->cairosurf, -Source_X, -Source_Y);
+  cairo_paint(tmpcairo);
+
+  /////// Render to main surface
+  cairo_identity_matrix(this->cr);
+  cairo_translate(this->cr, Destination_X, Destination_Y);
+  /*
+    src_w = 100
+    dest_w = 200
+    scale = 2 = 200/100 = dest/src
+  */
+  cairo_scale(this->cr,
+              static_cast<float>(Destination_Width)/static_cast<float>(Source_Width),
+              static_cast<float>(Destination_Height)/static_cast<float>(Source_Height));
+  std::cout <<
+    "  Scale factor(W: " << static_cast<float>(Destination_Width) << "/" <<
+                          static_cast<float>(Source_Width) << "=" <<
+                          static_cast<float>(Destination_Width)/static_cast<float>(Source_Width) <<
+                 "; H: " << static_cast<float>(Destination_Height) << "/" <<
+                          static_cast<float>(Source_Height) << "=" <<
+                          static_cast<float>(Destination_Height)/static_cast<float>(Source_Height)<<
+                 std::endl;
+  cairo_set_source_surface(this->cr, tmpsurface, 0, 0);//, Destination_X, Destination_Y);
+
+  cairo_paint(this->cr);
+
+  cairo_destroy(tmpcairo);
+  cairo_surface_destroy(tmpsurface);
+
+  //cairo_identity_matrix(this->cr);
+  //cairo_new_path(cr);
+  //cairo_set_source_rgb(cr, 1.0, 1.0, 0);
+  //cairo_set_line_width(cr, 1.0);
+  //cairo_rectangle(cr,
+  //                Destination_X, Destination_Y,
+  //                Destination_Width, Destination_Height);
+  //cairo_stroke(cr);
+  cairo_identity_matrix(this->cr);
 }
 
 //[id(0x0000233f), hidden]

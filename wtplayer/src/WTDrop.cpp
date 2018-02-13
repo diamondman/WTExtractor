@@ -7,7 +7,7 @@
 
 WTDrop::WTDrop(WT* wt_,
                WTBitmap* bitmap) :
-  WTObject(wt_), bitmap(bitmap) {
+  WTObject(wt_), bitmap(bitmap), width(bitmap->width), height(bitmap->height) {
   this->bitmap->AddRef();
 }
 
@@ -20,11 +20,31 @@ WTDrop::~WTDrop() {
 
 void WTDrop::_render(cairo_t* cr, int x, int y) {
   if(this->bitmap) {
-    cairo_set_source_surface(cr, this->bitmap->cairosurf,
-                             x + this->pos_x, y + this->pos_y);
+    cairo_identity_matrix(cr);
+    cairo_translate(cr, x + this->pos_x, y + this->pos_y);
+    //src_w = 100
+    //dest_w = 200
+    //scale = 2 = 200/100 = dest/src
+    if(width != this->bitmap->width || height != this->bitmap->height){
+      cairo_scale(cr,
+                  static_cast<float>(width)/static_cast<float>(this->bitmap->width),
+                  static_cast<float>(height)/static_cast<float>(this->bitmap->height));
+      std::cout <<
+        "  WTDrop Render Scale factor(W: " << static_cast<float>(width) << "/" <<
+        static_cast<float>(this->bitmap->width) << "=" <<
+        static_cast<float>(width)/static_cast<float>(this->bitmap->width) <<
+        "; H: " << static_cast<float>(height) << "/" <<
+        static_cast<float>(this->bitmap->height) << "=" <<
+        static_cast<float>(height)/static_cast<float>(this->bitmap->height)<<
+        std::endl;
+    }
+
+    cairo_set_source_surface(cr, this->bitmap->cairosurf, 0, 0);
     cairo_paint(cr);
+    cairo_identity_matrix(cr);
   }
 
+  cairo_new_path(cr);
   cairo_set_source_rgb(cr, 1.0, 0, 0);
   cairo_set_line_width(cr, 1.0);
   cairo_rectangle(cr,

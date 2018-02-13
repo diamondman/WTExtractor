@@ -29,6 +29,7 @@ WTCamera::~WTCamera() {
 }
 
 void WTCamera::_render(cairo_t* cr) {
+  cairo_new_path(cr);
   cairo_set_source_rgb(cr, 1.0, 0, 0);
   cairo_set_line_width(cr, 4.0);
   cairo_rectangle(cr, this->x, this->y, this->width, this->height);

@@ -169,9 +169,22 @@ private:
 
   int text_height = 10;
 
+  bool using_colorkey = false;
+  float colorkey_r = 0;
+  float colorkey_g = 0;
+  float colorkey_b = 0;
+
   float text_r = 0;
   float text_g = 0;
   float text_b = 0;
+
+  float text_bg_r = 0;
+  float text_bg_g = 0;
+  float text_bg_b = 0;
+
+  float draw_r = 0;
+  float draw_g = 0;
+  float draw_b = 0;
 
   unsigned int width = 0;
   unsigned int height = 0;
