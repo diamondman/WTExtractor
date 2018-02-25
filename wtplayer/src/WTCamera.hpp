@@ -1,6 +1,8 @@
 #pragma once
 
-#include <vector>
+#include <list>
+
+#include "container_WTDrop.hpp"
 
 #include "WTContainer.hpp"
 
@@ -9,7 +11,7 @@ class WTDrop;
 class WTVector3D;
 class WTCollisionInfo;
 
-class WTCamera : public WTContainer {
+class WTCamera : public WTContainer, public container_WTDrop {
 
 public:
   friend class WTDrop;
@@ -22,7 +24,8 @@ public:
   virtual ~WTCamera();
 
   typedef struct _cairo cairo_t;
-  void _render(cairo_t* cr);
+  virtual void _render(cairo_t* cr);
+  virtual void _moveDropToFront(WTDrop* drop);
 
   int getObjectType(){
     APILOG;
@@ -101,7 +104,7 @@ public:
   }
 
 private:
-  std::vector<WTDrop*> drops;
+  std::list<WTDrop*> drops;
   WTBitmap* render_bitmap = NULL;
 
   int x = 0;

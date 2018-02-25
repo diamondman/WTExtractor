@@ -19,6 +19,7 @@ WTDrop::~WTDrop() {
 }
 
 void WTDrop::_render(cairo_t* cr, int x, int y) {
+  APILOG;
   if(this->bitmap) {
     cairo_identity_matrix(cr);
     cairo_translate(cr, x + this->pos_x, y + this->pos_y);
@@ -45,15 +46,45 @@ void WTDrop::_render(cairo_t* cr, int x, int y) {
   }
 
   cairo_new_path(cr);
-  cairo_set_source_rgb(cr, 1.0, 0, 0);
-  cairo_set_line_width(cr, 1.0);
+  cairo_set_source_rgb(cr, 1.0, 1.0, 0);
+  cairo_set_line_width(cr, 2.0);
   cairo_rectangle(cr,
                   this->pos_x, this->pos_y,
                   this->width, this->height);
   cairo_stroke(cr);
 
+  printf("    Rendering %d drops\n", this->drops.size());
   for(WTDrop* drop : this->drops)
     drop->_render(cr, x + this->pos_x, y + this->pos_y);
+}
+
+void WTDrop::_moveDropToFront(WTDrop* drop) {
+  APILOG;
+  //printf("Prev Drop Order: ");
+  //for(WTDrop* d : this->drops)
+  //  printf("%p ", d);
+  //printf("\n    Moving drop to front %p\n", drop);
+
+  for(auto it = this->drops.begin(); it != this->drops.end(); ++it) {
+    if(*it == drop){
+      this->drops.splice(this->drops.end(), this->drops, it);
+
+      //printf("Post Drop Order: ");
+      //for(WTDrop* d : this->drops)
+      //  printf("%p ", d);
+      //printf("\n");
+      return;
+    }
+  }
+  std::cout << "ERROR! Tried to move a drop to the front that was not here! Prob our fault!\n";
+}
+
+void WTDrop::_setParent(container_WTDrop* parent) {
+  APILOG;
+  if(this->parent) {
+    this->parent->removeDrop(this);
+  }
+  this->parent = parent;
 }
 
 int WTDrop::getBitmapWidth(){
@@ -77,14 +108,13 @@ WTDrop* WTDrop::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
                             Bitmap_To_Use_As_Drop);
   drop->AddRef();
   this->drops.push_back(drop);
+  drop->_setParent(this);
   return drop;
 }
 
 void WTDrop::removeDrop(WTDrop* o){
   APILOG;
-  //for(int i = 0; i < this->drops.size(); i++) {
   for(auto it = this->drops.begin(); it != this->drops.end(); ++it) {
-    //if(this->drops[i] == o){
     if(*it == o){
       (*it)->Release();
       this->drops.erase(it);
@@ -122,6 +152,9 @@ void WTDrop::setPosition(int x,
 
 void WTDrop::bringToFront(){
   APILOG;
+  printf("    parent: %p\n", this->parent);
+  if(this->parent == NULL) return;
+  this->parent->_moveDropToFront(this);
 }
 
 void WTDrop::sendToBack(){

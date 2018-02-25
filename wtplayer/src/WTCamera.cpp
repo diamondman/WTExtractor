@@ -29,14 +29,39 @@ WTCamera::~WTCamera() {
 }
 
 void WTCamera::_render(cairo_t* cr) {
+  APILOG;
   cairo_new_path(cr);
   cairo_set_source_rgb(cr, 1.0, 0, 0);
   cairo_set_line_width(cr, 4.0);
   cairo_rectangle(cr, this->x, this->y, this->width, this->height);
   cairo_stroke(cr);
 
+  printf("  Rendering %d drops\n", this->drops.size());
   for(WTDrop* drop : this->drops)
     drop->_render(cr, 0, 0);
+}
+
+void WTCamera::_moveDropToFront(WTDrop* drop) {
+  APILOG;
+  //printf("Prev Drop Order: ");
+  //for(WTDrop* d : this->drops)
+  //  printf("%p ", d);
+  //printf("\n    Moving drop to front %p\n", drop);
+
+  for(auto it = this->drops.begin(); it != this->drops.end(); ++it) {
+    if(*it == drop){
+      this->drops.splice(this->drops.end(), this->drops, it);
+
+      //printf("Post Drop Order: ");
+      //for(WTDrop* d : this->drops)
+      //  printf("%p ", d);
+      //printf("\n");
+
+      return;
+    }
+  }
+  std::cout << "ERROR! Tried to move a drop to the front that was not here! Prob our fault!\n";
+
 }
 
 void WTCamera::setZoom(int Zoom_Factor){
@@ -61,15 +86,16 @@ WTDrop* WTCamera::addDrop(WTBitmap* Bitmap_To_Use_As_Drop,
                             Bitmap_To_Use_As_Drop);
   drop->AddRef();
   this->drops.push_back(drop);
+  drop->_setParent(this);
   return drop;
 }
 
 void WTCamera::removeDrop(WTDrop* o){
   APILOG;
-  for(int i = 0; i < this->drops.size(); i++) {
-    if(this->drops[i] == o){
-      o->Release();
-      this->drops.erase(this->drops.begin() + i);
+    for(auto it = this->drops.begin(); it != this->drops.end(); ++it) {
+    if(*it == o){
+      (*it)->Release();
+      this->drops.erase(it);
       return;
     }
   }
@@ -78,9 +104,12 @@ void WTCamera::removeDrop(WTDrop* o){
 
 WTDrop* WTCamera::getDrop(int Drop_Number){
   APILOG;
-  if(Drop_Number >= this->drops.size())
-    return NULL;
-  return this->drops[Drop_Number];
+  if (this->drops.size() > Drop_Number) {
+    auto it = this->drops.begin();
+    std::advance(it, Drop_Number);
+    return (*it);
+  }
+  return NULL;
 }
 
 void WTCamera::setViewHWND(int hWnd){

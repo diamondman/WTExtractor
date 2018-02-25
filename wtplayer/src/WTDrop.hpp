@@ -2,11 +2,13 @@
 
 #include <list>
 
+#include "container_WTDrop.hpp"
+
 #include "WTObject.hpp"
 
 class WTBitmap;
 
-class WTDrop : public WTObject {
+class WTDrop : public WTObject, public container_WTDrop {
 
 public:
   WTDrop(WT* wt_,
@@ -15,7 +17,9 @@ public:
   virtual ~WTDrop();
 
   typedef struct _cairo cairo_t;
-  void _render(cairo_t* cr, int x, int y);
+  virtual void _render(cairo_t* cr, int x, int y);
+  virtual void _moveDropToFront(WTDrop* drop);
+  void _setParent(container_WTDrop* parent);
 
   int getObjectType(){
     APILOG;
@@ -106,6 +110,7 @@ public:
 private:
   WTBitmap* bitmap = NULL;
   std::list<WTDrop*> drops;
+  container_WTDrop* parent = NULL;
 
   unsigned int pos_x = 0;
   unsigned int pos_y = 0;

@@ -75,6 +75,9 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %feature("director") InternalCallbackWrapper;
 %feature("director") InternalOnLoadCallbackWrapper;
 
+%ignore container_WTDrop;
+%include "src/container_WTDrop.hpp"
+
 %ignore IUnknown::AddRef;
 %ignore IUnknown::Release;
 %ignore IUnknown::GetRefCount;
@@ -128,6 +131,7 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %newobject WTDrop::getBitmap;
 %ignore WTDrop::WTDrop;
 %ignore WTDrop::_render;
+%ignore WTDrop::_setParent;
 %include "src/WTDrop.hpp"
 
 //The WTEvent constructor is necessary, for now at least.
