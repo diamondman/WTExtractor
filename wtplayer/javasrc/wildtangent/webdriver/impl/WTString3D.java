@@ -31,11 +31,13 @@ public class WTString3D extends wildtangent.webdriver.jni.WTString3D
 
     public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTString3D.setOnLoad(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoad(new InternalLoadEvent(callback));
     };
 
     public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTString3D.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
     };
 

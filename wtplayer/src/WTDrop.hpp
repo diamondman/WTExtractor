@@ -87,6 +87,7 @@ public:
 
   void setVisible(bool b){
     APILOG;
+    std::cout << (b ? "  (True}" : "  (False}") << std::endl;
     this->visible = b;
   }
 

@@ -39,7 +39,7 @@ WTFile::~WTFile(){
 
 VARIANT WTFile::readAll(){
   APILOG;
-  return 0;
+  throw std::runtime_error("unimplemented");
 }
 
 unsigned char WTFile::readByte(){
@@ -54,27 +54,36 @@ unsigned char WTFile::readByte(){
 
 int WTFile::readInt(){
   APILOG;
-  return 0;
+  throw std::runtime_error("unimplemented");
 }
 
 float WTFile::readFloat(){
   APILOG;
-  return 0;
+  throw std::runtime_error("unimplemented");
 }
 
 short WTFile::readShort(){
   APILOG;
-  return 0;
+  throw std::runtime_error("unimplemented");
 }
 
 double WTFile::readDouble(){
   APILOG;
-  return 0;
+  throw std::runtime_error("unimplemented");
 }
 
 const char* WTFile::readLine(){
   APILOG;
-  return 0;
+  std::string res = "";
+  unsigned char c;
+  while(!this->eof()) {
+    c = this->readByte();
+    if (c == '\r') continue;
+    res += c;
+    if (c == '\n') break;
+  }
+  //std::cout << "LINE: '''" << res << "'''" << std::endl;
+  return res.c_str();
 }
 
 //[id(0x00002b00), hidden]
@@ -85,12 +94,13 @@ void WTFile::close(){
 //[id(0x00002b01), hidden]
 void WTFile::seek(int Pos){
   APILOG;
+  throw std::runtime_error("unimplemented");
 }
 
 //[id(0x00002b02), hidden]
 int WTFile::move(int by){
   APILOG;
-  return 0;
+  throw std::runtime_error("unimplemented");
 }
 
 bool WTFile::eof(){
@@ -139,7 +149,13 @@ int WTFile::setEndian(int endian){
   return prev;
 }
 
+//TODO make this more efficient, also check the results.
 const char* WTFile::readString(int length){
   APILOG;
-  return (char*)"";
+  length = (length > -1) ? length : this->length() - wtbuff_offset;
+  std::string res = "";
+  while (!this->eof() && length--)
+    res += this->readByte();
+  //std::cout << "LINE: '''" << res << "'''" << std::endl;
+  return res.c_str();
 }

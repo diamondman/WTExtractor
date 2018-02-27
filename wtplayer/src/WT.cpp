@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <SDL.h>
 #include <cairo.h>
+#include <chrono>
 
 #include "basetypes.hpp"
 #include "InternalCallbackWrapper.hpp"
@@ -672,6 +673,9 @@ void WT::thread_bootstrap(void* This){
 void WT::wtMainThreadFunc(){
   SDL_Event e;
 
+  using namespace std::chrono;
+  int last_render = (int)(duration_cast< milliseconds >
+                          (system_clock::now().time_since_epoch()).count());
 
   while(this->wtThreadRun){
     std::cout << std::endl << "HELLO FROM WT THREAD " <<
@@ -684,11 +688,15 @@ void WT::wtMainThreadFunc(){
       }
     }
 
+
+    int curr_time = (int)(duration_cast<milliseconds>
+                          (system_clock::now().time_since_epoch()).count());
     if(this->RenderCallback != 0){
-      WTEvent *event = new WTEvent();
+      WTEvent *event = new WTEvent(curr_time - last_render);
       event->_Type = 8;
       this->RenderCallback->run(event);
     }
+    last_render = curr_time;
 
     SDL_FillRect(this->sdlsurf, NULL, 0x000000);
 

@@ -31,11 +31,13 @@ public class WTDrop extends wildtangent.webdriver.jni.WTDrop
 
     public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTDrop.setOnLoad(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoad(new InternalLoadEvent(callback));
     };
 
     public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTDrop.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
     };
 

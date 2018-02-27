@@ -51,11 +51,13 @@ public class WTBitmap extends wildtangent.webdriver.jni.WTBitmap
 
     public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTBitmap.setOnLoad(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoad(new InternalLoadEvent(callback));
     };
 
     public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTBitmap.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
     };
 

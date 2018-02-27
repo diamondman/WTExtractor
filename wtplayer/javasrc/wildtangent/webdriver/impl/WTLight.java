@@ -31,11 +31,13 @@ public class WTLight extends wildtangent.webdriver.jni.WTLight
 
     public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTLight.setOnLoad(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoad(new InternalLoadEvent(callback));
     };
 
     public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTLight.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
     };
 

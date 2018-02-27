@@ -31,11 +31,13 @@ public class WTActor extends wildtangent.webdriver.jni.WTActor
 
     public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTActor.setOnLoad(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoad(new InternalLoadEvent(callback));
     };
 
     public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTActor.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        callback.onLoadComplete(this);
         this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
     };
 

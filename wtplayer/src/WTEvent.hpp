@@ -7,6 +7,8 @@ class WTObject;
 class WTEvent {
 
 public:
+  WTEvent(int interval=0);
+
   int getType(){
     APILOG;
     return _Type;
@@ -14,7 +16,10 @@ public:
 
   int getTime();
 
-  int getInterval();
+  int getInterval(){
+    APILOG;
+    return interval_;
+  }
 
   //[id(0x0000138b), hidden]
   int getId(){
@@ -95,6 +100,7 @@ public:
 
   //private:
   int _Type;
+  int interval_;
   int _WTX;
   int _WTY;
   int _X;

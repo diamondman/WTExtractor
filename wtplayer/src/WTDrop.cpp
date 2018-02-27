@@ -20,6 +20,10 @@ WTDrop::~WTDrop() {
 
 void WTDrop::_render(cairo_t* cr, int x, int y) {
   APILOG;
+  if(!this->visible) {
+    std::cout << "  Not rendering: Drop not vislble." << std::endl;
+    return;
+  }
   if(this->bitmap) {
     cairo_identity_matrix(cr);
     cairo_translate(cr, x + this->pos_x, y + this->pos_y);

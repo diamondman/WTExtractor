@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+WTEvent::WTEvent(int interval) : interval_(interval) {}
+
 int WTEvent::getTime(){
   APILOG;
   using namespace std::chrono;
@@ -9,9 +11,4 @@ int WTEvent::getTime(){
                  (system_clock::now().time_since_epoch()).count());
   std::cout << "  Ret " << std::dec << ms << " ms;" << std::endl;
   return ms;
-}
-
-int WTEvent::getInterval(){
-  APILOG;
-  return 90;
 }

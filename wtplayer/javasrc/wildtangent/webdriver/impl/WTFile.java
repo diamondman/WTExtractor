@@ -30,20 +30,19 @@ public class WTFile extends wildtangent.webdriver.jni.WTFile
 
     public void setOnLoad(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTFile.setOnLoad(WTOnLoadEvent)}");
+        System.out.println(">>>> Starting onLoad callback");
+        callback.onLoadComplete(this);
+        System.out.println("<<<< Ending onLoad callback");
         this.setOnLoad(new InternalLoadEvent(callback));
     };
 
     public void setOnLoadedWithChildren(wildtangent.webdriver.WTOnLoadEvent callback){
         System.out.println("calling JAVA WTAPI {void WTFile.setOnLoadedWithChildren(WTOnLoadEvent)}");
+        System.out.println(">>>> Starting onLoad callback");
+        callback.onLoadComplete(this);
+        System.out.println("<<<< Ending onLoad callback");
         this.setOnLoadedWithChildren(new InternalLoadEvent(callback));
     };
-
-    /*public byte readByte() {
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-            System.out.println(ste);
-        }
-        return super.readByte();
-    }*/
 
     public void close() {
         System.out.println("*************************************FILE CLOSING*************************");
