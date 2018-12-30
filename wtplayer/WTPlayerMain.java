@@ -1,13 +1,10 @@
 import java.applet.Applet;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URLClassLoader;
-import java.net.URL;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import wildtangent.webdriver.WT;
-import wildtangent.webdriver.wt3dLib;
 
 
 public class WTPlayerMain {
@@ -28,12 +25,8 @@ public class WTPlayerMain {
                            + WTPlayerMain.class.getClassLoader().getClass().getName());
 
         ClassLoader loader = ClassLoader.getSystemClassLoader();
-
-        System.out.println("Loader URLs:");
-        URL[] urls = ((URLClassLoader)loader).getURLs();
-        for(URL url: urls){
-            System.out.println("  " + url.getFile());
-        }
+        System.out.println("Current System Class Loader : " +
+                           ClassLoader.getSystemClassLoader().getClass().getName());
 
         WT wt = new wildtangent.webdriver.impl.WT(localver_path, 800, 600);
 

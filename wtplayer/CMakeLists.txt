@@ -369,16 +369,18 @@ add_jar(rt
   ${RTSRC}/com/ms/wfc/util/Debug.java
 
   ${RTSRC}/java/applet/Applet.java
+  )
 
+add_jar(rt_js
   ${RTSRC}/netscape/javascript/JSObject.java
   )
 
 ############################
 
 set(CMAKE_JAVA_INCLUDE_PATH
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar)
+  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar:${CMAKE_CURRENT_BINARY_DIR}/rt_js.jar)
 add_jar(WTPlayerMain WTPlayerMain.java)
-add_dependencies(WTPlayerMain wildtangent rt)
+add_dependencies(WTPlayerMain wildtangent rt rt_js)
 
 ############################
 

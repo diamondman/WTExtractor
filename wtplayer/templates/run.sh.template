@@ -1,6 +1,17 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-#java -Djava.library.path=$DIR -cp $DIR/wildtangent.jar:$DIR/ms.jar:$DIR -Xbootclasspath/p:$DIR/rt.jar -jar main.jar
+
+# Get a running version of Java
+if [[ -n $(type -p java) ]]
+then
+  java_cmd=java
+elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]
+then
+  java_cmd="$JAVA_HOME/bin/java"
+else
+    echo "No Java found! Terminating"
+    exit 1
+fi
 
 VERBOSEFLAGS=""
 if [[ $* == *-v* ]]
@@ -9,10 +20,45 @@ then
 fi
 
 LOCALVER_PATH="/home/diamondman/.wine/drive_c/Program Files (x86)/WildTangent/Apps/GameChannel/Games/02554DAA-470F-40BC-BF60-675C5BD9920F/localver"
+GAME_BIN_PATH="${LOCALVER_PATH}/darkorbit"
 
-java \
-    ${VERBOSEFLAGS} \
-    -Djava.library.path=$DIR \
-    -cp $DIR/wildtangent.jar:$DIR/WTPlayerMain.jar:.:"${LOCALVER_PATH}/darkorbit" \
-    -Xbootclasspath/p:$DIR/rt.jar WTPlayerMain "${LOCALVER_PATH}"
-#"${@:2}"
+# returns the JDK version. (Courtesy of Eugene Yokota on stack overflow)
+# 8 for 1.8.0_nn, 9 for 9-ea etc
+jdk_version() {
+  local result
+  local IFS=$'\n'
+  # remove \r for Cygwin
+  local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
+  for line in $lines; do
+    if [[ (-z $result) && ($line = *"version \""*) ]]
+    then
+      local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
+      # on macOS, sed doesn't support '?'
+      if [[ $ver = "1."* ]]
+      then
+        result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
+      else
+        result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
+      fi
+    fi
+  done
+  echo "$result"
+}
+
+jdkv="$(jdk_version)"
+echo "Using Java JDK version $jdkv"
+
+if [[ "$jdkv" -ge "9" ]]; then
+    java_params="--patch-module java.desktop="$DIR/rt.jar"
+                 --patch-module jdk.jsobject="$DIR/rt_js.jar""
+else
+    java_params=-Xbootclasspath/p:"$DIR/rt.jar":"$DIR/rt_js.jar"
+fi
+
+set -x
+${java_cmd} \
+   ${VERBOSEFLAGS} \
+   -Djava.library.path=$DIR \
+   -cp "$DIR/wildtangent.jar":"$DIR/WTPlayerMain.jar":"${GAME_BIN_PATH}"\
+   ${java_params} \
+   WTPlayerMain "${LOCALVER_PATH}"
