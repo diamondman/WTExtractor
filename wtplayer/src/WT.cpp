@@ -670,6 +670,145 @@ void WT::thread_bootstrap(void* This){
   ((WT*)This)->wtMainThreadFunc();
 }
 
+static int SDLKeyToWTKey(SDL_Keycode code) {
+  switch(code){
+  case SDLK_LEFT:
+    return 37;
+  case SDLK_UP:
+    return 38;
+  case SDLK_RIGHT:
+    return 39;
+  case SDLK_DOWN:
+    return 40;
+  case SDLK_RETURN:
+    return 13;//return
+  case SDLK_SPACE:
+    return 32;//space
+  case SDLK_SEMICOLON:
+    return 186;//semicolon
+  case SDLK_EQUALS:
+    return 187;//"equals
+  case SDLK_COMMA:
+    return 188;//"comma
+  case SDLK_MINUS:
+    return 189;//"dash
+  case SDLK_PERIOD:
+    return 190;//"period
+  case SDLK_SLASH:
+    return 191;//"fslash
+  //case SDL_:
+  //  return 192;//"~
+  case SDLK_BACKSLASH:
+    return 220;//"backslash
+  case SDLK_QUOTE:
+    return 222;//"quote
+  case SDLK_KP_MULTIPLY:
+    return 106;//"kp_star
+  case SDLK_KP_PLUS:
+    return 107;//"kp_plus
+  case SDLK_KP_MINUS:
+    return 109;//"kp_minus
+  case SDLK_KP_BACKSPACE: // Correct?
+    return 110;//"kp_del
+  case SDLK_KP_DIVIDE:
+    return 111;//"kp_slash
+  case SDLK_KP_0:
+    return 96;//"kp_0
+  case SDLK_KP_1:
+    return 97;//"kp_1
+  case SDLK_KP_2:
+    return 98;//"kp_2
+  case SDLK_KP_3:
+    return 99;//"kp_3
+  case SDLK_KP_4:
+    return 100;//"kp_4
+  case SDLK_KP_5:
+    return 101;//"kp_5
+  case SDLK_KP_6:
+    return 102;//"kp_6
+  case SDLK_KP_7:
+    return 103;//"kp_7
+  case SDLK_KP_8:
+    return 104;//"kp_8
+  case SDLK_KP_9:
+    return 105;//"kp_9
+  case SDLK_0:
+    return '0';
+  case SDLK_1:
+    return '1';
+  case SDLK_2:
+    return '2';
+  case SDLK_3:
+    return '3';
+  case SDLK_4:
+    return '4';
+  case SDLK_5:
+    return '5';
+  case SDLK_6:
+    return '6';
+  case SDLK_7:
+    return '7';
+  case SDLK_8:
+    return '8';
+  case SDLK_9:
+    return '9';
+  case SDLK_a:
+    return 'A';
+  case SDLK_b:
+    return 'B';
+  case SDLK_c:
+    return 'C';
+  case SDLK_d:
+    return 'D';
+  case SDLK_e:
+    return 'E';
+  case SDLK_f:
+    return 'F';
+  case SDLK_g:
+    return 'G';
+  case SDLK_h:
+    return 'H';
+  case SDLK_i:
+    return 'I';
+  case SDLK_j:
+    return 'J';
+  case SDLK_k:
+    return 'K';
+  case SDLK_l:
+    return 'L';
+  case SDLK_m:
+    return 'M';
+  case SDLK_n:
+    return 'N';
+  case SDLK_o:
+    return 'O';
+  case SDLK_p:
+    return 'P';
+  case SDLK_q:
+    return 'Q';
+  case SDLK_r:
+    return 'R';
+  case SDLK_s:
+    return 'S';
+  case SDLK_t:
+    return 'T';
+  case SDLK_u:
+    return 'U';
+  case SDLK_v:
+    return 'V';
+  case SDLK_w:
+    return 'W';
+  case SDLK_x:
+    return 'X';
+  case SDLK_y:
+    return 'Y';
+  case SDLK_z:
+    return 'Z';
+  default:
+    return 0;
+  }
+}
+
 void WT::wtMainThreadFunc(){
   SDL_Event e;
 
@@ -680,20 +819,135 @@ void WT::wtMainThreadFunc(){
   while(this->wtThreadRun){
     std::cout << std::endl << "HELLO FROM WT THREAD " <<
       std::hex << static_cast<void*>(this->RenderCallback) << " Refcnt " <<
-      //std::dec << (this->RenderCallback == 0 ? 0 : this->RenderCallback->GetRefCount()) <<
       std::endl;
     while( SDL_PollEvent(&e) ) {
-      if( e.type == SDL_QUIT ) {
+      switch( e.type) {
+      case SDL_QUIT:
         this->wtThreadRun = false;
+        break;
+
+      case SDL_MOUSEMOTION:{
+        std::cout << "MOUSE MOTION EVENT ("<<e.motion.x<<", "<<e.motion.y<<")"
+                  << std::endl;
+        if(this->MouseCallback != 0){
+            WTEvent *event = new WTEvent(WTEVENT_MOUSEMOVEEVENT);
+            event->_WTX = e.motion.x;
+            event->_WTY = e.motion.y;
+            event->_X = e.motion.x;
+            event->_Y = e.motion.y;
+            //event->_ButtonState = 0; // TODO
+            this->MouseCallback->run(event);
+        }
+        break;
+      }
+      case SDL_MOUSEBUTTONDOWN:
+        if(this->MouseCallback != 0){
+          int type_;
+          int doubleType_;
+          bool typeValid = true;
+          switch(e.button.button){
+          case SDL_BUTTON_LEFT:
+            std::cout << "MOUSE LBTN DOWN EVENT";
+            type_ = WTEVENT_MOUSELEFTBUTTONDOWN;
+            doubleType_ = WTEVENT_MOUSELEFTDBLCLICKEVENT;
+            break;
+          case SDL_BUTTON_RIGHT:
+            std::cout << "MOUSE RBTN DOWN EVENT";
+            type_ = WTEVENT_MOUSERIGHTBUTTONDOWN;
+            doubleType_ = WTEVENT_MOUSERIGHTDBLCLICKEVENT;
+            break;
+          case SDL_BUTTON_MIDDLE:
+            std::cout << "MOUSE MBTN DOWN EVENT";
+            type_ = WTEVENT_MOUSEMIDDLEBUTTONDOWN;
+            doubleType_ = WTEVENT_MOUSEMIDDLEDBLCLICKEVENT;
+            break;
+          default:
+            typeValid = false;
+          }
+          if(!typeValid) break;
+          std::cout << " ("<<e.button.x<<", "<<e.button.y<<")" << std::endl;
+
+          WTEvent *event = new WTEvent(type_);
+          event->_WTX = e.button.x;
+          event->_WTY = e.button.y;
+          event->_X = e.button.x;
+          event->_Y = e.button.y;
+          //event->_ButtonState = 0; // TODO
+          this->MouseCallback->run(event);
+
+          if(e.button.clicks == 2){
+            std::cout << "MOUSE DOUBLE CLICK ALSO SENT" << std::endl;
+            event = new WTEvent(doubleType_);
+            event->_WTX = e.button.x;
+            event->_WTY = e.button.y;
+            event->_X = e.button.x;
+            event->_Y = e.button.y;
+            //event->_ButtonState = 0; // TODO
+            this->MouseCallback->run(event);
+          }
+        }
+        break;
+
+      case SDL_MOUSEBUTTONUP:
+        if(this->MouseCallback != 0){
+          int type_;
+          bool typeValid = true;
+          switch(e.button.button){
+          case SDL_BUTTON_LEFT:
+            std::cout << "MOUSE LBTN UP EVENT";
+            type_ = WTEVENT_MOUSELEFTBUTTONUP;
+            break;
+          case SDL_BUTTON_RIGHT:
+            std::cout << "MOUSE RBTN UP EVENT";
+            type_ = WTEVENT_MOUSERIGHTBUTTONUP;
+            break;
+          case SDL_BUTTON_MIDDLE:
+            std::cout << "MOUSE MBTN UP EVENT";
+            type_ = WTEVENT_MOUSEMIDDLEBUTTONUP;
+            break;
+          default:
+            typeValid = false;
+          }
+          if(!typeValid) break;
+          std::cout << " ("<<e.button.x<<", "<<e.button.y<<")" << std::endl;
+
+          WTEvent *event = new WTEvent(type_);
+          event->_WTX = e.button.x;
+          event->_WTY = e.button.y;
+          event->_X = e.button.x;
+          event->_Y = e.button.y;
+          //event->_ButtonState = 0; // TODO
+          this->MouseCallback->run(event);
+
+          //usleep(2 * 1000 * 1000);
+        }
+        break;
+      case SDL_KEYDOWN:
+        std::cout << "KEY DOWN EVENT ("<<e.key.keysym.sym<<")" << std::endl;
+        if(this->KeyboardCallback != 0){
+          WTEvent *event = new WTEvent(WTEVENT_KEYBOARDEVENT);
+          event->_Key = SDLKeyToWTKey(e.key.keysym.sym);
+          event->_KeyState = KEY_PRESS;
+          this->KeyboardCallback->run(event);
+        }
+        break;
+      case SDL_KEYUP:
+        std::cout << "KEY UP EVENT ("<<e.key.keysym.sym<<")" << std::endl;
+        if(this->KeyboardCallback != 0){
+          WTEvent *event = new WTEvent(WTEVENT_KEYBOARDEVENT);
+          event->_Key = SDLKeyToWTKey(e.key.keysym.sym);
+          event->_KeyState = KEY_RELEASE;
+          this->KeyboardCallback->run(event);
+        }
+        break;
       }
     }
-
 
     int curr_time = (int)(duration_cast<milliseconds>
                           (system_clock::now().time_since_epoch()).count());
     if(this->RenderCallback != 0){
-      WTEvent *event = new WTEvent(curr_time - last_render);
-      event->_Type = 8;
+      WTEvent *event = new WTEvent(WTEVENT_RENDEREVENT,
+                                   curr_time - last_render);
       this->RenderCallback->run(event);
     }
     last_render = curr_time;

@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-WTEvent::WTEvent(int interval) : interval_(interval) {}
+WTEvent::WTEvent(int type, int interval) : _Type(type), interval_(interval) {}
 
 int WTEvent::getTime(){
   APILOG;

@@ -4,10 +4,34 @@
 
 class WTObject;
 
+#define WTEVENT_RENDEREVENT               0 //The event is a render event.
+#define WTEVENT_MOUSEEVENT                1 //Unknown mouse event.
+#define WTEVENT_MOUSEMOVEEVENT            2 //The mouse moved.
+#define WTEVENT_MOUSELEFTDBLCLICKEVENT    5 //The left button was double-clicked.
+#define WTEVENT_MOUSELEFTBUTTONDOWN       6 //The left mouse button was pressed.
+#define WTEVENT_MOUSELEFTBUTTONUP         7 //The left mouse button was released.
+#define WTEVENT_MOUSERIGHTDBLCLICKEVENT   8 //The right button was double-clicked.
+#define WTEVENT_MOUSERIGHTBUTTONDOWN      9 //The right mouse button was pressed.
+#define WTEVENT_MOUSERIGHTBUTTONUP       10 //The right mouse button was released.
+#define WTEVENT_MOUSEMIDDLEDBLCLICKEVENT 11 //The middle button was double-clicked.
+#define WTEVENT_MOUSEMIDDLEBUTTONDOWN    12 //The middle mouse button was pressed.
+#define WTEVENT_MOUSEMIDDLEBUTTONUP      13 //The middle mouse button was released.
+#define WTEVENT_KEYBOARDEVENT            14 //A key was pressed or released.
+#define WTEVENT_EXCEPTIONEVENT           15 //An exception event has occurred.
+
+#define BTNSTATE_LEFT   1  //Left mouse button is pressed.
+#define BTNSTATE_RIGHT  2  //Right mouse button is pressed.
+#define BTNSTATE_SHIFT  4  //Shift key is pressed.
+#define BTNSTATE_CTRL   8  //Control key is pressed.
+#define BTNSTATE_MIDDLE 16 //Middle mouse button is pressed.
+
+#define KEY_RELEASE 0
+#define KEY_PRESS   1
+
 class WTEvent {
 
 public:
-  WTEvent(int interval=0);
+  WTEvent(int type=WTEVENT_EXCEPTIONEVENT, int interval=0);
 
   int getType(){
     APILOG;

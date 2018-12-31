@@ -313,10 +313,10 @@ add_jar(wildtangent
   ${JAVASRC}/wildtangent/webdriver/WTVector3D.java
   ${JAVASRC}/wildtangent/webdriver/WTVisualizer.java
 
-  ${JAVASRC}/wildtangent/webdriver/impl/InternalExceptionEvent.java
-  ${JAVASRC}/wildtangent/webdriver/impl/InternalKeyboardEvent.java
-  ${JAVASRC}/wildtangent/webdriver/impl/InternalMouseEvent.java
-  ${JAVASRC}/wildtangent/webdriver/impl/InternalRenderEvent.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalExceptionEventCallback.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalKeyboardEventCallback.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalMouseEventCallback.java
+  ${JAVASRC}/wildtangent/webdriver/impl/InternalRenderEventCallback.java
   ${JAVASRC}/wildtangent/webdriver/impl/InternalLoadEvent.java
   ${JAVASRC}/wildtangent/webdriver/impl/WTActor.java
   ${JAVASRC}/wildtangent/webdriver/impl/WTAudioClip3D.java
