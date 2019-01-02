@@ -10,6 +10,7 @@ add_library(WLD3 STATIC
   src/multifh.c
   src/wld3_extract.c
   src/pwt_decode.c
+  src/dshfl.c
   )
 target_include_directories (WLD3
   PUBLIC include

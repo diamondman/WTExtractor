@@ -8,6 +8,8 @@ extern "C" {
 #define _WLD3_DATAACCESSORS
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 typedef struct DataAccessor {
   size_t (*remaining)(struct DataAccessor*);

@@ -1,14 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
 
 #include "pwt_decode.h"
 #include "dataaccessors.h"
 
 int main(int args, char** argv){
   if(args == 1){
-    printf("Missing file path.\n");
+    fprintf(stderr, "Missing file path.\n");
     return 1;
   }
 
@@ -19,10 +16,10 @@ int main(int args, char** argv){
     pwt_print(pwt);
     pwt_free(pwt);
   }else
-    printf("ERROR! DONE!\n");
+    fprintf(stderr, "ERROR! DONE!\n");
 
   if(acc){
-    printf("OFFSET: %zu; Len %zu\n", ftell(acc->dat.file), acc->length);
+    fprintf(stderr, "OFFSET: %zu; Len %zu\n", ftell(acc->dat.file), acc->length);
     freeFileAccessor(acc);
   }
 

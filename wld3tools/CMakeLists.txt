@@ -13,3 +13,6 @@ target_link_libraries(PWTDecode WLD3)
 
 add_executable(WTExtract wtextract_cli_main.c)
 target_link_libraries(WTExtract WLD3)
+
+add_executable(WTDataClassDecode wtdatclassdecode_cli_main.c)
+target_link_libraries(WTDataClassDecode WLD3)
