@@ -174,6 +174,7 @@ DataAccessor* openFileAccessor(const char *filename){
 }
 
 void freeFileAccessor(DataAccessor* da){
+  if(da == NULL) return;
   if(da->dat.file) fclose(da->dat.file);
   free(da);
 }

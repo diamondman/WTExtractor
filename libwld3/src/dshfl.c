@@ -48,6 +48,7 @@ DSHFL* DSHFL_create(DataAccessor* acc) {
 }
 
 void DSHFL_free(DSHFL* dshfl) {
+  if(dshfl == NULL) return;
   free(dshfl);
 }
 
@@ -72,7 +73,6 @@ size_t DSHFL_decodeAllChunks(DSHFL* dshfl, unsigned char* buffout) {
   while(chunkLen = DSHFL_decodeNextChunk(dshfl, (DSHFL_DecodedChunk*)buffout)) {
     buffout += sizeof(DSHFL_EncodedChunk);
     total += chunkLen;
-    fprintf(stderr, "Total: %d; Added: %d\n", total, chunkLen);
   }
   return total;
 }

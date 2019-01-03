@@ -1,50 +1,76 @@
 package com.ms.com;
 
 public class Variant {
-    public Variant(int i) {
-        // TODO Auto-generated constructor stub
-    }
+    /* Types copied from https://www.javatips.net/api/jacob-master/src/com/jacob/com/Variant.java */
+    public static final short VariantEmpty = 0;
+//  public static final short VariantShort = 2;
+    public static final short VariantInt = 3;
+    public static final short VariantFloat = 4;
+    public static final short VariantDouble = 5;
+    public static final short VariantString = 8;
+    public static final short VariantBoolean = 11;
+    public static final short VariantSafeArray = 27;
 
-    public Variant(double doubleValue) {
-        // TODO Auto-generated constructor stub
+    private final short type;
+    private int valint = 0;
+    private double valdouble = 0;
+    private float valfloat = 0;
+    private String valstring = "";
+    private boolean valbool = false;
+    private SafeArray valsafearray = null;
+
+    public Variant(int val) {
+        this.type = VariantInt;
+        this.valint = val;
     }
-    public Variant(String string) {
-        // TODO Auto-generated constructor stub
+    public Variant(float val) {
+        this.type = VariantFloat;
+        this.valfloat = val;
     }
-    public Variant(boolean booleanValue) {
-        // TODO Auto-generated constructor stub
+    public Variant(double val) {
+        this.type = VariantDouble;
+        this.valdouble = val;
+    }
+    public Variant(String val) {
+        this.type = VariantString;
+        this.valstring = val;
+    }
+    public Variant(boolean val) {
+        this.type = VariantBoolean;
+        this.valbool = val;
     }
     public Variant() {
-        // TODO Auto-generated constructor stub
+        this.type = VariantEmpty;
     }
 
     public short getvt(){
-        return 0;
+        return this.type;
     }
 
     public boolean getBoolean(){
-        return false;
+        return this.valbool;
     }
     public double getDouble(){
-        return 0.0;
+        return this.valdouble;
     }
     public float getFloat(){
-        return 0.0f;
+        return this.valfloat;
     }
     public int getInt(){
-        return 0;
+        return this.valint;
     }
     public String getString(){
-        return null;
+        return this.valstring;
     }
 
     public SafeArray toSafeArray() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.valsafearray;
     }
-
-    public void putSafeArray(SafeArray safeArray) {
-        // TODO Auto-generated method stub
-
+    public void putSafeArray(SafeArray val) {
+        this.valsafearray = val;
+    }
+    public void putSafeArray(byte[] val) {
+        this.valsafearray = new SafeArray(0, 0);
+        this.valsafearray.fromByteArray(val);
     }
 }

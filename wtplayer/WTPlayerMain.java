@@ -6,7 +6,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import wildtangent.webdriver.WT;
 
-
 public class WTPlayerMain {
 
     public enum Message {
@@ -17,10 +16,15 @@ public class WTPlayerMain {
         System.loadLibrary("WTEngine");
     }
 
+    private static native void setPathForWtNativeLoader(String path);
+
     private ArrayBlockingQueue<Message> q = new ArrayBlockingQueue<Message>(128);
     private boolean loop = true;
 
     public WTPlayerMain(String localver_path){
+        // Set the path in wtgutils so Loader can find encoded classes.
+        setPathForWtNativeLoader(localver_path);
+
         System.out.println("Current Class Loader : "
                            + WTPlayerMain.class.getClassLoader().getClass().getName());
 
@@ -48,6 +52,7 @@ public class WTPlayerMain {
             System.err.println("Error! Failed to load game: The game's main "+
                                "class must extend java.applet.Applet.");
             e.printStackTrace();
+            return;
         }
 
         /*Runtime.getRuntime().addShutdownHook(new Thread() {

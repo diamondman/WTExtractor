@@ -19,7 +19,8 @@ then
     VERBOSEFLAGS="-verbose:class"
 fi
 
-LOCALVER_PATH="/home/diamondman/.wine/drive_c/Program Files (x86)/WildTangent/Apps/GameChannel/Games/02554DAA-470F-40BC-BF60-675C5BD9920F/localver"
+GAME_BASE_PATH="/home/diamondman/.wine/drive_c/Program Files (x86)/WildTangent/Apps/GameChannel/Games/02554DAA-470F-40BC-BF60-675C5BD9920F"
+LOCALVER_PATH="${GAME_BASE_PATH}/localver"
 GAME_BIN_PATH="${LOCALVER_PATH}/darkorbit"
 
 # returns the JDK version. (Courtesy of Eugene Yokota on stack overflow)
@@ -59,6 +60,7 @@ set -x
 ${java_cmd} \
    ${VERBOSEFLAGS} \
    -Djava.library.path=$DIR \
-   -cp "$DIR/wildtangent.jar":"$DIR/WTPlayerMain.jar":"${GAME_BIN_PATH}"\
+   -Xbootclasspath/a:"$DIR/com_ms.jar" \
+   -cp "${GAME_BASE_PATH}/wtgutils.jar":"$DIR/wildtangent.jar":"$DIR/WTPlayerMain.jar":"${GAME_BIN_PATH}" \
    ${java_params} \
    WTPlayerMain "${LOCALVER_PATH}"

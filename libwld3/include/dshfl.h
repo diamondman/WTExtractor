@@ -44,3 +44,7 @@ size_t DSHFL_decodeNextChunk(DSHFL* dshfl, DSHFL_DecodedChunk *out);
 size_t DSHFL_decodeAllChunks(DSHFL* dshfl, unsigned char* buffout);
 
 #endif
+
+#ifdef __cplusplus
+}
+#endif

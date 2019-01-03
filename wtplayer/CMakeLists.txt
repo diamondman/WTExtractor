@@ -65,6 +65,8 @@ add_library(wtapi SHARED
   src/WTSysInfo.cpp
   src/WTVector3D.cpp
   src/WTVisualizer.cpp
+
+  src/wtgutils.cpp
   )
 
 target_include_directories(wtapi
@@ -87,6 +89,7 @@ target_link_libraries(wtapi
     ${PNG_LIBRARIES}
     ${SDL2_LIBRARY}
     WLD3
+    -lstdc++fs # Used for experimental filesystem feature in wtgutils.
   )
 
 ############################
@@ -356,6 +359,10 @@ add_jar(wildtangent
 
 set(RTSRC ${JAVASRC})
 add_jar(rt
+  ${RTSRC}/java/applet/Applet.java
+  )
+
+add_jar(com_ms
   ${RTSRC}/com/ms/com/_Guid.java ${RTSRC}/com/ms/com/IUnknown.java
   ${RTSRC}/com/ms/com/NoAutoScripting.java
   ${RTSRC}/com/ms/com/SafeArray.java ${RTSRC}/com/ms/com/Variant.java
@@ -368,7 +375,7 @@ add_jar(rt
 
   ${RTSRC}/com/ms/wfc/util/Debug.java
 
-  ${RTSRC}/java/applet/Applet.java
+  ${RTSRC}/com/ms/wfc/app/SystemInformation.java
   )
 
 add_jar(rt_js
@@ -378,9 +385,9 @@ add_jar(rt_js
 ############################
 
 set(CMAKE_JAVA_INCLUDE_PATH
-  ${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar:${CMAKE_CURRENT_BINARY_DIR}/rt_js.jar)
+  ${CMAKE_CURRENT_BINARY_DIR}/com_ms.jar:${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar:${CMAKE_CURRENT_BINARY_DIR}/rt_js.jar)
 add_jar(WTPlayerMain WTPlayerMain.java)
-add_dependencies(WTPlayerMain wildtangent rt rt_js)
+add_dependencies(WTPlayerMain wildtangent rt com_ms rt_js)
 
 ############################
 

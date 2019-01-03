@@ -2,18 +2,15 @@ package com.ms.com;
 
 public class SafeArray {
 
-	public SafeArray(int i, int length) {
-		// TODO Auto-generated constructor stub
-	}
+	private byte[] arrby;
+
+	public SafeArray(int i, int length) {}
 
 	public void fromByteArray(byte[] arrby) {
-		// TODO Auto-generated method stub
-		
+		this.arrby = arrby;
 	}
 
 	public byte[] toByteArray() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.arrby;
 	}
-
 }
