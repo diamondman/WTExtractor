@@ -72,18 +72,19 @@ double WTFile::readDouble(){
   throw std::runtime_error("unimplemented");
 }
 
+std::string readLine_strres;
 const char* WTFile::readLine(){
-  APILOG;
-  std::string res = "";
+  //APILOG;
+  readLine_strres = "";
   unsigned char c;
   while(!this->eof()) {
     c = this->readByte();
     if (c == '\r') continue;
-    res += c;
+    readLine_strres += c;
     if (c == '\n') break;
   }
-  //std::cout << "LINE: '''" << res << "'''" << std::endl;
-  return res.c_str();
+  std::cout << "LINE: '''" << readLine_strres << "'''" << std::endl;
+  return readLine_strres.c_str();
 }
 
 //[id(0x00002b00), hidden]
@@ -150,12 +151,13 @@ int WTFile::setEndian(int endian){
 }
 
 //TODO make this more efficient, also check the results.
+std::string readString_strres;
 const char* WTFile::readString(int length){
   APILOG;
   length = (length > -1) ? length : this->length() - wtbuff_offset;
-  std::string res = "";
+  readString_strres = "";
   while (!this->eof() && length--)
-    res += this->readByte();
-  //std::cout << "LINE: '''" << res << "'''" << std::endl;
-  return res.c_str();
+    readString_strres += this->readByte();
+  //std::cout << "LINE: '''" << readString_strres << "'''" << std::endl;
+  return readString_strres.c_str();
 }

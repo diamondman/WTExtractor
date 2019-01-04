@@ -39,7 +39,7 @@ VARIANT WTObject::getUserData(){
 
 void WTObject::setUserData(VARIANT User_Data){
   APILOG;
-  this->userdata = User_Data;
+  //this->userdata = User_Data;
 }
 
 bool WTObject::isValid(){

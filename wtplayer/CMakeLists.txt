@@ -384,9 +384,16 @@ add_jar(rt_js
 
 ############################
 
-set(CMAKE_JAVA_INCLUDE_PATH
-  ${CMAKE_CURRENT_BINARY_DIR}/com_ms.jar:${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar:${CMAKE_CURRENT_BINARY_DIR}/rt.jar:${CMAKE_CURRENT_BINARY_DIR}/rt_js.jar)
-add_jar(WTPlayerMain WTPlayerMain.java)
+add_jar(WTPlayerMain
+  SOURCES
+    WTPlayerMain.java
+  INCLUDE_JARS
+    ${CMAKE_CURRENT_BINARY_DIR}/com_ms.jar
+    ${CMAKE_CURRENT_BINARY_DIR}/wildtangent.jar
+    ${CMAKE_CURRENT_BINARY_DIR}/rt.jar
+    ${CMAKE_CURRENT_BINARY_DIR}/rt_js.jar
+  )
+
 add_dependencies(WTPlayerMain wildtangent rt com_ms rt_js)
 
 ############################

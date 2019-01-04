@@ -18,6 +18,10 @@ if [[ $* == *-v* ]]
 then
     VERBOSEFLAGS="-verbose:class"
 fi
+if [[ $* == *-d* ]]
+then
+    DEBUGFLAGS="-agentlib:jdwp=transport=dt_socket,server=y,address=8000"
+fi
 
 GAME_BASE_PATH="/home/diamondman/.wine/drive_c/Program Files (x86)/WildTangent/Apps/GameChannel/Games/02554DAA-470F-40BC-BF60-675C5BD9920F"
 LOCALVER_PATH="${GAME_BASE_PATH}/localver"
@@ -63,4 +67,5 @@ ${java_cmd} \
    -Xbootclasspath/a:"$DIR/com_ms.jar" \
    -cp "${GAME_BASE_PATH}/wtgutils.jar":"$DIR/wildtangent.jar":"$DIR/WTPlayerMain.jar":"${GAME_BIN_PATH}" \
    ${java_params} \
+   ${DEBUGFLAGS} \
    WTPlayerMain "${LOCALVER_PATH}"
