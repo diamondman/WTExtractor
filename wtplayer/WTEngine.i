@@ -1,4 +1,5 @@
 %module(directors="1") WTEngine
+%include "typemaps.i"
 %{
 #include "basetypes.hpp"
 #include "InternalCallbackWrapper.hpp"
@@ -162,6 +163,24 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %include "src/WTEvent.hpp"
 
 %ignore WTFile::WTFile;
+/////////////////////////////////////////////////////////////
+%typemap(jtype) bool readAll "byte[]"
+%typemap(jstype) bool readAll "byte[]"
+%typemap(jni) bool readAll "jbyteArray"
+%typemap(javaout) bool readAll { for (StackTraceElement ste : Thread.currentThread().getStackTrace()) System.out.println("    " + ste); return $jnicall; /*typemap(javaout)*/ }
+%typemap(in, numinputs=0) signed char ** arrReadAllOut (signed char * temp) "$1=&temp;"
+%typemap(in, numinputs=0) int * lReadAllOut (int l) "$1=&l; /*typemap(in, numinputs=0) int* */"
+%typemap(argout) (signed char ** arrReadAllOut, int * lReadAllOut) {
+    $result = JCALL1(NewByteArray, jenv, *$2);
+    JCALL4(SetByteArrayRegion, jenv, $result, 0, *$2, (const jbyte*) *$1);
+    //delete[] $1;
+}
+%typemap(out) bool readAll {
+    if (!$1) {
+        return NULL;
+    }
+}
+/////////////////////////////////////////////////////////////
 %include "src/WTFile.hpp"
 
 %ignore WTFont::WTFont;

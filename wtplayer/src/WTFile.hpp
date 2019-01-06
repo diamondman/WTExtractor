@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "basetypes.hpp"
 
 #include "WTObject.hpp"
@@ -23,7 +25,8 @@ public:
       WTFILE;
   }
 
-  VARIANT readAll();
+  bool readAll(signed char ** arrReadAllOut, int * lReadAllOut);
+  //VARIANT readAll();
 
   unsigned char readByte();
 
@@ -67,4 +70,5 @@ private:
   int cacheType;
   int endian;
   size_t wtbuff_offset = 0;
+  std::string full_fname;
 };

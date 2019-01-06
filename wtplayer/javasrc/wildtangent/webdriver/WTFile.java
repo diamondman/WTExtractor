@@ -16,7 +16,7 @@ extends WTObject {
 
     public double readDouble();
 
-    //public byte[] readAll();
+    public byte[] readAll();
 
     public boolean eof();
 
@@ -38,4 +38,3 @@ extends WTObject {
 
     public int move(int var1);
 }
-

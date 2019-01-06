@@ -1,4 +1,5 @@
 #include <string>
+#include <cstring>
 #include <dataaccessors.h>
 #include <wld3_extract.h>
 
@@ -12,7 +13,7 @@ WTFile::WTFile(WT* wt_,
   WTObject(wt_), wld3(0), cacheType(WTCache_Type), endian(endian) {
   APILOG;
 
-  std::string full_fname = std::string(this->wt->getFilesPath()) + "/" + File_Name;
+  full_fname = std::string(this->wt->getFilesPath()) + "/" + File_Name;
   std::cout << "opening file: \"" << full_fname << "\"" << std::endl;
 
   DataAccessor* acc = openFileAccessor(full_fname.c_str());
@@ -37,9 +38,19 @@ WTFile::~WTFile(){
     wld3_free(this->wld3);
 }
 
-VARIANT WTFile::readAll(){
+bool WTFile::readAll(signed char** result, int* len) {
   APILOG;
-  throw std::runtime_error("unimplemented");
+  std::cout << "    file: " << full_fname << std::endl;
+  if(!this->wld3 || result == NULL || len == NULL) return 0;
+  *len = this->wld3->payload_len - this->wtbuff_offset;
+  std::cout << "  Reading from: " << wtbuff_offset << "; len: " << *len << std::endl;
+
+  if(*len < 0) return false;
+
+  *result = new signed char[*len];
+  std::memcpy(*result, &this->wld3->payload_data[wtbuff_offset], *len);
+  wtbuff_offset += *len;
+  return true;
 }
 
 unsigned char WTFile::readByte(){
