@@ -162,6 +162,14 @@ JAVA_ARRAYS_TYPEMAPS(uint8_t, byte, jbyte, UInt8, "[S") /* uint8_t[ANY] */
 %ignore KEY_PRESS;
 %include "src/WTEvent.hpp"
 
+%ignore WTFILE_STATUS_OK;
+%ignore WTFILE_STATUS_NOSUCHFILE;
+%ignore WTFILE_STATUS_EOF;
+%ignore WTFILE_STATUS_FORBIDDEN;
+%ignore WTFILE_STATUS_NOTOPENED;
+%ignore WTBYTECONVENTION_BIG;
+%ignore WTBYTECONVENTION_HOST;
+%ignore WTBYTECONVENTION_LITTLE;
 %ignore WTFile::WTFile;
 /////////////////////////////////////////////////////////////
 %typemap(jtype) bool readAll "byte[]"
