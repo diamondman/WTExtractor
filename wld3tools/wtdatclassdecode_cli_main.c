@@ -44,6 +44,6 @@ int main(int argc, char* argv[]){
 
  FINISH:
   if(dshfl) DSHFL_free(dshfl);
-  if(acc) freeFileAccessor(acc);
+  if(acc) acc->free(acc);
   return ret;
 }

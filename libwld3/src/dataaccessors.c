@@ -49,7 +49,7 @@ static int da_buff_strstrpos(DataAccessor* da, uint8_t* str){
   return firstchar-da->dat.buff-da->offset;
 }
 
-void freeBufferAccessor(DataAccessor* da){
+static void da_buff_free(DataAccessor* da){
   free(da);
 }
 
@@ -66,6 +66,7 @@ DataAccessor* openBufferAccessor(const uint8_t* buffer, size_t len){
   acc->memcmp = da_buff_memcmp;
   acc->strchrpos = da_buff_strchrpos;
   acc->strstrpos = da_buff_strstrpos;
+  acc->free = da_buff_free;
 
   return acc;
 }
@@ -151,6 +152,14 @@ static int da_file_strstrpos(DataAccessor* da, uint8_t* str){
   return -1;
 }
 
+static void da_file_free(DataAccessor* da){
+  if(da == NULL) return;
+  printf("ABOUT TO CLOSE FILE!\n");
+  if(da->dat.file) fclose(da->dat.file);
+  printf("FILE CLOSED!\n");
+  free(da);
+}
+
 DataAccessor* openFileAccessor(const char *filename){
   FILE *f = fopen(filename, "rb");
   if(f == NULL) return NULL;
@@ -170,12 +179,7 @@ DataAccessor* openFileAccessor(const char *filename){
   acc->memcmp = da_file_memcmp;
   acc->strchrpos = da_file_strchrpos;
   acc->strstrpos = da_file_strstrpos;
+  acc->free = da_file_free;
 
   return acc;
-}
-
-void freeFileAccessor(DataAccessor* da){
-  if(da == NULL) return;
-  if(da->dat.file) fclose(da->dat.file);
-  free(da);
 }

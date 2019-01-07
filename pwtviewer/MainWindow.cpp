@@ -29,7 +29,7 @@ MainWindow::MainWindow(const QString& modelFilePath)
 
   if(modelFileInfo.completeSuffix().toLower() == "wt") {
     wt = wld3_extract(acc);
-    freeFileAccessor(acc);
+    acc->free(acc);
     acc = openBufferAccessor(wt->payload_data, wt->payload_len);
 
     setWTMetaLabel(wt);
@@ -47,10 +47,10 @@ MainWindow::MainWindow(const QString& modelFilePath)
   ui->ogrePane->setModel(pwt);
 
   if(wt) {
-    freeBufferAccessor(acc);
+    acc->free(acc);
     wld3_free(wt);
   } else {
-    freeFileAccessor(acc);
+    acc->free(acc);
   }
 }
 

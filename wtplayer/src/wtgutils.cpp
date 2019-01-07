@@ -54,7 +54,7 @@ JNIEXPORT jobject JNICALL Java_wtgutils_com_Loader_loadClass
 
   std::experimental::filesystem::path fullpath = loaderpath / path_in;
   std::shared_ptr<DataAccessor> acc(openFileAccessor(fullpath.c_str()),
-                                    freeFileAccessor);
+                                    [](DataAccessor* a){if(a)a->free(a);});
   if(acc == NULL) {
     throwNoSuchFileException(env, fullpath.c_str());
     return 0;

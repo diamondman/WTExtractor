@@ -75,13 +75,12 @@ WTBitmap::WTBitmap(WT* wt_,
                    int WTCache_Type) :
   WTObject(wt_),
   width(100), height(100){
-
   std::string full_fname = std::string(this->wt->getFilesPath()) + "/" + File_Name;
   std::cout << "opening file: \"" << full_fname << "\"" << std::endl;
 
   std::shared_ptr<DataAccessor> acc = std::shared_ptr<DataAccessor>
     (openFileAccessor(full_fname.c_str()),
-     freeFileAccessor);
+     [](DataAccessor* acc){if(acc) acc->free(acc);});
   if(acc == nullptr){
     printf("Failed to create accessor for WTBitmap (%s)!\n\n", full_fname.c_str());
     throw std::runtime_error("Could not create Accessor for WTBitmap.");

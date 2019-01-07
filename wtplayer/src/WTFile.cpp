@@ -10,77 +10,150 @@ WTFile::WTFile(WT* wt_,
                const char* File_Name,
                int WTCache_Type,
                int endian) :
-  WTObject(wt_), wld3(0), cacheType(WTCache_Type), endian(endian) {
+  WTObject(wt_), acc(0), _wld3(0), cacheType(WTCache_Type), endian(endian) {
   APILOG;
 
   full_fname = std::string(this->wt->getFilesPath()) + "/" + File_Name;
   std::cout << "opening file: \"" << full_fname << "\"" << std::endl;
 
-  DataAccessor* acc = openFileAccessor(full_fname.c_str());
-  if(!acc){
+  this->acc = openFileAccessor(full_fname.c_str());
+  if(this->acc == 0){
     printf("Failed to create accessor for WTFile!\n\n");
+    this->status_ = WTFILE_STATUS_NOSUCHFILE;
     return;
   }
-  this->wld3 = wld3_extract(acc);
+  if(wld3_check_magic(acc)) {
+    printf("  File is WT compressed, decompressing.\n");
+    this->_wld3 = wld3_extract(this->acc);
+    if(this->_wld3 > 0) {
+      wld3_print(this->_wld3);
+      this->acc->free(this->acc);
+      this->acc = 0;
+      this->acc = openBufferAccessor(this->_wld3->payload_data,
+                                     this->_wld3->payload_len);
+      if(!this->acc){
+        printf("Failed to create accessor for decoded WTFile!\n\n");
+        this->status_ = WTFILE_STATUS_NOTOPENED;
+        return;
+      }
+    } else {
+      printf("WTFile::WTFile NOT VALID! NOT HANDLED!\n");
+      this->status_ = WTFILE_STATUS_NOTOPENED;
+      return;
+    }
+  } else {
+    printf("  File is not compressed in WT format.\n");
+  }
 
-  if(this->wld3>0)
-    wld3_print(this->wld3);
-  else
-    printf("ERROR! DONE!\n");
-
-  printf("MADE THE ACC %p\n\n", acc);
-  freeFileAccessor(acc);
+  this->status_ = WTFILE_STATUS_OK;
 }
 
 WTFile::~WTFile(){
   APILOG;
-  if(this->wld3)
-    wld3_free(this->wld3);
+  if(this->acc)
+    this->acc->free(this->acc);
+  if(this->_wld3)
+    wld3_free(this->_wld3);
+}
+
+size_t WTFile::remaining() {
+  if(!this->acc) throw std::runtime_error("acc is null!");
+  return this->acc->remaining(this->acc);
+}
+
+size_t WTFile::__read(void *buffer, size_t bytes) {
+  if(!this->acc) throw std::runtime_error("acc is null!");
+  return this->acc->read(this->acc, buffer, bytes);
+}
+
+//[id(0x00002b04), hidden]
+int WTFile::length(){
+  //APILOG;
+  if(!this->acc) throw std::runtime_error("acc is null!");
+  return this->acc->length;
 }
 
 bool WTFile::readAll(signed char** result, int* len) {
   APILOG;
   std::cout << "    file: " << full_fname << std::endl;
-  if(!this->wld3 || result == NULL || len == NULL) return 0;
-  *len = this->wld3->payload_len - this->wtbuff_offset;
-  std::cout << "  Reading from: " << wtbuff_offset << "; len: " << *len << std::endl;
+  if(result == NULL || len == NULL) return 0;
+  *len = this->remaining();
+  //std::cout << "  Reading from: " << wtbuff_offset << "; len: "
+  //          << *len << std::endl;
 
   if(*len < 0) return false;
 
   *result = new signed char[*len];
-  std::memcpy(*result, &this->wld3->payload_data[wtbuff_offset], *len);
-  wtbuff_offset += *len;
+  this->__read(*result, *len);
   return true;
 }
 
 unsigned char WTFile::readByte(){
   //APILOG;
-  if(!this->wld3)
-    return 0;
-  if(this->wtbuff_offset >= this->wld3->payload_len) return 0;
-  //std::cout << "  DATA = '" << this->wld3->payload_data[wtbuff_offset] << "'; " <<
-  //  "OFFSET = " << this->wtbuff_offset << std::endl;
-  return this->wld3->payload_data[wtbuff_offset++];
+  unsigned char res;
+  this->__read(&res, 1);
+  //std::cout << "  BYTE: " << res << std::endl;
+  return res;
 }
 
 int WTFile::readInt(){
   APILOG;
-  throw std::runtime_error("unimplemented");
+  int res;
+  this->__read(&res, sizeof(int));
+
+  switch(this->endian) {
+  case WTBYTECONVENTION_BIG:
+    return be32toh(res);
+  case WTBYTECONVENTION_LITTLE:
+    return le32toh(res);
+  default: //WTBYTECONVENTION_HOST:
+    return res;
+  }
 }
 
 float WTFile::readFloat(){
   APILOG;
-  throw std::runtime_error("unimplemented");
+  float res;
+  this->__read(&res, sizeof(float));
+
+  switch(this->endian) {
+  case WTBYTECONVENTION_BIG:
+    return be32toh(res);
+  case WTBYTECONVENTION_LITTLE:
+    return le32toh(res);
+  default: //WTBYTECONVENTION_HOST:
+    return res;
+  }
 }
 
 short WTFile::readShort(){
   APILOG;
-  throw std::runtime_error("unimplemented");
+  short res;
+  this->__read(&res, sizeof(short));
+
+  switch(this->endian) {
+  case WTBYTECONVENTION_BIG:
+    return be32toh(res);
+  case WTBYTECONVENTION_LITTLE:
+    return le32toh(res);
+  default: //WTBYTECONVENTION_HOST:
+    return res;
+  }
 }
 
 double WTFile::readDouble(){
   APILOG;
-  throw std::runtime_error("unimplemented");
+  double res;
+  this->__read(&res, sizeof(double));
+
+  switch(this->endian) {
+  case WTBYTECONVENTION_BIG:
+    return be32toh(res);
+  case WTBYTECONVENTION_LITTLE:
+    return le32toh(res);
+  default: //WTBYTECONVENTION_HOST:
+    return res;
+  }
 }
 
 std::string readLine_strres;
@@ -94,7 +167,7 @@ const char* WTFile::readLine(){
     readLine_strres += c;
     if (c == '\n') break;
   }
-  std::cout << "LINE: '''" << readLine_strres << "'''" << std::endl;
+  //std::cout << "LINE: '''" << readLine_strres << "'''" << std::endl;
   return readLine_strres.c_str();
 }
 
@@ -117,39 +190,19 @@ int WTFile::move(int by){
 
 bool WTFile::eof(){
   //APILOG;
-  if(!this->wld3){
-    //std::cout << "  EOF = TRUE (no wld3)" << std::endl;
-    return true;
-  }
-  if(this->wtbuff_offset >= this->wld3->payload_len){
-    //std::cout << "  EOF = TRUE" << std::endl;
-    return true;
-  }
-  //std::cout << "  EOF = FALSE" << std::endl;
-  return false;
-     //return this->wtbuff_offset >= this->wld3->payload_len;
-}
-
-//[id(0x00002b04), hidden]
-int WTFile::length(){
-  APILOG;
-  if(!this->wld3)
-    return 0;
-  return this->wld3->payload_len;
+  return this->remaining() <= 0;
 }
 
 int WTFile::status(){
   APILOG;
-  if(!this->wld3){
-    return -6; //No such file.
-    std::cout << "  STATUS = NO FILE" << std::endl;
+  if(this->status_ != WTFILE_STATUS_OK) {
+    std::cout << "  STATUS = " << this->status_ << std::endl;
+    return this->status_;
   }
   if(this->eof()){
-    return -9; //EOF.
+    return WTFILE_STATUS_EOF;
     std::cout << "  STATUS = EOF" << std::endl;
   }
-  //return -10; //Forbidden.
-  //return -11; //Not Opened. (File is loading or something)
   std::cout << "  STATUS = ALL OK!" << std::endl;
   return 0; //No Errors
 }
@@ -165,7 +218,7 @@ int WTFile::setEndian(int endian){
 std::string readString_strres;
 const char* WTFile::readString(int length){
   APILOG;
-  length = (length > -1) ? length : this->length() - wtbuff_offset;
+  length = (length > -1) ? length : this->remaining();
   readString_strres = "";
   while (!this->eof() && length--)
     readString_strres += this->readByte();

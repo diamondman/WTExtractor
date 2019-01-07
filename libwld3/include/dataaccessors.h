@@ -18,6 +18,7 @@ typedef struct DataAccessor {
   int (*memcmp)(struct DataAccessor*, const uint8_t* buff, size_t bytes);
   int (*strchrpos)(struct DataAccessor*, uint8_t chr);
   int (*strstrpos)(struct DataAccessor*, uint8_t* str);
+  void (*free)(struct DataAccessor*);
 
   uint8_t type;
   size_t length;
@@ -29,10 +30,7 @@ typedef struct DataAccessor {
 } DataAccessor;
 
 DataAccessor* openBufferAccessor(const uint8_t* buffer, size_t len);
-void freeBufferAccessor(DataAccessor* da);
-
 DataAccessor* openFileAccessor(const char *filename);
-void freeFileAccessor(DataAccessor* da);
 
 #endif
 

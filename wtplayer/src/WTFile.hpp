@@ -37,7 +37,6 @@ public:
   }
 
   bool readAll(signed char ** arrReadAllOut, int * lReadAllOut);
-  //VARIANT readAll();
 
   unsigned char readByte();
 
@@ -77,9 +76,13 @@ public:
   const char* readString(int length = -1);
 
 private:
-  WLD3* wld3;
+  size_t __read(void *buffer, size_t bytes);
+  size_t remaining();
+
+  DataAccessor* acc;
+  WLD3* _wld3;
   int cacheType;
   int endian;
-  size_t wtbuff_offset = 0;
   std::string full_fname;
+  int status_;
 };

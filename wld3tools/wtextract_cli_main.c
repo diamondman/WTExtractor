@@ -18,7 +18,7 @@ int main(int args, char** argv){
   }else
     fprintf(stderr, "ERROR! DONE!\n");
 
-  if(acc) freeFileAccessor(acc);
+  if(acc) acc->free(acc);
 
   return 0;
 }

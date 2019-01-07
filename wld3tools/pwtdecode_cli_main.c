@@ -20,7 +20,7 @@ int main(int args, char** argv){
 
   if(acc){
     fprintf(stderr, "OFFSET: %zu; Len %zu\n", ftell(acc->dat.file), acc->length);
-    freeFileAccessor(acc);
+    acc->free(acc);
   }
 
   return 0;
