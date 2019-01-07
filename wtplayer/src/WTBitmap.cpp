@@ -90,7 +90,7 @@ WTBitmap::WTBitmap(WT* wt_,
 
   std::shared_ptr<WLD3> wld3 = std::shared_ptr<WLD3>(wld3_extract(acc.get()),
                                                      wld3_free);
-  if(wld3 == nullptr) {
+  if(wld3.get() <= 0) { // TODO: this is not terribly elegant.
     printf( "Cairo Surface could not be created!\n" );
     throw std::runtime_error("Could not create Cairo Surface.");
   }

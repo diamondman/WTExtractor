@@ -23,7 +23,7 @@ WTFile::WTFile(WT* wt_,
   }
   this->wld3 = wld3_extract(acc);
 
-  if(this->wld3)
+  if(this->wld3>0)
     wld3_print(this->wld3);
   else
     printf("ERROR! DONE!\n");
