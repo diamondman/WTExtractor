@@ -12,7 +12,7 @@ int main(int args, char** argv){
   DataAccessor* acc = openFileAccessor(argv[1]);
   WLD3* wt = wld3_extract(acc);
 
-  if(wt){
+  if(wt>0){
     wld3_print(wt);
     wld3_free(wt);
   }else

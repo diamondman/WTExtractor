@@ -348,8 +348,14 @@ static void wt_cab_extract(WLD3* wt){
   free_filename(mem_cab_in);
 }
 
+bool wld3_check_magic(DataAccessor* acc) {
+  if(acc == NULL) return false;
+  bool iscorrect = (acc->memcmp(acc, "WLD3", 4) == 0);
+  acc->seek(acc, -4);
+  return iscorrect;
+}
+
 WLD3* wld3_extract(DataAccessor* acc){
-  //Reader *f = readerCreate(fbuff, fsize);
   uint8_t headerlens[9];
   uint8_t* rawheaders[9];
   struct tm tm;
@@ -569,6 +575,7 @@ WLD3* wld3_extract(DataAccessor* acc){
 
  FAIL:
   if(wt){wld3_free(wt); wt=NULL;}
+  wt = (WLD3*)WLD3STATUS_INVFORMAT;
   goto CLEANUP;
 }
 

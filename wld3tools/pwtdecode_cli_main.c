@@ -12,7 +12,7 @@ int main(int args, char** argv){
   DataAccessor* acc = openFileAccessor(argv[1]);
   PWT* pwt = pwt_extract(acc);
 
-  if(pwt){
+  if(pwt>0){
     pwt_print(pwt);
     pwt_free(pwt);
   }else

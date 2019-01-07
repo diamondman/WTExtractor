@@ -23,6 +23,7 @@ static size_t da_buff_read(DataAccessor* da, void *buffer, size_t bytes){
 }
 
 static int da_buff_seek(DataAccessor* da, off_t offset){
+  if(offset > (off_t)(da->length-da->offset))
   if(offset > da->length-da->offset) return -1;
   da->offset += offset;
   return 0;
@@ -92,7 +93,7 @@ static size_t da_file_read(DataAccessor* da, void *buffer, size_t bytes){
 }
 
 static int da_file_seek(DataAccessor* da, off_t offset){
-  if(offset > da->length-da->offset) return -1;
+  if(offset > (off_t)(da->length-da->offset)) return -1;
   int res = fseek(da->dat.file, offset, SEEK_CUR);
   if(res == 0){
     da->offset += offset;

@@ -21,7 +21,12 @@ enum resource_class{
 #define MAX_EXT_LEN 3
 #define EXT_BUFF_LEN (MAX_EXT_LEN+1)
 
+#define WLD3STATUS_ALLOCERR  ( 0)
+#define WLD3STATUS_INVFORMAT (-1)
+
 typedef struct WLD3 WLD3;
+
+bool wld3_check_magic(DataAccessor*);
 
 WLD3* wld3_extract(DataAccessor*);
 
