@@ -94,8 +94,10 @@ static size_t da_file_read(DataAccessor* da, void *buffer, size_t bytes){
 }
 
 static int da_file_seek(DataAccessor* da, off_t offset){
+  printf("SEEK FROM %d\n", ftell(da->dat.file));
   if(offset > (off_t)(da->length-da->offset)) return -1;
   int res = fseek(da->dat.file, offset, SEEK_CUR);
+  printf("SEEK TO %d\n", ftell(da->dat.file));
   if(res == 0){
     da->offset += offset;
     return 0;
@@ -107,12 +109,15 @@ static int da_file_seek(DataAccessor* da, off_t offset){
 static int da_file_memcmp(DataAccessor* da, const uint8_t* buff, size_t bytes){
   if(bytes > da->length - da->offset) return 1;
   uint8_t byte;
+  int ret = 0;
   for(int i = 0; i < bytes; i++){
     if(fread(&byte, 1, 1, da->dat.file) != 1) return 1;
-    if(byte != buff[i]) return 1;
+    if(ret == 0)
+      if(byte != buff[i])
+        ret = 1;
   }
   da->offset += bytes;
-  return 0;
+  return ret;
 }
 
 static int da_file_strchrpos(DataAccessor* da, uint8_t chr){
