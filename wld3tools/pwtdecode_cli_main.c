@@ -19,7 +19,7 @@ int main(int args, char** argv){
     fprintf(stderr, "ERROR! DONE!\n");
 
   if(acc){
-    fprintf(stderr, "OFFSET: %zu; Len %zu\n", ftell(acc->dat.file), acc->length);
+    fprintf(stderr, "OFFSET: %zu; Len %zu\n", acc->tell(acc), acc->length);
     acc->free(acc);
   }
 

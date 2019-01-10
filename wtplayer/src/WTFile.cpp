@@ -1,3 +1,7 @@
+//#include <iostream>
+//#include <iomanip>
+#include <stdio.h>
+
 #include <string>
 #include <cstring>
 #include <dataaccessors.h>
@@ -22,7 +26,10 @@ WTFile::WTFile(WT* wt_,
     this->status_ = WTFILE_STATUS_NOSUCHFILE;
     return;
   }
-  if(wld3_check_magic(acc)) {
+  int curr_offset = acc->tell(acc);
+  bool is_wld3_compressed = wld3_check_magic(acc);
+  acc->seek(acc, curr_offset, SEEK_SET); // Rewind the file
+  if(is_wld3_compressed) {
     printf("  File is WT compressed, decompressing.\n");
     this->_wld3 = wld3_extract(this->acc);
     if(this->_wld3 > 0) {
@@ -42,7 +49,7 @@ WTFile::WTFile(WT* wt_,
       return;
     }
   } else {
-    printf("  File is not compressed in WT format.\n");
+    printf("  File is not compressed in WT format. Rewound to %d\n", acc->tell(acc));
   }
 
   this->status_ = WTFILE_STATUS_OK;
@@ -66,11 +73,10 @@ size_t WTFile::__read(void *buffer, size_t bytes) {
   return this->acc->read(this->acc, buffer, bytes);
 }
 
-//[id(0x00002b04), hidden]
 int WTFile::length(){
   //APILOG;
   if(!this->acc) throw std::runtime_error("acc is null!");
-  return this->acc->length;
+  return this->acc->length(this->acc);
 }
 
 bool WTFile::readAll(signed char** result, int* len) {
@@ -78,8 +84,8 @@ bool WTFile::readAll(signed char** result, int* len) {
   std::cout << "    file: " << full_fname << std::endl;
   if(result == NULL || len == NULL) return 0;
   *len = this->remaining();
-  //std::cout << "  Reading from: " << wtbuff_offset << "; len: "
-  //          << *len << std::endl;
+  std::cout << "  Reading from: " << this->acc->tell(this->acc) << "; len: "
+            << *len << std::endl;
 
   if(*len < 0) return false;
 

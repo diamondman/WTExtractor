@@ -11,22 +11,18 @@ extern "C" {
 #include <stdlib.h>
 #include <stdio.h>
 
+// Seek origin is one of {SEEK_SET, SEEK_CUR, SEEK_END}.
+
 typedef struct DataAccessor {
+  size_t (*length)(struct DataAccessor*);
   size_t (*remaining)(struct DataAccessor*);
   size_t (*read)(struct DataAccessor*, void *buffer, size_t bytes);
-  int (*seek)(struct DataAccessor*, off_t offset);
+  int (*seek)(struct DataAccessor*, off_t offset, int origin);
+  int (*tell)(struct DataAccessor*);
   int (*memcmp)(struct DataAccessor*, const uint8_t* buff, size_t bytes);
   int (*strchrpos)(struct DataAccessor*, uint8_t chr);
   int (*strstrpos)(struct DataAccessor*, uint8_t* str);
   void (*free)(struct DataAccessor*);
-
-  uint8_t type;
-  size_t length;
-  size_t offset;
-  union {
-    const uint8_t* buff;
-    FILE* file;
-  } dat;
 } DataAccessor;
 
 DataAccessor* openBufferAccessor(const uint8_t* buffer, size_t len);

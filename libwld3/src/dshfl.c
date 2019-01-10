@@ -53,7 +53,7 @@ void DSHFL_free(DSHFL* dshfl) {
 }
 
 static size_t DSHFL_offset(DSHFL* dshfl) {
-  return dshfl->acc->offset - 4;
+  return dshfl->acc->tell(dshfl->acc) - 4;
 }
 
 size_t DSHFL_decodeNextChunk(DSHFL* dshfl, DSHFL_DecodedChunk* out) {

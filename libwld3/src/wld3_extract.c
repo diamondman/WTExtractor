@@ -350,9 +350,7 @@ static void wt_cab_extract(WLD3* wt){
 
 bool wld3_check_magic(DataAccessor* acc) {
   if(acc == NULL) return false;
-  bool iscorrect = (acc->memcmp(acc, "WLD3", 4) == 0);
-  acc->seek(acc, -4);
-  return iscorrect;
+  return (acc->memcmp(acc, "WLD3", 4) == 0);
 }
 
 WLD3* wld3_extract(DataAccessor* acc){
@@ -393,7 +391,7 @@ WLD3* wld3_extract(DataAccessor* acc){
   }
 
   acc->read(acc, wt->outext, typelen);
-  acc->seek(acc, 1); //Ignore Space
+  acc->seek(acc, 1, SEEK_CUR); //Ignore Space
 
   if(acc->memcmp(acc, WT_HEADER_STR, sizeof(WT_HEADER_STR)-1) != 0){
     printf("Invalid format: Incorrect Magic line. Unknown format.\n");
@@ -403,7 +401,7 @@ WLD3* wld3_extract(DataAccessor* acc){
 
   //Skip Text Header Create Time. It is unnecessary
   uint32_t offset = acc->strchrpos(acc, '\n');
-  acc->seek(acc, offset);
+  acc->seek(acc, offset, SEEK_CUR);
 
   if(acc->memcmp(acc, "\n\r\n", 3) != 0){
     printf("Format Incorrect: Expected newline after date string \n");
@@ -422,7 +420,7 @@ WLD3* wld3_extract(DataAccessor* acc){
   }else
     wt->comment = NULL;
 
-  acc->seek(acc, 9); //Consume "\r\n.START\n"
+  acc->seek(acc, 9, SEEK_CUR); //Consume "\r\n.START\n"
 
   /////////////// Being Encoded Headers
   uint8_t headercount;
@@ -567,6 +565,8 @@ WLD3* wld3_extract(DataAccessor* acc){
   if(strcmp(wt->outext, "cab")==0 || strcmp(wt->outext, "tmp")==0)
     wt_detect_payload_type(wt);
 
+  printf("wld3 created: %p\n", wt);
+
  CLEANUP:
   for(int i = 0; i<sizeof(rawheaders)/sizeof(uint8_t*); i++)
     if(rawheaders[i]){free(rawheaders[i]);rawheaders[i]=0;}
@@ -582,6 +582,7 @@ WLD3* wld3_extract(DataAccessor* acc){
 void wld3_print(WLD3* wt){
   char uuid_str[37];
   struct tm* timeinfo;
+  printf("Calling wld3_print: %p\n", wt);
 
   printf("Copyright:     %s\n", wt->copyright);
 
